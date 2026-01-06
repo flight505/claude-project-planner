@@ -1,564 +1,346 @@
-# Claude Scientific Writer
+# Claude Project Planner
 
-[![PyPI version](https://img.shields.io/pypi/v/scientific-writer.svg)](https://pypi.org/project/scientific-writer/)
-[![Total Downloads](https://static.pepy.tech/badge/scientific-writer)](https://pepy.tech/project/scientific-writer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> 🚀 **Looking for more advanced capabilities?** For end-to-end scientiic writing, deep scientfic search, advanced image generation and enterprise solutions, visit **[www.k-dense.ai](https://www.k-dense.ai)**
+**An AI-powered project planning toolkit** that combines deep research with comprehensive software architecture design. Generate complete project specifications, architecture documents, sprint plans, building blocks, cost analyses, and implementation roadmaps—all backed by real-time research and verified data.
 
-**A deep research and writing tool** that combines the power of AI-driven deep research with well-formatted written outputs. Generate publication-ready scientific papers, reports, posters, grant proposals, literature reviews, and more academic documents—all backed by real-time literature search and verified citations.
+Project Planner breaks down complex software projects into Claude Code-buildable components, enabling incremental delivery with clear specifications and acceptance criteria.
 
-Scientific Writer performs comprehensive research before writing, ensuring every claim is supported by real, verifiable sources. Features include real-time research lookup via Perplexity Sonar Pro Search, intelligent paper detection, comprehensive document conversion, and AI-powered diagram generation with Nano Banana Pro. You have the option of using it as a claude code plugin, python package or a native CLI
+## Key Features
+
+### 📋 Project Planning
+- **Building Blocks** - Decompose projects into discrete, buildable components
+- **Sprint Planning** - User stories with INVEST criteria and capacity management
+- **Architecture Design** - C4 model diagrams, ADRs, technology research
+- **Implementation Roadmaps** - Milestones, dependencies, critical path
+
+### 💰 Cost & Risk Analysis
+- **Service Cost Estimation** - AWS, GCP, Azure pricing with ROI projections
+- **Risk Assessment** - Risk registers with scoring and mitigation strategies
+- **Feasibility Analysis** - Technical, resource, and market viability
+
+### 🔍 Research-Backed
+- **Technology Research** - Stack comparisons with real benchmarks
+- **Competitive Analysis** - Market positioning and differentiation
+- **AI-Powered Diagrams** - C4, sequence, ERD, deployment diagrams via Nano Banana Pro
 
 ## Quick Start
 
 ### Prerequisites
 - Python 3.10-3.12
-- ANTHROPIC_API_KEY (required), OPENROUTER_API_KEY (optional for research lookup)
+- `ANTHROPIC_API_KEY` (required)
+- `OPENROUTER_API_KEY` (optional, for research-lookup and diagrams)
 
-### Installation Options
+### Installation
 
 #### Option 1: Claude Code Plugin (Recommended) ⭐
-The easiest way to use Scientific Writer is as a Claude Code plugin. See the [Plugin Installation](#-use-as-a-claude-code-plugin-recommended) section above.
 
-#### Option 2: Install from PyPI (CLI/API Usage)
 ```bash
-pip install scientific-writer
+# Add the plugin marketplace
+/plugin marketplace add https://github.com/flight505/claude-project-planner
+
+# Install the plugin
+/plugin install claude-project-planner
+
+# Restart Claude Code when prompted
 ```
 
-#### Option 3: Install from source with uv
+#### Option 2: Install from PyPI
+
 ```bash
-git clone https://github.com/K-Dense-AI/claude-scientific-writer.git
-cd claude-scientific-writer
+pip install project-planner
+```
+
+#### Option 3: Install from source
+
+```bash
+git clone https://github.com/flight505/claude-project-planner.git
+cd claude-project-planner
 uv sync
 ```
 
-### Configure API keys
+### Configure API Keys
+
 ```bash
 # .env file (recommended)
 echo "ANTHROPIC_API_KEY=your_key" > .env
 echo "OPENROUTER_API_KEY=your_openrouter_key" >> .env
+
 # or export in your shell
 export ANTHROPIC_API_KEY='your_key'
 ```
 
-### Usage Options
+## Usage
 
-#### Use as Plugin (Recommended)
-After installing the plugin and running `/scientific-writer:init`, simply ask Claude:
+### Plugin Usage (Recommended)
+
+After installing the plugin, simply ask Claude:
+
 ```bash
-> Create a Nature paper on CRISPR gene editing. Present experimental_data.csv 
-  (efficiency across 5 cell lines), include Western_blot.png and flow_cytometry.png 
-  showing 87% editing efficiency (p<0.001). Compare with literature benchmarks.
+# Full project planning
+> Plan a B2B SaaS inventory management system with multi-tenant architecture,
+  PostgreSQL database, React frontend, and deployment on AWS.
 
-> Generate an NSF grant proposal presenting preliminary data from quantum_results.csv 
-  (99.2% gate fidelity), circuit_topology.png, and error_rates.csv. 
-  Include 5-year timeline with milestones_budget.xlsx.
+# Architecture research
+> Research the best technology stack for a real-time collaboration app.
+  Compare WebSockets vs SSE vs polling for our use case.
 
-> @research-lookup Find papers on mRNA vaccine efficacy (2022-2024). Compare 
-  with our trial_outcomes.csv (n=500, 94% efficacy) and antibody_titers.png.
+# Building blocks specification
+> Break down an e-commerce platform into buildable components.
+  Include user authentication, product catalog, cart, checkout, and admin dashboard.
+
+# Sprint planning
+> Create a sprint plan for the authentication service.
+  Include user registration, login, OAuth, and password reset features.
+
+# Cost analysis
+> Estimate monthly infrastructure costs for a SaaS app with 10,000 users.
+  Consider compute, database, storage, and third-party services.
+
+# Risk assessment
+> Identify technical and business risks for migrating from monolith to microservices.
+  Include mitigation strategies and contingency plans.
 ```
-
-#### Use the CLI
-```bash
-# If installed via pip
-scientific-writer
-
-# If installed from source with uv
-uv run scientific-writer
-```
-
-#### Use the Python API
-```python
-import asyncio
-from scientific_writer import generate_paper
-
-async def main():
-    # Detailed prompt with specific data and figures
-    async for update in generate_paper(
-        query=(
-            "Create a Nature paper on CRISPR gene editing. "
-            "Present editing_efficiency.csv (5 cell lines, n=200 cells each). "
-            "Include Western blot (protein_knockout.png) showing target depletion, "
-            "flow cytometry data (editing_percentages.png) with 87% efficiency in HEK293, "
-            "and off_target_analysis.csv showing <0.1% off-target effects. "
-            "Compare results to published Cas9 benchmarks (typically 70-75% efficiency)."
-        ),
-        data_files=[
-            "editing_efficiency.csv",
-            "protein_knockout.png",
-            "editing_percentages.png",
-            "off_target_analysis.csv"
-        ]
-    ):
-        if update["type"] == "progress":
-            print(f"[{update['stage']}] {update['message']}")
-        else:
-            print(f"✓ PDF: {update['files']['pdf_final']}")
-            print(f"  Figures: {len(update.get('figures', []))} included")
-
-asyncio.run(main())
-```
-
-## 🎯 Use as a Claude Code Plugin (Recommended)
-
-**Scientific Writer works best as a Claude Code (Cursor) plugin**, providing seamless access to all scientific writing capabilities directly in your IDE. No CLI required!
-
-### Quick Start - Plugin Installation
-
-1. **Add the plugin marketplace** in Claude Code:
-   ```bash
-   /plugin marketplace add https://github.com/K-Dense-AI/claude-scientific-writer
-   ```
-
-2. **Install the plugin**:
-   ```bash
-   /plugin install claude-scientific-writer
-   ```
-
-3. **Restart Claude Code** when prompted.
-
-4. **Initialize in your project**:
-   ```bash
-   /scientific-writer:init
-   ```
-   This creates a `CLAUDE.md` file with comprehensive scientific writing instructions and makes all 19+ skills available.
-
-5. **Start using immediately**:
-   ```bash
-   # Create papers with data and figures
-   > Create a Nature paper on CRISPR gene editing. Present knockout_efficiency.csv 
-     (5 cell lines tested), include Western blot (protein_levels.png) and flow 
-     cytometry data (editing_rates.png). Highlight 87% efficiency in HEK293 cells.
-   
-   > Write an NSF grant proposal for quantum computing. Present preliminary results 
-     from gate_fidelity.csv (99.2% fidelity), include circuit_diagram.png and 
-     error_analysis.png. Compare to state-of-art 95% baseline.
-   
-   > Generate conference poster. Feature results from clinical_trial.csv 
-     (n=150), survival_curves.png, biomarker_heatmap.png, and mechanism_diagram.svg.
-   
-   # Use specific skills with research data
-   > @research-lookup Find papers on mRNA vaccine efficacy (2022-2024). Compare 
-     with our trial_data.csv showing 94% efficacy and antibody_titers.xlsx.
-   
-   > @peer-review Evaluate this manuscript. Reference sample size in methods.csv 
-     (n=30) and effect_sizes.png. Assess if statistical power is adequate.
-   
-   > @clinical-reports Create case report for autoimmune disorder. Include patient_labs.xlsx 
-     (6 months data), MRI_scans/ folder, treatment_timeline.csv showing response.
-   ```
-
-### Why Use the Plugin?
-
-- ✅ **No CLI Required** - Everything works directly in Claude Code
-- ✅ **Instant Access** - All 19+ skills available immediately
-- ✅ **IDE Integration** - Files created and edited in your project
-- ✅ **Context Aware** - Skills understand your project structure
-- ✅ **Seamless Workflow** - No switching between tools
-
-### Available Skills
-
-When installed as a plugin, you get instant access to:
-- `scientific-schematics` - AI diagram generation with Nano Banana Pro (CONSORT, neural networks, pathways)
-- `research-lookup` - Real-time literature search
-- `peer-review` - Systematic manuscript evaluation
-- `citation-management` - BibTeX and reference handling
-- `clinical-reports` - Medical documentation standards
-- `research-grants` - NSF, NIH, DOE proposal support
-- `scientific-slides` - Research presentations
-- `latex-posters` - Conference poster generation
-- `hypothesis-generation` - Scientific hypothesis development
-- `market-research-reports` - Comprehensive 50+ page market analysis reports with visuals
-- And 10+ more specialized skills...
-
-See the [Plugin Testing Guide](#plugin-testing-local-development) below for local development instructions.
-
-## Features
-
-### 📝 Document Generation
-- **Scientific papers** with IMRaD structure (Nature, Science, NeurIPS, etc.)
-- **Clinical reports** (case reports, diagnostic reports, trial reports, patient documentation)
-- **Research posters** using LaTeX (beamerposter, tikzposter, baposter)
-- **Grant proposals** (NSF, NIH, DOE, DARPA) with agency-specific formatting
-- **Literature reviews** with systematic citation management
-- **Scientific schematics** powered by Nano Banana Pro (CONSORT diagrams, neural architectures, biological pathways, circuit diagrams)
-
-### 🤖 AI-Powered Capabilities
-- **Real-time research lookup** using Perplexity Sonar Pro Search (via OpenRouter)
-- **AI-powered diagram generation** with Nano Banana Pro - create any scientific diagram from natural language descriptions
-- **Intelligent paper detection** - automatically identifies references to existing papers
-- **Peer review feedback** with quantitative ScholarEval framework (8-dimension scoring)
-- **Iterative editing** with context-aware revision suggestions
-
-### 🔧 Developer-Friendly
-- **Programmatic API** - Full async Python API with type hints
-- **CLI interface** - Interactive command-line tool with progress tracking
-- **Progress streaming** - Real-time updates during generation
-- **Comprehensive results** - JSON output with metadata, file paths, citations
-
-### 📦 Data & File Integration
-- **Automatic data handling** - Drop files in `data/`, auto-sorted to `figures/` or `data/`
-- **Document conversion** - PDF, DOCX, PPTX, XLSX to Markdown with MarkItDown
-- **Bibliography management** - Automatic BibTeX generation and citation formatting
-- **Figure integration** - Images automatically referenced and organized
-
-## Typical Workflow
 
 ### CLI Usage
-1. Place figures and data in `data/` at the project root (images → `figures/`, files → `data/` automatically)
-2. Run `scientific-writer` and describe what you want
-3. Follow progress updates; outputs saved to `writing_outputs/<timestamp>_<topic>/`
 
 ```bash
-# Start a new paper with figures and data
-> Create a Nature paper on CRISPR gene editing. Include experimental_results.csv showing knockout efficiency across 5 cell lines. Reference figure1.png (Western blot) and figure2.png (flow cytometry data) in the results section. Discuss the 87% efficiency improvement observed in HEK293 cells.
+# If installed via pip
+project-planner
 
-# Continue editing with additional research results
-> Add a methods section describing the experimental setup used to generate the data in results_table.csv. Reference the protocols for transfection, selection, and validation shown in microscopy_images/ folder.
-
-# Grant proposal with preliminary data
-> Write an NSF proposal for quantum computing research. Present preliminary results from quantum_fidelity.csv showing 99.2% gate fidelity. Include circuit_diagram.png and error_rates.png figures. Emphasize the breakthrough results compared to current state-of-art (95% fidelity).
-
-# Research poster with comprehensive figures
-> Generate a conference poster from my paper. Feature dose_response_graph.png as the central figure. Include mechanism_schematic.png, compare_treatments.png, and statistical_analysis.png. Highlight the p<0.001 significance for the primary outcome shown in the results.
-
-# Clinical case report with patient data
-> Create a clinical case report for rare disease presentation. Reference patient_timeline.csv showing symptom progression over 6 months. Include diagnostic_images/ (CT scans, MRI). Discuss lab_values.xlsx showing elevated biomarkers and treatment response documented in follow_up_data.csv.
-
-# Literature review with meta-analysis
-> Create a literature review on machine learning in healthcare. Reference the comparison in studies_comparison.csv covering 50 papers. Include forest_plot.png showing pooled effect sizes and quality_assessment.png from bias analysis. Synthesize the findings showing diagnostic accuracy (AUC 0.89), treatment prediction (accuracy 82%), and risk stratification results.
+# If installed from source with uv
+uv run project-planner
 ```
 
-### API Usage
+### Python API
+
 ```python
 import asyncio
-from scientific_writer import generate_paper
+from project_planner import generate_project
 
 async def main():
-    async for update in generate_paper(
-        query="Create a NeurIPS paper on transformers",
-        data_files=["results.csv", "figure.png"],
-        output_dir="./my_papers",
-        track_token_usage=True  # Optional: track token consumption
+    async for update in generate_project(
+        query=(
+            "Plan a task management SaaS application. "
+            "Include user authentication, team management, "
+            "task CRUD operations, notifications, and analytics dashboard. "
+            "Target: 5,000 users in year 1, growing to 50,000 by year 3."
+        ),
+        output_dir="./planning_outputs"
     ):
         if update["type"] == "progress":
             print(f"[{update['stage']}] {update['message']}")
         else:
-            print(f"✓ PDF: {update['files']['pdf_final']}")
-            # Token usage available when track_token_usage=True
-            if "token_usage" in update:
-                print(f"  Tokens used: {update['token_usage']['total_tokens']:,}")
+            print(f"✓ Plan complete: {update['files']['summary']}")
 
 asyncio.run(main())
 ```
 
-## Quick Reference
+## Available Skills
 
-### Common Commands
+When installed as a plugin, you get access to 14 specialized skills:
 
-| Task | Command Example |
-|------|----------------|
-| **Scientific Paper** | `> Create a Nature paper on CRISPR gene editing. Present knockout efficiency data from results.csv (5 cell lines tested). Include Western blot (figure1.png) and flow cytometry (figure2.png) showing 87% efficiency in HEK293 cells. Compare with published benchmarks.` |
-| **Clinical Report** | `> Create a clinical case report for rare mitochondrial disease. Include patient_timeline.csv (6-month progression), diagnostic_scans/ folder (MRI, CT images), and lab_values.xlsx showing elevated lactate (8.2 mmol/L) and creatine kinase (450 U/L). Describe treatment response.` |
-| **Grant Proposal** | `> Write an NSF proposal for quantum error correction research. Present preliminary data from gate_fidelity.csv showing 99.2% fidelity (vs 95% state-of-art). Include circuit_topology.png, error_rates_comparison.png, and scalability_projections.csv for 100-qubit systems.` |
-| **Research Poster** | `> Generate an A0 conference poster. Highlight findings from efficacy_study.csv (n=150 patients, 40% response rate). Feature mechanism_diagram.png, survival_curves.png, biomarker_heatmap.png, and statistical_forest_plot.png (p<0.001 primary endpoint).` |
-| **Literature Review** | `> Create a systematic review on AI in drug discovery. Reference studies_database.csv (127 papers, 2020-2024). Include success_rates_meta.png (pooled OR=2.3, 95% CI 1.8-2.9), publication_trends.png, and therapeutic_areas_breakdown.csv showing oncology dominance (45% of studies).` |
-| **Peer Review** | `> Evaluate this manuscript using ScholarEval. Reference figures (power_analysis.png shows n=30, underpowered), review statistics in results_table.csv, assess methodology against CONSORT standards, verify citations match claims.` |
-| **Hypothesis Paper** | `> Generate research hypotheses on aging interventions. Reference transcriptomics_data.csv (15,000 genes across tissues), pathway_enrichment.png, and longevity_correlations.csv. Propose 5 testable hypotheses linking NAD+ metabolism, senescence, and lifespan extension.` |
-| **Continue Editing** | `> Add methods section describing the protocols used to generate binding_assay.csv data. Include equipment specs, statistical tests used (t-tests in stats_summary.csv), and sample size justification from power_calculation.xlsx` |
-| **Find Existing Paper** | `> Find the CRISPR paper and add discussion of limitations shown in off_target_analysis.csv and efficiency_variation.png across different cell types` |
+### Core Research
+| Skill | Description |
+|-------|-------------|
+| `research-lookup` | Real-time technology and market research via Perplexity |
+| `competitive-analysis` | Market positioning, competitor profiling, feature comparison |
 
-### Research Lookup Examples
+### Architecture & Design
+| Skill | Description |
+|-------|-------------|
+| `architecture-research` | Technology stack research, ADRs, C4 model documentation |
+| `project-diagrams` | AI-generated C4, sequence, ERD, deployment diagrams |
+| `building-blocks` | Component specifications for Claude Code to build |
 
-```bash
-# Recent research with data integration (auto-triggers research lookup)
-> Create a paper on recent advances in quantum computing (2024). Compare published values with our gate_fidelity_results.csv (99.2% for 2-qubit gates). Include our error_correction_benchmarks.png and cite papers achieving >98% fidelity. Discuss how our topology_diagram.png relates to Google's and IBM's recent architectures.
+### Planning & Estimation
+| Skill | Description |
+|-------|-------------|
+| `sprint-planning` | User stories (INVEST), capacity management, timelines |
+| `service-cost-analysis` | Cloud pricing, ROI projections, cost optimization |
+| `risk-assessment` | Risk registers, scoring matrices, mitigation strategies |
 
-# Fact verification with experimental context
-> What are the current success rates for CAR-T therapy in B-cell lymphoma? Compare with our clinical_trial_outcomes.csv (n=45 patients, 62% complete response). Include our response_timeline.png and cytokine_profiles.csv. How do our results compare to published JULIET and ZUMA trials?
+### Quality & Review
+| Skill | Description |
+|-------|-------------|
+| `feasibility-analysis` | Technical, resource, and market feasibility |
+| `plan-review` | Project plan validation against best practices |
+| `market-research-reports` | Comprehensive market analysis reports |
 
-# Literature search with data-driven focus
-> Find 10 recent papers on transformer efficiency optimizations (2023-2024). Compare their reported FLOPS and memory usage with our benchmark_results.csv testing GPT-4, Claude, and Llama models. Include our latency_comparison.png and throughput_scaling.csv for context.
+### Utilities
+| Skill | Description |
+|-------|-------------|
+| `generate-image` | AI image generation for diagrams and visuals |
+| `markitdown` | Document conversion (PDF, DOCX, PPTX to Markdown) |
+| `document-skills` | General document processing utilities |
 
-# Meta-analysis with new data
-> Search for RCTs on metformin in aging (last 5 years). Compare published efficacy data with our mouse_longevity_study.csv (18% lifespan extension, n=120). Include our survival_curves.png, biomarker_changes.xlsx (AMPK, mTOR, NAD+ levels), and dose_response.png. How do our findings align with human trial outcomes?
+## Output Structure
 
-# Comparative analysis
-> Find papers on CRISPR base editors vs prime editors (2022-2024). Compare their reported efficiency and specificity with our editing_efficiency.csv (5 targets, 3 cell lines). Include our off_target_analysis.png and on_target_rates.csv. Discuss if our 89% on-target rate is competitive.
+Project Planner creates organized output folders:
+
+```
+planning_outputs/
+└── YYYYMMDD_HHMMSS_<project_name>/
+    ├── progress.md              # Real-time progress log
+    ├── SUMMARY.md               # Executive summary
+    ├── PLAN_REVIEW.md           # Quality review
+    │
+    ├── specifications/          # Project requirements
+    │   ├── project_spec.md      # Business requirements
+    │   ├── technical_spec.md    # Technical specifications
+    │   └── api_spec.md          # API contracts
+    │
+    ├── research/                # Research findings
+    │   ├── market_research.md   # Market analysis
+    │   ├── technology_research.md
+    │   └── competitive_analysis.md
+    │
+    ├── analysis/                # Feasibility & costs
+    │   ├── feasibility.md
+    │   ├── cost_analysis.md
+    │   ├── risk_assessment.md
+    │   └── roi_projections.md
+    │
+    ├── components/              # Building blocks
+    │   ├── building_blocks.yaml # Component specifications
+    │   └── component_specs/     # Detailed specs per component
+    │
+    ├── planning/                # Sprint plans
+    │   ├── sprint_plan.md
+    │   ├── timeline.md
+    │   └── milestones.md
+    │
+    ├── diagrams/                # Architecture diagrams
+    │   ├── architecture.png
+    │   ├── data_model.png
+    │   └── sequence_diagrams/
+    │
+    └── data/                    # Input data and references
 ```
 
-### Document Types
+## Building Blocks Format
 
-| Type | Example with Data/Figures |
-|------|---------|
-| **Papers** | `> Create a Nature paper on neural plasticity. Present electrophysiology_data.csv (n=30 neurons), include LTP_traces.png, calcium_imaging_timelapse/ folder, and synaptic_strength.csv showing 156% potentiation (p<0.001).` |
-| **Clinical Reports** | `> Write a case report for autoimmune encephalitis. Include MRI_series/ (FLAIR, T2 sequences), CSR_results.xlsx (oligoclonal bands, elevated IgG), EEG_recordings.png, treatment_timeline.csv showing immunotherapy response over 8 weeks.` |
-| **Grants** | `> NSF proposal for optogenetics. Present pilot_data/ with behavioral_results.csv (n=24 mice), neural_activation_maps.png, circuit_tracing.tif, and projection_analysis.csv showing 78% success in behavior modification. Include 5-year timeline with milestones.xlsx.` |
-| **Posters** | `> A0 poster for ASCO conference. Feature trial_demographics.csv (n=200), primary_outcome_kaplan_meier.png, adverse_events_heatmap.png, biomarker_correlations.csv, mechanism_schematic.png. Highlight 8.5 month median PFS improvement.` |
-| **Reviews** | `> Systematic review of immunotherapy combinations. Reference extracted_data.csv from 85 trials, include forest_plot_OS.png and forest_plot_PFS.png for meta-analysis, risk_of_bias_summary.png, network_meta_analysis.csv comparing 12 regimens.` |
-| **Schematics** | `> Generate CONSORT diagram for RCT using Nano Banana Pro. Use enrollment_data.csv (n=450 screened, 312 randomized), show flowchart with allocation. Create transformer architecture diagram showing encoder-decoder. Generate biological pathway diagrams for MAPK signaling.` |
+Building blocks are specified in YAML for Claude Code to build:
 
-### File Handling
+```yaml
+building_blocks:
+  - name: "User Authentication Service"
+    id: "BB-001"
+    type: "backend"
+    description: "Handles authentication, authorization, and sessions"
 
-```bash
-# 1. Drop all your research files in data/ folder
-cp experimental_data.csv ~/Documents/claude-scientific-writer/data/
-cp western_blot.png ~/Documents/claude-scientific-writer/data/
-cp flow_cytometry.png ~/Documents/claude-scientific-writer/data/
-cp statistical_summary.xlsx ~/Documents/claude-scientific-writer/data/
-cp methods_diagram.svg ~/Documents/claude-scientific-writer/data/
+    responsibilities:
+      - "User registration with email verification"
+      - "Login/logout with JWT tokens"
+      - "OAuth2 integration (Google, GitHub)"
+      - "Password reset flow"
 
-# 2. Files are automatically sorted by type:
-#    Images (png, jpg, svg, tif, pdf figures) → figures/
-#    Data files (csv, json, txt, xlsx, tsv) → data/
-#    Documents (pdf, docx, pptx) → converted to markdown
+    dependencies:
+      internal:
+        - block_id: "BB-010"
+          interface: "Database Service"
+      external:
+        - name: "PostgreSQL"
+          version: ">=14.0"
+        - name: "Redis"
+          version: ">=6.0"
 
-# 3. Reference files explicitly in your prompt with specific details
-> Create a NeurIPS paper on deep learning optimization. Include training_curves.csv showing convergence after 50 epochs across 5 model architectures. Reference accuracy_comparison.png (our method: 94.2% vs baseline: 89.1%), loss_landscapes.png visualizing optimization trajectories, and hyperparameter_grid.csv with 100 configurations tested. Include architecture_diagram.svg in methods. Discuss the 5.1% accuracy improvement and 30% faster convergence shown in benchmark_results.xlsx.
+    interfaces:
+      api_endpoints:
+        - method: "POST"
+          path: "/api/v1/auth/register"
+          description: "Register new user"
+        - method: "POST"
+          path: "/api/v1/auth/login"
+          description: "Authenticate and get tokens"
+      events_published:
+        - name: "user.registered"
+        - name: "user.logged_in"
 
-# 4. Reference folders for multiple related files
-> Write a radiology case report. Include the CT_scans/ folder (20 slices showing tumor progression), lab_results/ with weekly bloodwork CSVs, and treatment_response.xlsx documenting lesion measurements. Reference dates in imaging_timeline.csv for timeline.
+    complexity: "M"  # S, M, L, XL
+    estimated_hours: 24
+    story_points: 5
 
-# 5. Combine data files for comprehensive presentation
-> Generate grant proposal presenting preliminary data from: dose_response.csv (6 doses, 4 replicates), survival_analysis.csv (Kaplan-Meier data, n=80 mice), mechanism_pathway.png, gene_expression.csv (RNA-seq, 15,000 genes), and protein_validation.xlsx (Western blots quantified). Include budget from project_costs.xlsx.
+    test_criteria:
+      - "User can register with valid email/password"
+      - "Invalid credentials return 401"
+      - "JWT tokens are valid and properly scoped"
+      - "Rate limiting prevents brute force"
+
+    priority: "critical"
+    sprint_assignment: "Sprint 1"
 ```
 
-### API Quick Start
+## Sprint Planning Format
 
-```python
-import asyncio
-from scientific_writer import generate_paper
+Sprint plans follow INVEST criteria:
 
-# Simple usage with detailed prompt
-async for update in generate_paper(
-    "Create a Nature paper on CRISPR base editing. Present editing efficiency from "
-    "results.csv (5 cell lines, n=200 per line). Include Western blots (protein_expression.png), "
-    "flow cytometry (editing_rates.png), and off-target analysis (specificity_heatmap.png). "
-    "Highlight 89% on-target efficiency with <0.1% off-target effects."
-):
-    if update["type"] == "result":
-        print(f"PDF: {update['files']['pdf_final']}")
+```yaml
+sprints:
+  - sprint_number: 1
+    name: "Foundation Sprint"
+    duration_weeks: 2
 
-# With multiple data files and specific instructions
-async for update in generate_paper(
-    query=(
-        "Create an ICML paper on reinforcement learning for robotics. "
-        "Present training_metrics.csv (1M timesteps, 5 environments). "
-        "Include learning_curves.png comparing our method (reward: 450) vs baselines (320), "
-        "success_rates.csv across 100 test episodes, policy_visualizations.png, "
-        "and ablation_study.xlsx testing 8 hyperparameter configurations. "
-        "Include robot_architecture.svg diagram and trajectory_examples.png in methods. "
-        "Emphasize 40% improvement over SAC and 25% over TD3."
-    ),
-    data_files=[
-        "training_metrics.csv",
-        "learning_curves.png", 
-        "success_rates.csv",
-        "policy_visualizations.png",
-        "ablation_study.xlsx",
-        "robot_architecture.svg",
-        "trajectory_examples.png"
-    ],
-    output_dir="./papers"
-):
-    if update["type"] == "progress":
-        print(f"[{update['stage']}] {update['message']}")
-    elif update["type"] == "result":
-        print(f"✓ Paper completed!")
-        print(f"  PDF: {update['files']['pdf_final']}")
-        print(f"  LaTeX: {update['files']['tex_final']}")
-        print(f"  Figures: {len(update.get('figures', []))} included")
+    goals:
+      - "Set up development infrastructure"
+      - "Implement core authentication"
 
-# Clinical trial report with comprehensive data
-async for update in generate_paper(
-    query=(
-        "Generate Phase 2 clinical trial report for novel immunotherapy. "
-        "Present patient_demographics.csv (n=120, stratified by age/stage), "
-        "primary_endpoint_PFS.csv (median 12.3 months, HR=0.65, p=0.003), "
-        "secondary_outcomes.xlsx (ORR 45%, DCR 78%), "
-        "kaplan_meier_curves.png for OS and PFS, "
-        "adverse_events.csv (Grade 3+: 23%), "
-        "biomarker_analysis.csv (PD-L1, TMB correlations), "
-        "and response_waterfall.png. Include CONSORT diagram based on enrollment_flow.csv."
-    ),
-    data_files=[
-        "patient_demographics.csv",
-        "primary_endpoint_PFS.csv", 
-        "secondary_outcomes.xlsx",
-        "kaplan_meier_curves.png",
-        "adverse_events.csv",
-        "biomarker_analysis.csv",
-        "response_waterfall.png",
-        "enrollment_flow.csv"
-    ]
-):
-    if update["type"] == "result":
-        print(f"Trial report: {update['files']['pdf_final']}")
+    capacity:
+      team_size: 3
+      available_points: 30
+      committed_points: 28
+
+    stories:
+      - id: "US-001"
+        title: "User Registration"
+        description: "As a user, I can register with email and password"
+        acceptance_criteria:
+          - "Email validation works"
+          - "Password meets strength requirements"
+          - "Confirmation email is sent"
+        story_points: 5
+        building_block: "BB-001"
+
+    risks:
+      - "OAuth integration may take longer"
 ```
 
-## Plugin Testing (Local Development)
+## Example Workflow
 
-For developers working on the plugin or testing locally:
+**Request:** "Plan a B2B SaaS inventory management system"
 
-### Setup Local Marketplace
-
-1. **Create a test marketplace** in the parent directory:
-   ```bash
-   cd ..
-   mkdir -p test-marketplace/.claude-plugin
-   ```
-
-2. **Create marketplace configuration** (`test-marketplace/.claude-plugin/marketplace.json`):
-   
-   Copy the example from `test-marketplace-example.json` or create:
-   
-   ```json
-   {
-     "name": "test-marketplace",
-     "owner": { "name": "K-Dense" },
-     "plugins": [
-       {
-         "name": "claude-scientific-writer",
-         "source": "../claude-scientific-writer",
-         "description": "Scientific writing skills and CLAUDE.md initializer"
-       }
-     ]
-   }
-   ```
-   
-   **Note**: Update the `source` path to match your local directory structure (relative to the test-marketplace directory).
-
-### Install and Test
-
-3. **Add the test marketplace** in Claude Code:
-   ```bash
-   /plugin marketplace add ../test-marketplace
-   ```
-   
-   (Use the correct relative or absolute path to your test-marketplace directory)
-
-4. **Install the plugin**:
-   ```bash
-   /plugin install claude-scientific-writer@test-marketplace
-   ```
-
-5. **Restart Claude Code** when prompted.
-
-6. **Test the plugin**:
-   - Open any project directory
-   - Run `/scientific-writer:init`
-   - Verify CLAUDE.md is created
-   - Test skills: "What skills are available?"
-   - Try creating a document: "Create a short scientific abstract on quantum computing"
-
-### Verify Plugin Structure
-
-Your plugin should have this structure:
-```
-claude-scientific-writer/
-├── .claude-plugin/
-│   └── plugin.json          # Plugin metadata
-├── commands/
-│   └── scientific-writer-init.md  # /scientific-writer:init command
-├── skills/                  # All 20 skills
-│   ├── citation-management/
-│   ├── clinical-decision-support/
-│   ├── clinical-reports/
-│   ├── document-skills/
-│   ├── hypothesis-generation/
-│   ├── latex-posters/
-│   ├── literature-review/
-│   ├── market-research-reports/
-│   ├── markitdown/
-│   ├── paper-2-web/
-│   ├── peer-review/
-│   ├── research-grants/
-│   ├── research-lookup/
-│   ├── scholar-evaluation/
-│   ├── scientific-critical-thinking/
-│   ├── scientific-schematics/
-│   ├── scientific-slides/
-│   ├── scientific-writing/
-│   ├── treatment-plans/
-│   └── venue-templates/
-├── templates/
-│   └── CLAUDE.scientific-writer.md  # CLAUDE.md template
-└── ... (existing Python package files)
-```
-
-### Troubleshooting Plugin Installation
-
-- **Skills not showing**: Verify each `SKILL.md` has valid YAML frontmatter (name, description, allowed-tools)
-- **Command not working**: Check `commands/scientific-writer-init.md` exists and has proper frontmatter
-- **Template not found**: Ensure `templates/CLAUDE.scientific-writer.md` is present
-- **Marketplace not loading**: Verify `marketplace.json` syntax and relative path to plugin
-
-## 📄 Example Outputs
-
-Want to see what Scientific Writer can create? Check out real examples in the [`docs/examples/`](docs/examples/) directory!
-
-| Document Type | Example | Description |
-|--------------|---------|-------------|
-| **Research Paper** | Coming soon | Full scientific papers with IMRaD structure |
-| **Grant Proposal** | [NSF Proposal](docs/examples/grants/v6_draft.pdf) | Complete NSF grant with budget and timeline |
-| **Research Poster** | [Conference Poster](docs/examples/poster/poster.pdf) | LaTeX-generated academic poster |
-| **Presentation Slides** | [AI Scientist Talk](docs/examples/slides/ai_scientist_talk.pdf) | Professional research presentation |
-| **Clinical Report** | [Treatment Plan](docs/examples/treatment_plan/GERD.pdf) | Patient treatment documentation |
-| **Clinical Decision Support** | [Breast Cancer](docs/examples/clinical_decision_support/breast_cancer.pdf) | Evidence-based clinical recommendations |
-| **Hypothesis Generation** | [AI Weather Prediction](docs/examples/hypotheses_generation/AI_in_weather.pdf) | Research hypothesis development |
-| **Market Research** | [Agentic AI Report](docs/examples/market%20research%20reports/agentic_ai_life_sciences.pdf) | Industry analysis and market insights |
-
-**🎯 Browse the examples** to see formatting, structure, and quality before starting your own projects!
+**Project Planner will:**
+1. ✅ Create project folder: `planning_outputs/20250106_143022_b2b_inventory_saas/`
+2. 🔍 Research competitive landscape and market size
+3. 🔍 Research technology options (frameworks, databases, cloud)
+4. 📐 Design system architecture with C4 diagrams
+5. 🧱 Break down into 15-20 building blocks
+6. 📅 Create 6-sprint implementation plan
+7. 💰 Analyze costs with AWS/GCP pricing
+8. ⚠️ Assess 10-15 risks with mitigations
+9. ✅ Conduct plan review
+10. 📋 Deliver comprehensive SUMMARY.md
 
 ## Documentation
 
-### User Guides
-- [📖 Complete Features Guide](docs/FEATURES.md) - Comprehensive overview of all capabilities
-- [🔧 API Reference](docs/API.md) - Full programmatic API documentation
-- [🎯 Skills Overview](docs/SKILLS.md) - All available skills and tools
-- [🐛 Troubleshooting](docs/TROUBLESHOOTING.md) - Common issues and solutions
-
-### Developer Resources
-- [💻 Development Guide](docs/DEVELOPMENT.md) - Contributing and development setup
-- [📦 Releasing Guide](docs/RELEASING.md) - Versioning and publishing
-- [📋 Release Notes](CHANGELOG.md) - Version history and updates
-- [🤖 System Instructions](CLAUDE.md) - Agent instructions (advanced)
-
-## Versioning and Publishing (short)
-Use `uv` and the helper scripts:
-- Bump version (keeps pyproject + __init__ in sync): `uv run scripts/bump_version.py [patch|minor|major]`
-- Build and publish: `uv run scripts/publish.py` (or `--bump patch|minor|major`)
-See [docs/RELEASING.md](docs/RELEASING.md) for prerequisites, dry runs, tagging, and verification.
-
-## Migration (v1.x -> v2.0)
-- CLI remains unchanged (scientific-writer).
-- New programmatic API: from scientific_writer import generate_paper.
-- Legacy single-file script is replaced by a proper package; no action needed for CLI users.
+- [Features Guide](docs/FEATURES.md) - Comprehensive overview
+- [API Reference](docs/API.md) - Python API documentation
+- [Skills Overview](docs/SKILLS.md) - All available skills
+- [Development Guide](docs/DEVELOPMENT.md) - Contributing guide
 
 ## License
-MIT - see LICENSE.
+
+MIT - see [LICENSE](LICENSE)
 
 ## Support
-- Open an issue on GitHub
+
+- Open an issue on [GitHub](https://github.com/flight505/claude-project-planner/issues)
 - See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for common problems
 
-## 💬 Join Our Community!
+## Credits
 
-**Want to connect with other researchers, share tips, and get help in real-time?** Join our vibrant Slack community! 🎉
+Forked from [claude-scientific-writer](https://github.com/K-Dense-AI/claude-scientific-writer) by K-Dense AI. Transformed for software project planning use cases.
 
-Whether you're writing your first paper, exploring advanced features, or just want to chat about scientific writing and AI, we'd love to have you! Get faster support, share your success stories, and collaborate with fellow users.
+---
 
-👉 **[Join the K-Dense Community on Slack](https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g)** 👈
-
-We're excited to meet you! 🚀
-
-## ⭐ Show Your Support
-
-If you find this project helpful for your research or work, please consider giving it a star on GitHub! It helps others discover the tool and motivates continued development. Thank you! 🙏
-
-![GitHub stars](https://img.shields.io/github/stars/K-Dense-AI/claude-scientific-writer?style=social)
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=K-Dense-AI/claude-scientific-writer&type=Date)](https://star-history.com/#K-Dense-AI/claude-scientific-writer&Date)
+⭐ **If you find this useful, please star the repo!** It helps others discover the tool.

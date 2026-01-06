@@ -1,7 +1,7 @@
 [project]
-name = "scientific-writer"
-version = "2.10.2"
-description = "Deep research and writing tool - combines AI-driven deep research with well-formatted written outputs. Generates publication-ready scientific documents with verified citations."
+name = "project-planner"
+version = "1.0.0"
+description = "AI-powered project planning tool - generates comprehensive software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -9,41 +9,35 @@ dependencies = [
     "claude-agent-sdk>=0.1.0",
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
-    "pymupdf>=1.24.0",
+    "pyyaml>=6.0.0",
+    "jinja2>=3.1.0",
 ]
 
 # System Dependencies (must be installed separately):
-# 
-# LaTeX Distribution (required for PDF compilation):
+#
+# Optional for diagram generation:
+#   - Mermaid CLI for rendering Mermaid diagrams
+#     Install: npm install -g @mermaid-js/mermaid-cli
+#
+# Optional for LaTeX document generation:
 #   - macOS: MacTeX (https://www.tug.org/mactex/) or BasicTeX
 #     Install: brew install --cask mactex-no-gui
 #   - Linux: TeX Live
 #     Install: sudo apt-get install texlive-full (Ubuntu/Debian)
-#              sudo dnf install texlive-scheme-full (Fedora)
 #   - Windows: MiKTeX (https://miktex.org/) or TeX Live
-#
-# Required LaTeX packages (usually included in full distributions):
-#   - pdflatex, bibtex, latexmk
-#   - Common packages: amsmath, graphicx, hyperref, natbib, geometry
-#
-# PDF to Image Conversion:
-#   PyMuPDF is included as a dependency - no external software needed!
-#   PDF to image conversion works out of the box.
-#
-# Optional but recommended:
-#   - Ghostscript (for PDF manipulation)
-#   - ImageMagick (for image processing)
 
 [project.scripts]
-scientific-writer = "scientific_writer.cli:cli_main"
+project-planner = "project_planner.cli:cli_main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["scientific_writer"]
+packages = ["project_planner"]
 
 [tool.uv]
-dev-dependencies = []
-
+dev-dependencies = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+]
