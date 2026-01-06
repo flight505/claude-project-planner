@@ -42,6 +42,10 @@ uv.lock
 .env
 .env.local
 
+# Claude local config (contains API keys)
+.claude/*.local.md
+*.local.md
+
 # Output directories
 paper_outputs/
 writing_outputs/
