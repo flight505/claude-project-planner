@@ -1,4 +1,4 @@
-"""Core utilities for scientific writer."""
+"""Core utilities for project planner."""
 
 import os
 import shutil
@@ -13,8 +13,8 @@ load_dotenv()
 
 def setup_claude_skills(package_dir: Path, work_dir: Path) -> None:
     """
-    Set up Claude skills and WRITER.md by copying .claude/ from package to working directory.
-    
+    Set up Claude skills and PLANNER.md by copying .claude/ from package to working directory.
+
     Args:
         package_dir: Package installation directory containing .claude/
         work_dir: User's working directory where .claude/ should be copied
@@ -59,43 +59,47 @@ def get_api_key(api_key: Optional[str] = None) -> str:
 
 def load_system_instructions(work_dir: Path) -> str:
     """
-    Load system instructions from .claude/WRITER.md in the working directory.
-    
+    Load system instructions from .claude/PLANNER.md in the working directory.
+
     Args:
-        work_dir: Working directory containing .claude/WRITER.md.
-        
+        work_dir: Working directory containing .claude/PLANNER.md.
+
     Returns:
         System instructions string.
     """
-    instructions_file = work_dir / ".claude" / "WRITER.md"
-    
+    instructions_file = work_dir / ".claude" / "PLANNER.md"
+
+    # Fallback to WRITER.md for backwards compatibility
+    if not instructions_file.exists():
+        instructions_file = work_dir / ".claude" / "WRITER.md"
+
     if instructions_file.exists():
         with open(instructions_file, 'r', encoding='utf-8') as f:
             return f.read()
     else:
-        # Fallback if WRITER.md doesn't exist
+        # Fallback if no instructions file exists
         return (
-            "You are a scientific writing assistant. Follow best practices for "
-            "scientific communication and always present a plan before execution."
+            "You are a project planning assistant. Help users research, plan, and "
+            "document software projects with architecture designs and implementation roadmaps."
         )
 
 
 def ensure_output_folder(cwd: Path, custom_dir: Optional[str] = None) -> Path:
     """
-    Ensure the writing_outputs folder exists.
-    
+    Ensure the planning_outputs folder exists.
+
     Args:
         cwd: Current working directory (project root).
         custom_dir: Optional custom output directory path.
-        
+
     Returns:
         Path to the output folder.
     """
     if custom_dir:
         output_folder = Path(custom_dir).resolve()
     else:
-        output_folder = cwd / "writing_outputs"
-    
+        output_folder = cwd / "planning_outputs"
+
     output_folder.mkdir(exist_ok=True, parents=True)
     return output_folder
 
@@ -202,41 +206,40 @@ def extract_images_from_docx(docx_path: Path, figures_output: Path) -> List[Dict
 
 
 def process_data_files(
-    cwd: Path, 
-    data_files: List[Path], 
-    paper_output_path: str,
+    cwd: Path,
+    data_files: List[Path],
+    project_output_path: str,
     delete_originals: bool = True
 ) -> Optional[Dict[str, Any]]:
     """
-    Process data files by copying them to the paper output folder.
-    Manuscript files (.tex) go to drafts/, 
-    Source files (.md, .docx, .pdf) go to sources/,
-    images go to figures/, 
+    Process data files by copying them to the project output folder.
+    Spec files (.md) go to specifications/,
+    images go to diagrams/,
     data files (csv, json, etc.) go to data/,
     everything else goes to sources/.
-    
+
     Args:
         cwd: Current working directory (project root).
         data_files: List of file paths to process.
-        paper_output_path: Path to the paper output directory.
+        project_output_path: Path to the project output directory.
         delete_originals: Whether to delete original files after copying.
-        
+
     Returns:
         Dictionary with information about processed files, or None if no files.
     """
     if not data_files:
         return None
-    
-    paper_output = Path(paper_output_path)
-    data_output = paper_output / "data"
-    figures_output = paper_output / "figures"
-    drafts_output = paper_output / "drafts"
-    sources_output = paper_output / "sources"
+
+    project_output = Path(project_output_path)
+    data_output = project_output / "data"
+    diagrams_output = project_output / "diagrams"
+    specs_output = project_output / "specifications"
+    sources_output = project_output / "sources"
     
     # Ensure output directories exist
     data_output.mkdir(parents=True, exist_ok=True)
-    figures_output.mkdir(parents=True, exist_ok=True)
-    drafts_output.mkdir(parents=True, exist_ok=True)
+    diagrams_output.mkdir(parents=True, exist_ok=True)
+    specs_output.mkdir(parents=True, exist_ok=True)
     sources_output.mkdir(parents=True, exist_ok=True)
     
     image_extensions = get_image_extensions()
@@ -247,31 +250,31 @@ def process_data_files(
     processed_info = {
         'data_files': [],
         'image_files': [],
-        'manuscript_files': [],
+        'spec_files': [],
         'source_files': [],
         'all_files': []
     }
-    
+
     for file_path in data_files:
         file_ext = file_path.suffix.lower()
         file_name = file_path.name
-        
+
         # Determine destination based on file type
-        # Priority: manuscript (.tex) → drafts/, images → figures/, 
-        # data files → data/, source files → sources/, everything else → sources/
-        
-        if file_ext in manuscript_extensions:
-            # CRITICAL: Only .tex files go to drafts/ folder for editing workflow
-            destination = drafts_output / file_name
-            file_type = 'manuscript'
-            processed_info['manuscript_files'].append({
+        # Priority: specs (.md with spec in name) → specifications/, images → diagrams/,
+        # data files → data/, everything else → sources/
+
+        if file_ext == '.md' and ('spec' in file_name.lower() or 'requirement' in file_name.lower()):
+            # Spec files go to specifications/ folder
+            destination = specs_output / file_name
+            file_type = 'spec'
+            processed_info['spec_files'].append({
                 'name': file_name,
                 'path': str(destination),
                 'original': str(file_path),
                 'extension': file_ext
             })
         elif file_ext in image_extensions:
-            destination = figures_output / file_name
+            destination = diagrams_output / file_name
             file_type = 'image'
             processed_info['image_files'].append({
                 'name': file_name,
@@ -287,7 +290,7 @@ def process_data_files(
                 'original': str(file_path)
             })
         else:
-            # Source files (.md, .docx, .pdf) and everything else go to sources/
+            # Everything else goes to sources/
             destination = sources_output / file_name
             file_type = 'source'
             processed_info['source_files'].append({
@@ -306,9 +309,9 @@ def process_data_files(
                 'destination': str(destination)
             })
             
-            # If it's a .docx file, extract images to figures folder
+            # If it's a .docx file, extract images to diagrams folder
             if file_ext == '.docx':
-                extracted_images = extract_images_from_docx(file_path, figures_output)
+                extracted_images = extract_images_from_docx(file_path, diagrams_output)
                 if extracted_images:
                     for img_info in extracted_images:
                         processed_info['image_files'].append(img_info)
@@ -337,18 +340,13 @@ def create_data_context_message(processed_info: Optional[Dict[str, Any]]) -> str
         return ""
     
     context_parts = ["\n[DATA FILES AVAILABLE]"]
-    
-    # CRITICAL: If manuscript files (.tex) are present, this is an EDITING task
-    if processed_info.get('manuscript_files'):
-        context_parts.append("\n⚠️  EDITING MODE - Manuscript files (.tex) detected!")
-        context_parts.append("\nManuscript files (in drafts/ folder for editing):")
-        for file_info in processed_info['manuscript_files']:
-            context_parts.append(f"  - {file_info['name']} ({file_info['extension']}): {file_info['path']}")
-        context_parts.append("\n🔧 TASK: This is an EDITING task, not creating from scratch.")
-        context_parts.append("   → Read the existing manuscript from drafts/")
-        context_parts.append("   → Apply the requested changes/improvements")
-        context_parts.append("   → Create new version following version numbering protocol")
-        context_parts.append("   → Document changes in revision_notes.md")
+
+    # If spec files are present, note them
+    if processed_info.get('spec_files'):
+        context_parts.append("\n📋 Specification files detected (in specifications/ folder):")
+        for file_info in processed_info['spec_files']:
+            context_parts.append(f"  - {file_info['name']}: {file_info['path']}")
+        context_parts.append("\n→ Use these as requirements input for the project plan")
     
     if processed_info.get('source_files'):
         context_parts.append("\nSource/Context files (in sources/ folder for reference):")
@@ -366,27 +364,27 @@ def create_data_context_message(processed_info: Optional[Dict[str, Any]]) -> str
         # Separate images by source (direct vs extracted from docx)
         direct_images = [img for img in processed_info['image_files'] if 'source_docx' not in img]
         extracted_images = [img for img in processed_info['image_files'] if 'source_docx' in img]
-        
-        context_parts.append("\nImage files (in figures/ folder):")
-        
+
+        context_parts.append("\nImage/diagram files (in diagrams/ folder):")
+
         if direct_images:
             context_parts.append("  Directly provided:")
             for file_info in direct_images:
                 context_parts.append(f"    - {file_info['name']}: {file_info['path']}")
-        
+
         if extracted_images:
             # Group extracted images by source docx
             from collections import defaultdict
             images_by_docx = defaultdict(list)
             for img in extracted_images:
                 images_by_docx[img['source_docx']].append(img)
-            
+
             context_parts.append("  Extracted from .docx files:")
             for docx_name, images in images_by_docx.items():
                 img_names = ', '.join([img['name'] for img in images])
                 context_parts.append(f"    - From {docx_name}: {img_names}")
-        
-        context_parts.append("\nNote: These images can be referenced as figures in the paper.")
+
+        context_parts.append("\nNote: These can be referenced as existing diagrams or mockups.")
     
     context_parts.append("[END DATA FILES]\n")
     
