@@ -42,7 +42,7 @@ Every report should generate **6 essential visuals** at the start, with addition
 
 ### Visual Generation Tools
 
-**Use `scientific-schematics` for:**
+**Use `project-diagrams` for:**
 - Market growth trajectory charts
 - TAM/SAM/SOM breakdown diagrams (concentric circles)
 - Porter's Five Forces diagrams
@@ -58,12 +58,12 @@ Every report should generate **6 essential visuals** at the start, with addition
 
 ```bash
 # Example: Generate a TAM/SAM/SOM diagram
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "TAM SAM SOM concentric circle diagram showing Total Addressable Market $50B outer circle, Serviceable Addressable Market $15B middle circle, Serviceable Obtainable Market $3B inner circle, with labels and arrows pointing to each segment" \
   -o figures/tam_sam_som.png --doc-type report
 
 # Example: Generate Porter's Five Forces
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "Porter's Five Forces diagram with center box 'Competitive Rivalry' connected to four surrounding boxes: 'Threat of New Entrants' (top), 'Bargaining Power of Suppliers' (left), 'Bargaining Power of Buyers' (right), 'Threat of Substitutes' (bottom). Each box should show High/Medium/Low rating" \
   -o figures/porters_five_forces.png --doc-type report
 ```
@@ -510,27 +510,27 @@ Or generate individually:
 
 ```bash
 # 1. Market growth trajectory
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "Bar chart showing market growth from 2020 to 2034, with historical bars in dark blue (2020-2024) and projected bars in light blue (2025-2034). Y-axis shows market size in billions USD. Include CAGR annotation" \
   -o figures/01_market_growth.png --doc-type report
 
 # 2. TAM/SAM/SOM breakdown
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "TAM SAM SOM concentric circles diagram. Outer circle TAM Total Addressable Market, middle circle SAM Serviceable Addressable Market, inner circle SOM Serviceable Obtainable Market. Each labeled with acronym and description. Blue gradient" \
   -o figures/02_tam_sam_som.png --doc-type report
 
 # 3. Porter's Five Forces
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "Porter's Five Forces diagram with center box 'Competitive Rivalry' connected to four surrounding boxes: Threat of New Entrants (top), Bargaining Power of Suppliers (left), Bargaining Power of Buyers (right), Threat of Substitutes (bottom). Color code by rating: High=red, Medium=yellow, Low=green" \
   -o figures/03_porters_five_forces.png --doc-type report
 
 # 4. Competitive positioning matrix
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "2x2 competitive positioning matrix with X-axis 'Market Focus (Niche to Broad)' and Y-axis 'Solution Approach (Product to Platform)'. Plot 8-10 competitors as labeled circles of varying sizes. Include quadrant labels" \
   -o figures/04_competitive_positioning.png --doc-type report
 
 # 5. Risk heatmap
-python skills/scientific-schematics/scripts/generate_schematic.py \
+python skills/project-diagrams/scripts/generate_schematic.py \
   "Risk heatmap matrix. X-axis Impact (Low to Critical), Y-axis Probability (Unlikely to Very Likely). Color gradient: Green (low risk) to Red (critical risk). Plot 10-12 risks as labeled points" \
   -o figures/05_risk_heatmap.png --doc-type report
 
@@ -604,9 +604,9 @@ Verify the report meets quality standards:
 - [ ] Bibliography is complete
 - [ ] PDF renders without errors
 
-**Step 11: Peer Review**
+**Step 11: Plan Review**
 
-Use the peer-review skill to evaluate the report:
+Use the plan-review skill to evaluate the report:
 - Assess comprehensiveness
 - Verify data accuracy
 - Check logical flow
@@ -750,13 +750,10 @@ For complete formatting reference, see `assets/FORMATTING_GUIDE.md`.
 This skill works synergistically with:
 
 - **research-lookup**: Essential for gathering market data, statistics, and competitive intelligence
-- **scientific-schematics**: Generate all diagrams, charts, and visualizations
-- **venue-templates**: For academic publication writing style guidance when research is published
-
-**Publication Writing Styles:** When market research findings are published in academic venues, consult the **venue-templates** skill for writing style guides covering Nature/Science, Cell Press, medical journals, and ML/CS conferences.
+- **project-diagrams**: Generate all diagrams, charts, and visualizations
 - **generate-image**: Create infographics and conceptual illustrations
-- **peer-review**: Evaluate report quality and completeness
-- **citation-management**: Manage BibTeX references
+- **plan-review**: Evaluate report quality and completeness
+- **competitive-analysis**: Detailed competitor profiling and market positioning analysis
 
 ---
 

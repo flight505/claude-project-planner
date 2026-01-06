@@ -1,6 +1,6 @@
 ---
 name: generate-image
-description: Generate or edit images using AI models (FLUX, Gemini). Use for general-purpose image generation including photos, illustrations, artwork, visual assets, concept art, and any image that isn't a technical diagram or schematic. For flowcharts, circuits, pathways, and technical diagrams, use the scientific-schematics skill instead.
+description: Generate or edit images using AI models (FLUX, Gemini). Use for general-purpose image generation including photos, illustrations, artwork, visual assets, concept art, and any image that isn't a technical diagram or schematic. For flowcharts, architecture diagrams, and technical diagrams, use the project-diagrams skill instead.
 ---
 
 # Generate Image
@@ -17,12 +17,12 @@ Generate and edit high-quality images using OpenRouter's image generation models
 - Image editing and modifications
 - Any general-purpose image generation needs
 
-**Use scientific-schematics instead for:**
+**Use project-diagrams instead for:**
 - Flowcharts and process diagrams
-- Circuit diagrams and electrical schematics
-- Biological pathways and signaling cascades
 - System architecture diagrams
-- CONSORT diagrams and methodology flowcharts
+- C4 model diagrams
+- Sequence diagrams
+- ERD and data model diagrams
 - Any technical/schematic diagrams
 
 ## Quick Start
@@ -172,7 +172,7 @@ If the script fails, read the error message and address the issue before retryin
 
 ## Integration with Other Skills
 
-- **scientific-schematics**: Use for technical diagrams, flowcharts, circuits, pathways
+- **project-diagrams**: Use for technical diagrams, flowcharts, architecture, C4 models
 - **generate-image**: Use for photos, illustrations, artwork, visual concepts
-- **scientific-slides**: Combine with generate-image for visually rich presentations
-- **latex-posters**: Use generate-image for poster visuals and hero images
+- **market-research-reports**: Use generate-image for report visuals and hero images
+- **competitive-analysis**: Use generate-image for market positioning visualizations
