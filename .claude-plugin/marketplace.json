@@ -2,7 +2,7 @@
   "name": "claude-project-planner",
   "metadata": {
     "description": "AI-powered project planning toolkit - generates comprehensive software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps backed by real research.",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "homepage": "https://github.com/flight505/claude-project-planner"
   },
   "owner": {
@@ -14,26 +14,7 @@
       "name": "claude-project-planner",
       "description": "Comprehensive project planning and architecture research skills for Claude Code",
       "source": "./",
-      "strict": false,
-      "skills": [
-        "./project_planner/.claude/skills/research-lookup",
-        "./project_planner/.claude/skills/project-diagrams",
-        "./project_planner/.claude/skills/architecture-research",
-        "./project_planner/.claude/skills/building-blocks",
-        "./project_planner/.claude/skills/sprint-planning",
-        "./project_planner/.claude/skills/service-cost-analysis",
-        "./project_planner/.claude/skills/risk-assessment",
-        "./project_planner/.claude/skills/feasibility-analysis",
-        "./project_planner/.claude/skills/plan-review",
-        "./project_planner/.claude/skills/competitive-analysis",
-        "./project_planner/.claude/skills/market-research-reports",
-        "./project_planner/.claude/skills/generate-image",
-        "./project_planner/.claude/skills/markitdown",
-        "./project_planner/.claude/skills/document-skills/docx",
-        "./project_planner/.claude/skills/document-skills/pdf",
-        "./project_planner/.claude/skills/document-skills/pptx",
-        "./project_planner/.claude/skills/document-skills/xlsx"
-      ]
+      "strict": true
     }
   ]
 }
