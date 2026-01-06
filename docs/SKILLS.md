@@ -1,8 +1,8 @@
 # Available Skills
 
-**Scientific Writer is a deep research and writing tool** that combines AI-driven deep research with well-formatted written outputs. The skills below power this capability—from conducting literature searches and verifying citations to generating publication-ready documents in various formats.
+**Claude Project Planner is a deep research and project planning tool** that combines AI-driven deep research with well-formatted written outputs. The skills below power this capability—from conducting literature searches and verifying citations to generating publication-ready documents in various formats.
 
-This document provides an overview of all skills available in the Scientific Writer CLI.
+This document provides an overview of all skills available in the Claude Project Planner CLI.
 
 ## Writing Skills
 
@@ -767,7 +767,7 @@ Claude will generate competitive analysis with strategic frameworks and visualiz
 
 ## How Skills Are Used
 
-When you interact with the Scientific Writer CLI, Claude automatically:
+When you interact with the Claude Project Planner CLI, Claude automatically:
 
 1. **Detects relevant skills**: Based on your request, Claude identifies which skills to use
 2. **Loads resources**: Accesses reference materials, scripts, and templates

@@ -1,6 +1,6 @@
 # Troubleshooting Guide
 
-This document provides solutions to common issues you may encounter when using the Claude Scientific Writer.
+This document provides solutions to common issues you may encounter when using Claude Project Planner.
 
 ## Table of Contents
 - [Windows: Claude Code Not Found Error](#windows-claude-code-not-found-error)
@@ -14,7 +14,7 @@ This document provides solutions to common issues you may encounter when using t
 ## Windows: Claude Code Not Found Error
 
 ### Problem
-When running the scientific writer on Windows, you may encounter this error:
+When running the project planner on Windows, you may encounter this error:
 ```
 Error: Claude Code not found at: C:\Users\<username>\AppData\Roaming\npm\claude.CMD Please try again or type 'exit' to quit.
 ```
@@ -61,7 +61,7 @@ Windows permissions can sometimes interfere with `.CMD` file execution. Try runn
 1. Right-click on Command Prompt or PowerShell
 2. Select "Run as administrator"
 3. Navigate to your project directory
-4. Run the scientific writer again
+4. Run the project planner again
 
 #### 5. Use Node.js Command Prompt
 If you installed Node.js via the Windows installer, try using the "Node.js command prompt" that comes with it instead of the regular command prompt.
@@ -74,7 +74,7 @@ If the above steps don't resolve the issue, consider using [WSL](https://learn.m
 wsl --install
 ```
 
-Then install Node.js and the scientific writer within your WSL environment, where the Claude Code CLI typically has fewer compatibility issues.
+Then install Node.js and the project planner within your WSL environment, where the Claude Code CLI typically has fewer compatibility issues.
 
 #### 7. Try Using npx Directly
 If Claude Code works from the command line but the SDK can't find it, try using `npx` to run it:
@@ -105,7 +105,7 @@ venv\Scripts\activate
 pip install -e .
 ```
 
-Then run the scientific writer from within this virtual environment.
+Then run the project planner from within this virtual environment.
 
 ### Known Issue: SDK Compatibility on Windows (No Admin Rights)
 
@@ -128,7 +128,7 @@ The SDK may be using a process spawning method that doesn't properly resolve `.C
    ```
    Then set up the project in WSL where the SDK has better compatibility.
 
-2. **Try Git Bash**: If you have Git for Windows installed, try running the scientific writer from Git Bash instead of CMD/PowerShell, as it provides a more Unix-like environment.
+2. **Try Git Bash**: If you have Git for Windows installed, try running the project planner from Git Bash instead of CMD/PowerShell, as it provides a more Unix-like environment.
 
 3. **Request IT assistance**: Ask your IT department to either:
    - Grant you temporary admin rights for software installation
@@ -331,10 +331,10 @@ chmod +r <file_path>  # Add read permission
 Ensure you have write permissions in the project directory:
 ```bash
 # Check permissions
-ls -ld /path/to/claude-scientific-writer
+ls -ld /path/to/claude-project-planner
 
 # Fix if needed (Linux/macOS)
-chmod u+w /path/to/claude-scientific-writer
+chmod u+w /path/to/claude-project-planner
 ```
 
 ### Problem: Data files not being processed

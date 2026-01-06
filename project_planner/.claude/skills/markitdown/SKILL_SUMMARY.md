@@ -2,7 +2,7 @@
 
 ## Overview
 
-A comprehensive skill for using Microsoft's MarkItDown tool has been created for the Claude Scientific Writer. This skill enables conversion of 15+ file formats to Markdown, optimized for LLM processing and scientific workflows.
+A comprehensive skill for using Microsoft's MarkItDown tool has been created for Claude Project Planner. This skill enables conversion of 15+ file formats to Markdown, optimized for LLM processing and scientific workflows.
 
 ## What Was Created
 

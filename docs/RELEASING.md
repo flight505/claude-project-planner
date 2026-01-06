@@ -16,7 +16,7 @@ This guide covers version bumps and publishing to PyPI for this package. It cons
 
 ## Bump the Version (semver)
 
-Use the helper script to bump patch, minor, or major and keep `pyproject.toml` and `scientific_writer/__init__.py` in sync:
+Use the helper script to bump patch, minor, or major and keep `pyproject.toml` and `project_planner/__init__.py` in sync:
 
 ```bash
 uv run scripts/bump_version.py patch   # X.Y.Z -> X.Y.(Z+1)
@@ -54,16 +54,16 @@ uv run scripts/verify_package.py
 Basic smoke checks after release:
 
 ```bash
-pip install scientific-writer==X.Y.Z
-python -c "from scientific_writer import generate_paper; print('ok')"
-uvx scientific-writer --help
+pip install project-planner==X.Y.Z
+python -c "from project_planner import generate_paper; print('ok')"
+uvx project-planner --help
 ```
 
 ## CLI entry points
 
-- Installed command: `scientific-writer`
-- One-off: `uvx scientific-writer`
-- Tools: `uv tool install scientific-writer` then `uv tool run scientific-writer`
+- Installed command: `project-planner`
+- One-off: `uvx project-planner`
+- Tools: `uv tool install project-planner` then `uv tool run project-planner`
 
 ## Notes
 

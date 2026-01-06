@@ -62,7 +62,7 @@ def _load_env_file():
         if cwd == cwd.parent:  # Reached root
             break
     
-    # Try the package's parent directory (scientific-writer project root)
+    # Try the package's parent directory (project-planner project root)
     script_dir = Path(__file__).resolve().parent
     for _ in range(5):
         env_path = script_dir / ".env"
@@ -192,7 +192,7 @@ LAYOUT:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/scientific-writer",
+            "HTTP-Referer": "https://github.com/project-planner",
             "X-Title": "Scientific Schematic Generator"
         }
         

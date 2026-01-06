@@ -323,5 +323,5 @@ For issues or questions:
 
 ## License
 
-Part of the scientific-writer package. See main repository for license information.
+Part of the project-planner package. See main repository for license information.
 

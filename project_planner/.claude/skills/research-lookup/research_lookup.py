@@ -50,8 +50,8 @@ class ResearchLookup:
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://scientific-writer.local",
-            "X-Title": "Scientific Writer Research Tool"
+            "HTTP-Referer": "https://project-planner.local",
+            "X-Title": "Project Planner Research Tool"
         }
 
     def _select_model(self, query: str) -> str:

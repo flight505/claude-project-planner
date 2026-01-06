@@ -1,8 +1,8 @@
 # Complete Features Guide
 
-**Scientific Writer is a deep research and writing tool** that combines the power of AI-driven deep research with well-formatted written outputs of various forms. Before generating any document, it conducts comprehensive literature searches, verifies citations, and synthesizes information—ensuring your scientific writing is backed by real, verifiable sources.
+**Claude Project Planner is a deep research and project planning tool** that combines the power of AI-driven deep research with well-formatted written outputs of various forms. Before generating any document, it conducts comprehensive literature searches, verifies citations, and synthesizes information—ensuring your scientific writing is backed by real, verifiable sources.
 
-This guide provides a comprehensive overview of all features available in Scientific Writer v2.0.
+This guide provides a comprehensive overview of all features available in Claude Project Planner v2.0.
 
 ## Table of Contents
 
@@ -325,11 +325,11 @@ Simply drop files into the `data/` folder at the project root.
 **Example Workflow:**
 ```bash
 # 1. Copy your files
-cp experiment_results.csv ~/Documents/claude-scientific-writer/data/
-cp performance_graph.png ~/Documents/claude-scientific-writer/data/
+cp experiment_results.csv ~/Documents/claude-project-planner/data/
+cp performance_graph.png ~/Documents/claude-project-planner/data/
 
 # 2. Start the CLI
-scientific-writer
+project-planner
 
 # 3. Files are automatically detected and processed
 > Create a paper analyzing the experimental results
@@ -429,7 +429,7 @@ Full async Python API with comprehensive type hints.
 
 **Core Function:**
 ```python
-from scientific_writer import generate_paper
+from project_planner import generate_paper
 
 async def generate_paper(
     query: str,
@@ -443,7 +443,7 @@ async def generate_paper(
 
 **Type-Safe Models:**
 ```python
-from scientific_writer import (
+from project_planner import (
     ProgressUpdate,  # Progress information
     PaperResult,     # Final result with all paper info
     PaperMetadata,   # Paper metadata (title, date, word count)

@@ -1,8 +1,8 @@
-# Scientific Writer API
+# Claude Project Planner API
 
-**Scientific Writer is a deep research and writing tool** that combines AI-driven deep research with well-formatted written outputs. This API lets you programmatically generate publication-ready documents backed by real-time literature search and verified citations.
+**Claude Project Planner is a deep research and project planning tool** that combines AI-driven deep research with well-formatted written outputs. This API lets you programmatically generate publication-ready documents backed by real-time literature search and verified citations.
 
-Complete reference for the Scientific Writer v2.0 programmatic API. For a quick start, see the README. This page contains full details, examples, and best practices.
+Complete reference for the Claude Project Planner v2.0 programmatic API. For a quick start, see the README. This page contains full details, examples, and best practices.
 
 ## Installation
 
@@ -18,10 +18,10 @@ uv pip install -e .
 
 ```python
 import asyncio
-from scientific_writer import generate_paper
+from project_planner import generate_project
 
 async def main():
-    async for update in generate_paper("Create a Nature paper on CRISPR"):
+    async for update in generate_project("Create a Nature paper on CRISPR"):
         if update["type"] == "progress":
             print(f"[{update['stage']}] {update['message']}")
         else:
@@ -32,7 +32,7 @@ asyncio.run(main())
 
 ## API Functions
 
-### `generate_paper()`
+### `generate_project()`
 
 Asynchronous generator that creates a scientific paper and yields progress updates.
 
@@ -40,7 +40,7 @@ Asynchronous generator that creates a scientific paper and yields progress updat
 ```python
 from typing import AsyncGenerator, Dict, Any, Optional, List
 
-async def generate_paper(
+async def generate_project(
     query: str,
     output_dir: Optional[str] = None,
     api_key: Optional[str] = None,
@@ -72,10 +72,10 @@ An async generator that yields:
 **Example:**
 ```python
 import asyncio
-from scientific_writer import generate_paper
+from project_planner import generate_project
 
 async def example():
-    async for update in generate_paper(
+    async for update in generate_project(
         query="Create a NeurIPS paper on transformers",
         output_dir="./my_papers",
         data_files=["results.csv", "figure.png"],
@@ -188,7 +188,7 @@ Token usage statistics. Only present when `track_token_usage=True`.
 
 **Example:**
 ```python
-async for update in generate_paper("Create a paper", track_token_usage=True):
+async for update in generate_project("Create a paper", track_token_usage=True):
     if update["type"] == "result":
         if "token_usage" in update:
             usage = update["token_usage"]
@@ -203,12 +203,12 @@ async for update in generate_paper("Create a paper", track_token_usage=True):
 
 ```python
 import asyncio
-from scientific_writer import generate_paper
+from project_planner import generate_project
 
 async def create_paper():
     query = "Create a Nature paper on quantum computing"
     
-    async for update in generate_paper(query):
+    async for update in generate_project(query):
         if update["type"] == "progress":
             print(f"Progress: {update['message']}")
         else:
@@ -224,7 +224,7 @@ asyncio.run(create_paper())
 
 ```python
 async def track_progress():
-    async for update in generate_paper("Create a paper on ML"):
+    async for update in generate_project("Create a paper on ML"):
         if update["type"] == "progress":
             # Show stage-based progress
             stage_icons = {
@@ -244,7 +244,7 @@ async def track_progress():
 
 ```python
 async def custom_directory():
-    async for update in generate_paper(
+    async for update in generate_project(
         "Create a conference paper",
         output_dir="./my_research/papers"
     ):
@@ -262,7 +262,7 @@ async def with_data_files():
         "./appendix_data.json"
     ]
     
-    async for update in generate_paper(
+    async for update in generate_project(
         "Create a paper analyzing the experimental results",
         data_files=data_files
     ):
@@ -279,7 +279,7 @@ import json
 async def save_to_json():
     result = None
     
-    async for update in generate_paper("Create a paper"):
+    async for update in generate_project("Create a paper"):
         if update["type"] == "result":
             result = update
     
@@ -294,7 +294,7 @@ async def save_to_json():
 ```python
 async def with_error_handling():
     try:
-        async for update in generate_paper("Create a paper"):
+        async for update in generate_project("Create a paper"):
             if update["type"] == "progress":
                 print(f"[{update['stage']}] {update['message']}")
             else:
@@ -319,7 +319,7 @@ async def with_error_handling():
 ```python
 async def with_custom_api_key():
     # Override ANTHROPIC_API_KEY environment variable
-    async for update in generate_paper(
+    async for update in generate_project(
         "Create a paper",
         api_key="sk-ant-your-api-key-here"
     ):
@@ -331,7 +331,7 @@ async def with_custom_api_key():
 
 ```python
 async def list_all_files():
-    async for update in generate_paper("Create a paper"):
+    async for update in generate_project("Create a paper"):
         if update["type"] == "result":
             files = update["files"]
             
@@ -357,10 +357,10 @@ async def list_all_files():
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Yes* | Your Anthropic API key for Scientific-Writer |
+| `ANTHROPIC_API_KEY` | Yes* | Your Anthropic API key for Project-Planner |
 | `OPENROUTER_API_KEY` | No | For real-time research lookup via Perplexity Sonar Pro Search |
 
-\* Can be overridden by passing `api_key` parameter to `generate_paper()`
+\* Can be overridden by passing `api_key` parameter to `generate_project()`
 
 ### Research Lookup
 
@@ -393,7 +393,7 @@ echo "OPENROUTER_API_KEY=your_key_here" >> .env
 **Example usage:**
 ```python
 # Will automatically use research lookup to find recent papers
-async for update in generate_paper(
+async for update in generate_project(
     "Create a paper on recent advances in quantum computing (2024)"
 ):
     pass
@@ -453,7 +453,7 @@ The API handles errors gracefully:
 The API automatically processes data files and organizes them appropriately:
 
 ```python
-async for update in generate_paper(
+async for update in generate_project(
     query="Analyze experimental results",
     data_files=[
         "./results.csv",           # → copied to data/
@@ -488,7 +488,7 @@ The CLI automatically detects references to existing papers:
 # Explicitly starts a new paper
 ```
 
-This feature is CLI-specific because the API is stateless. Each `generate_paper()` call creates a new paper.
+This feature is CLI-specific because the API is stateless. Each `generate_project()` call creates a new paper.
 
 ### Custom Output Organization
 
@@ -496,14 +496,14 @@ Control where papers are saved:
 
 ```python
 # Custom output directory
-async for update in generate_paper(
+async for update in generate_project(
     query="Create a paper",
     output_dir="~/my_research/papers"
 ):
     pass
 
 # Custom working directory
-async for update in generate_paper(
+async for update in generate_project(
     query="Create a paper",
     cwd="/path/to/project",
     output_dir="./outputs"
@@ -516,7 +516,7 @@ async for update in generate_paper(
 Choose different Claude models (though Sonnet 4.5 is recommended):
 
 ```python
-async for update in generate_paper(
+async for update in generate_project(
     query="Create a paper",
     model="claude-sonnet-4-20250514"  # Latest Sonnet 4.5
 ):
@@ -528,7 +528,7 @@ async for update in generate_paper(
 Track token consumption for cost monitoring and usage analysis:
 
 ```python
-async for update in generate_paper(
+async for update in generate_project(
     query="Create a paper on quantum computing",
     track_token_usage=True
 ):
@@ -556,7 +556,7 @@ async for update in generate_paper(
 The API automatically extracts metadata from generated papers:
 
 ```python
-async for update in generate_paper(query):
+async for update in generate_project(query):
     if update["type"] == "result":
         # Extracted metadata
         title = update["metadata"]["title"]        # From \title{} in LaTeX
@@ -586,7 +586,7 @@ def format_stage(stage: str) -> str:
     }
     return f"{icons.get(stage, '⏳')} {stage}"
 
-async for update in generate_paper(query):
+async for update in generate_project(query):
     if update["type"] == "progress":
         print(f"\r{format_stage(update['stage'])}: {update['message']}", end="")
 
@@ -601,7 +601,7 @@ stage_emojis = {
     "complete": "✅"
 }
 
-async for update in generate_paper(query):
+async for update in generate_project(query):
     if update["type"] == "progress":
         emoji = stage_emojis.get(update["stage"], "⏳")
         print(f"{emoji} [{update['stage']}] {update['message']}")
@@ -615,7 +615,7 @@ from datetime import datetime
 
 log_file = "paper_generation.log"
 
-async for update in generate_paper(query):
+async for update in generate_project(query):
     # Log all updates
     with open(log_file, "a") as f:
         f.write(json.dumps(update) + "\n")
@@ -641,7 +641,7 @@ async def generate_multiple_sequential():
     
     results = []
     for query in papers:
-        async for update in generate_paper(query):
+        async for update in generate_project(query):
             if update["type"] == "result":
                 results.append(update)
     
@@ -650,7 +650,7 @@ async def generate_multiple_sequential():
 # Parallel generation (advanced)
 async def generate_multiple_parallel():
     async def generate_one(query):
-        async for update in generate_paper(query):
+        async for update in generate_project(query):
             if update["type"] == "result":
                 return update
     

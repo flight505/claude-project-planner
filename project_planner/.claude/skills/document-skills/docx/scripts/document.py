@@ -57,14 +57,14 @@ class DocxXMLEditor(XMLEditor):
     """
 
     def __init__(
-        self, xml_path, rsid: str, author: str = "Scientific-Writer", initials: str = "SW"
+        self, xml_path, rsid: str, author: str = "Project-Planner", initials: str = "SW"
     ):
         """Initialize with required RSID and optional author.
 
         Args:
             xml_path: Path to XML file to edit
             rsid: RSID to automatically apply to new elements
-            author: Author name for tracked changes and comments (default: "Scientific-Writer")
+            author: Author name for tracked changes and comments (default: "Project-Planner")
             initials: Author initials (default: "SW")
         """
         super().__init__(xml_path)
@@ -617,7 +617,7 @@ class Document:
         unpacked_dir,
         rsid=None,
         track_revisions=False,
-        author="Scientific-Writer",
+        author="Project-Planner",
         initials="SW",
     ):
         """
@@ -628,7 +628,7 @@ class Document:
             unpacked_dir: Path to unpacked DOCX directory (must contain word/ subdirectory)
             rsid: Optional RSID to use for all comment elements. If not provided, one will be generated.
             track_revisions: If True, enables track revisions in settings.xml (default: False)
-            author: Default author name for comments (default: "Scientific-Writer")
+            author: Default author name for comments (default: "Project-Planner")
             initials: Default author initials for comments (default: "SW")
         """
         self.original_path = Path(unpacked_dir)

@@ -148,11 +148,11 @@ python scripts/convert_with_ai.py image.png output.md --custom-prompt "Describe 
 python scripts/convert_literature.py papers/ markdown/ --organize-by-year --create-index
 ```
 
-## Integration with Scientific Writer
+## Integration with Project Planner
 
-This skill integrates seamlessly with the Scientific Writer CLI for:
-- Converting source materials for paper writing
-- Processing literature for reviews
+This skill integrates seamlessly with Claude Project Planner for:
+- Converting source materials for project documentation
+- Processing documents for analysis
 - Extracting data from various document formats
 - Preparing documents for LLM analysis
 

@@ -1,6 +1,6 @@
 # Complete Documentation Index
 
-**Scientific Writer v2.7.0** - Comprehensive documentation navigation guide.
+**Claude Project Planner v2.7.0** - Comprehensive documentation navigation guide.
 
 ---
 
@@ -42,7 +42,7 @@
 
 ## 🎯 Quick Navigation by Use Case
 
-### I Want to Install and Use Scientific Writer
+### I Want to Install and Use Claude Project Planner
 
 **As a Claude Code Plugin (Recommended):**
 1. Start: [Plugin Installation Guide](../README.md#-use-as-a-claude-code-plugin-recommended)
@@ -101,10 +101,10 @@
 
 ## 🔗 External Resources
 
-- **GitHub Repository**: https://github.com/K-Dense-AI/claude-scientific-writer
-- **PyPI Package**: https://pypi.org/project/scientific-writer/
+- **GitHub Repository**: https://github.com/K-Dense-AI/claude-project-planner
+- **PyPI Package**: https://pypi.org/project/project-planner/
 - **Community Slack**: [Join K-Dense Community](https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g)
-- **Issue Tracker**: https://github.com/K-Dense-AI/claude-scientific-writer/issues
+- **Issue Tracker**: https://github.com/K-Dense-AI/claude-project-planner/issues
 
 ---
 
@@ -167,7 +167,7 @@
 ### File Organization
 
 ```
-claude-scientific-writer/
+claude-project-planner/
 ├── README.md                    # Main entry point
 ├── CHANGELOG.md                 # Version history
 ├── CLAUDE.md                    # System instructions
@@ -233,7 +233,7 @@ claude-scientific-writer/
 Found an issue with the documentation? Please:
 
 1. **Check**: [Troubleshooting Guide](TROUBLESHOOTING.md)
-2. **Search**: [GitHub Issues](https://github.com/K-Dense-AI/claude-scientific-writer/issues)
+2. **Search**: [GitHub Issues](https://github.com/K-Dense-AI/claude-project-planner/issues)
 3. **Report**: Create a new issue with the "documentation" label
 4. **Discuss**: Join our [Slack Community](https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g)
 

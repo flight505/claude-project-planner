@@ -1,6 +1,6 @@
-# Scientific Writer Documentation
+# Claude Project Planner Documentation
 
-Welcome to the Scientific Writer documentation! **Scientific Writer is a deep research and writing tool** that combines the power of AI-driven deep research with well-formatted written outputs of various forms—from scientific papers and grant proposals to clinical reports and conference presentations.
+Welcome to the Claude Project Planner documentation! **Claude Project Planner is a deep research and project planning tool** that combines the power of AI-driven deep research with well-formatted written outputs of various forms—from scientific papers and grant proposals to clinical reports and conference presentations.
 
 This guide will help you navigate the available resources.
 
@@ -19,7 +19,7 @@ Start here to get up and running quickly:
 
 ### For Developers
 
-Integrate Scientific Writer into your Python projects:
+Integrate Claude Project Planner into your Python projects:
 
 1. **[API Reference](API.md)** - Full programmatic API documentation
 2. **[Development Guide](DEVELOPMENT.md)** - Contributing and development setup
@@ -34,21 +34,21 @@ Having issues? Check these resources:
 
 ## 🎯 Usage Modes
 
-Scientific Writer can be used in three ways:
+Claude Project Planner can be used in three ways:
 
 1. **🌟 Claude Code Plugin (Recommended)** - Use directly in your IDE
-   - One-command setup: `/scientific-writer:init`
+   - One-command setup: `/project-planner:init`
    - All 19+ skills available immediately
    - No CLI required
    - See: [Plugin Installation Guide](../README.md#-use-as-a-claude-code-plugin-recommended)
 
-2. **💻 Command Line Interface (CLI)** - Interactive scientific writing
-   - Run: `scientific-writer` or `uv run scientific-writer`
+2. **💻 Command Line Interface (CLI)** - Interactive project planning
+   - Run: `project-planner` or `uv run project-planner`
    - Full-featured interactive mode
    - See: [CLI Quick Start](../README.md#use-the-cli)
 
 3. **🔧 Python API** - Programmatic integration
-   - Import: `from scientific_writer import generate_paper`
+   - Import: `from project_planner import generate_project`
    - Async API with progress streaming
    - See: [API Reference](API.md)
 
@@ -158,7 +158,7 @@ When looking for specific information:
 
 ### By Keywords
 - `generate_paper()` → [API.md](API.md)
-- `scientific-writer` → [README.md](../README.md)
+- `project-planner` → [README.md](../README.md)
 - `NSF`/`NIH`/`DOE`/`DARPA` → [SKILLS.md](SKILLS.md#5-research-grants)
 - `CONSORT`/`circuit`/`pathway` → [SKILLS.md](SKILLS.md#6-scientific-schematics-and-diagrams)
 - `MarkItDown` → [SKILLS.md](SKILLS.md#7-markitdown---universal-file-to-markdown-converter)
@@ -182,7 +182,7 @@ If you can't find what you're looking for:
 - [API Quick Start](../README.md#use-the-python-api)
 - [Common Commands](../README.md#common-commands)
 - [Example Code](../example_api_usage.py)
-- [PyPI Package](https://pypi.org/project/scientific-writer/)
+- [PyPI Package](https://pypi.org/project/project-planner/)
 
 ---
 

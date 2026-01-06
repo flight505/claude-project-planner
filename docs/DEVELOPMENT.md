@@ -1,13 +1,13 @@
 # Development and Architecture
 
-This document is for contributors and maintainers. It summarizes the package architecture, design decisions, and development workflow for Scientific Writer v2.7.0.
+This document is for contributors and maintainers. It summarizes the package architecture, design decisions, and development workflow for Claude Project Planner v2.7.0.
 
 ## Architecture Overview
 
 ### Package Structure
 
 ```
-scientific_writer/
+project_planner/
 ├── __init__.py          # Public API exports, version
 ├── api.py               # Async generate_paper() function
 ├── cli.py               # CLI entrypoint (cli_main)
@@ -19,19 +19,19 @@ scientific_writer/
 ### Plugin Structure
 
 ```
-claude-scientific-writer/
+claude-project-planner/
 ├── .claude-plugin/          # Plugin metadata
 │   └── plugin.json
 ├── commands/                # Plugin commands
-│   └── scientific-writer-init.md
+│   └── project-planner-init.md
 ├── skills/                  # All 19+ skills
 │   ├── citation-management/
 │   ├── clinical-reports/
 │   ├── research-lookup/
 │   └── ... (16+ more)
 ├── templates/               # CLAUDE.md template
-│   └── CLAUDE.scientific-writer.md
-└── scientific_writer/       # Python package
+│   └── CLAUDE.project-planner.md
+└── project_planner/       # Python package
 ```
 
 ### Key Components
@@ -77,7 +77,7 @@ Environment variables:
 
 ```bash
 # CLI
-uv run scientific-writer
+uv run project-planner
 
 # Example API usage
 uv run python example_api_usage.py
@@ -106,8 +106,8 @@ For local plugin development and testing:
    {
      "name": "test-marketplace",
      "plugins": [{
-       "name": "claude-scientific-writer",
-       "source": "../claude-scientific-writer"
+       "name": "claude-project-planner",
+       "source": "../claude-project-planner"
      }]
    }
    ```
@@ -119,12 +119,12 @@ For local plugin development and testing:
 
 4. **Install plugin**:
    ```
-   /plugin install claude-scientific-writer@test-marketplace
+   /plugin install claude-project-planner@test-marketplace
    ```
 
 5. **Test in a project**:
    ```
-   /scientific-writer:init
+   /project-planner:init
    ```
 
 ### Plugin Structure Requirements
@@ -132,7 +132,7 @@ For local plugin development and testing:
 - **`.claude-plugin/plugin.json`** - Plugin metadata
 - **`commands/`** - Command definitions (YAML frontmatter required)
 - **`skills/`** - Skill definitions (each with SKILL.md + YAML frontmatter)
-- **`templates/`** - Template files (CLAUDE.scientific-writer.md)
+- **`templates/`** - Template files (CLAUDE.project-planner.md)
 
 ### Adding New Skills
 
@@ -153,7 +153,7 @@ For local plugin development and testing:
 v2.7.0 highlights:
 
 - **Claude Code Plugin Focus** - Optimized for IDE integration
-- Plugin installation with `/scientific-writer:init`
+- Plugin installation with `/project-planner:init`
 - All 19+ skills accessible via plugin
 - Streamlined IDE workflow
 
@@ -170,21 +170,21 @@ See `CHANGELOG.md` for details.
 
 ### v1.x -> v2.0
 
-- CLI remains identical (`scientific-writer`)
+- CLI remains identical (`project-planner`)
 - New package structure replaces single-file script
-- For programmatic use, import from `scientific_writer`
+- For programmatic use, import from `project_planner`
 
 Example:
 
 ```python
-from scientific_writer import generate_paper
+from project_planner import generate_paper
 ```
 
 ### CLI/API -> Plugin (v2.7.0)
 
 For best IDE experience:
 - Install as Claude Code plugin (recommended)
-- Use `/scientific-writer:init` in your project
+- Use `/project-planner:init` in your project
 - Access all skills directly in IDE
 - No CLI required for most workflows
 

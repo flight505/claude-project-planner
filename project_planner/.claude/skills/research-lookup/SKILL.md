@@ -16,7 +16,7 @@ Use this skill when you need:
 
 - **Current Research Information**: Latest studies, papers, and findings in a specific field
 - **Literature Verification**: Check facts, statistics, or claims against current research
-- **Background Research**: Gather context and supporting evidence for scientific writing
+- **Background Research**: Gather context and supporting evidence for project planning
 - **Citation Sources**: Find relevant papers and studies to cite in manuscripts
 - **Technical Documentation**: Look up specifications, protocols, or methodologies
 - **Recent Developments**: Stay current with emerging trends and breakthroughs
@@ -424,15 +424,15 @@ Key findings from high-impact literature:
 - "Find similar studies using different approaches"
 - "What controversies exist in this research area?"
 
-## Integration with Scientific Writing
+## Integration with Project Planning
 
-This skill enhances scientific writing by providing:
+This skill enhances project planning by providing:
 
-1. **Literature Review Support**: Gather current research for introduction and discussion sections
-2. **Methods Validation**: Verify protocols and procedures against current standards
-3. **Results Contextualization**: Compare findings with recent similar studies
-4. **Discussion Enhancement**: Support arguments with latest evidence
-5. **Citation Management**: Provide properly formatted citations in multiple styles
+1. **Technology Research**: Gather current information on frameworks, tools, and best practices
+2. **Architecture Validation**: Verify patterns and approaches against current standards
+3. **Competitive Analysis**: Compare solutions with recent similar projects
+4. **Decision Support**: Inform architectural decisions with latest evidence
+5. **Cost Research**: Research pricing and service comparisons
 
 ## Error Handling and Limitations
 
@@ -572,7 +572,7 @@ This skill enhances scientific writing by providing:
 
 ## Complementary Tools
 
-In addition to research-lookup, the scientific writer has access to **WebSearch** for:
+In addition to research-lookup, the project planner has access to **WebSearch** for:
 
 - **Quick metadata verification**: Look up DOIs, publication years, journal names, volume/page numbers
 - **Non-academic sources**: News, blogs, technical documentation, current events
@@ -602,4 +602,4 @@ This skill serves as a powerful research assistant with intelligent dual-model s
 - **Academic Focus**: Both models configured to prioritize peer-reviewed sources and scholarly literature
 - **Complementary WebSearch**: Use alongside WebSearch for metadata verification and non-academic sources
 
-Whether you need quick fact-finding or deep analytical synthesis, this skill automatically adapts to deliver the right level of research support for your scientific writing needs.
+Whether you need quick fact-finding or deep analytical synthesis, this skill automatically adapts to deliver the right level of research support for your project planning needs.
