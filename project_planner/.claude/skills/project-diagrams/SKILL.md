@@ -1,6 +1,6 @@
 ---
 name: project-diagrams
-description: "Create publication-quality architecture diagrams using Nano Banana Pro AI with smart iterative refinement. Specialized in system architecture, C4 diagrams, data flow, sequence diagrams, and software design visualizations for project planning."
+description: "Create publication-quality architecture diagrams using Nano Banana Pro AI or Mermaid. Specialized in system architecture, C4 diagrams, data flow, sequence diagrams, and software design visualizations for project planning."
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -8,7 +8,33 @@ allowed-tools: [Read, Write, Edit, Bash]
 
 ## Overview
 
-Project diagrams transform complex software architectures and system designs into clear visual representations. **This skill uses Nano Banana Pro AI for diagram generation with Gemini 3 Pro quality review.**
+Project diagrams transform complex software architectures and system designs into clear visual representations. **This skill offers two diagram generation approaches:**
+
+| Approach | Best For | Output |
+|----------|----------|--------|
+| **Nano Banana Pro AI** | Publication-quality visuals, presentations, complex custom diagrams | PNG images |
+| **Mermaid** | Version-controlled docs, GitHub markdown, editable diagrams | SVG/PNG from code |
+
+## Choosing Your Approach
+
+### Use Nano Banana Pro AI when:
+- You need visually polished, publication-ready diagrams
+- Creating custom visualizations that don't fit standard templates
+- Diagrams for presentations, proposals, or client deliverables
+- Complex architectural diagrams with custom styling
+
+### Use Mermaid when:
+- Diagrams need to be version-controlled in git (text diffs)
+- Embedding directly in GitHub/GitLab markdown
+- You need to edit and iterate quickly on diagram structure
+- Standardized diagram types (flowcharts, sequence, C4, ERD, Gantt)
+- Collaborative documentation where others may edit
+
+---
+
+## Option 1: Nano Banana Pro AI (Recommended for Visuals)
+
+**This approach uses Nano Banana Pro AI for diagram generation with Gemini 3 Pro quality review.**
 
 **How it works:**
 - Describe your diagram in natural language
@@ -173,3 +199,269 @@ Works with other project planning skills:
 | Deployment | Cloud infrastructure |
 | CI/CD Pipeline | Build/deployment workflow |
 | Component | Internal service structure |
+
+---
+
+## Option 2: Mermaid (Recommended for Version Control)
+
+Mermaid generates diagrams from text-based code, perfect for documentation that lives in git repositories.
+
+### Quick Start: Inline Mermaid
+
+Embed directly in markdown files:
+
+````markdown
+```mermaid
+flowchart LR
+    A[Client] --> B[API Gateway]
+    B --> C[Auth Service]
+    B --> D[User Service]
+    C --> E[(Database)]
+    D --> E
+```
+````
+
+### Mermaid Diagram Types for Project Planning
+
+#### 1. System Architecture (Flowchart)
+
+```mermaid
+flowchart TB
+    subgraph Frontend
+        A[React App]
+        B[Mobile App]
+    end
+
+    subgraph API Layer
+        C[API Gateway]
+        D[Load Balancer]
+    end
+
+    subgraph Services
+        E[Auth Service]
+        F[User Service]
+        G[Order Service]
+    end
+
+    subgraph Data
+        H[(PostgreSQL)]
+        I[(Redis Cache)]
+        J[(S3 Storage)]
+    end
+
+    A --> D
+    B --> D
+    D --> C
+    C --> E & F & G
+    E --> H
+    F --> H & I
+    G --> H & J
+```
+
+#### 2. Sequence Diagrams
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant A as API Gateway
+    participant Auth as Auth Service
+    participant DB as Database
+
+    U->>F: Click Login
+    F->>A: POST /auth/login
+    A->>Auth: Validate credentials
+    Auth->>DB: Query user
+    DB-->>Auth: User data
+    Auth-->>A: JWT token
+    A-->>F: 200 OK + token
+    F-->>U: Redirect to dashboard
+```
+
+#### 3. C4 Model Diagrams
+
+```mermaid
+C4Context
+    title System Context Diagram - Inventory Management
+
+    Person(user, "Warehouse Staff", "Manages inventory")
+    Person(admin, "Admin", "Configures system")
+
+    System(inventory, "Inventory System", "Core application")
+
+    System_Ext(erp, "ERP System", "Enterprise resource planning")
+    System_Ext(shipping, "Shipping API", "Delivery tracking")
+
+    Rel(user, inventory, "Uses")
+    Rel(admin, inventory, "Configures")
+    Rel(inventory, erp, "Syncs data")
+    Rel(inventory, shipping, "Tracks shipments")
+```
+
+#### 4. Entity Relationship Diagrams
+
+```mermaid
+erDiagram
+    USER ||--o{ ORDER : places
+    USER {
+        uuid id PK
+        string email UK
+        string name
+        timestamp created_at
+    }
+    ORDER ||--|{ ORDER_ITEM : contains
+    ORDER {
+        uuid id PK
+        uuid user_id FK
+        decimal total
+        string status
+        timestamp created_at
+    }
+    ORDER_ITEM }o--|| PRODUCT : references
+    ORDER_ITEM {
+        uuid id PK
+        uuid order_id FK
+        uuid product_id FK
+        int quantity
+        decimal price
+    }
+    PRODUCT {
+        uuid id PK
+        string name
+        decimal price
+        int stock
+    }
+```
+
+#### 5. Sprint Timeline (Gantt Chart)
+
+```mermaid
+gantt
+    title Sprint 1 - Foundation
+    dateFormat YYYY-MM-DD
+    section Infrastructure
+        CI/CD Setup           :done, infra1, 2025-01-06, 3d
+        Database Setup        :active, infra2, after infra1, 2d
+    section Authentication
+        User Registration     :auth1, after infra2, 3d
+        Login/Logout         :auth2, after auth1, 2d
+        JWT Implementation   :auth3, after auth2, 2d
+    section Testing
+        Unit Tests           :test1, after auth3, 2d
+        Integration Tests    :test2, after test1, 2d
+```
+
+#### 6. State Diagrams (Workflows)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Pending: Submit
+    Pending --> Approved: Approve
+    Pending --> Rejected: Reject
+    Rejected --> Draft: Revise
+    Approved --> Published: Publish
+    Published --> Archived: Archive
+    Archived --> [*]
+```
+
+#### 7. Component Diagrams (Mindmap)
+
+```mermaid
+mindmap
+    root((Inventory System))
+        Core Services
+            Auth Service
+            Inventory Service
+            Order Service
+            Notification Service
+        Data Layer
+            PostgreSQL
+            Redis
+            S3
+        Infrastructure
+            AWS ECS
+            CloudFront
+            Route53
+        Integrations
+            ERP Sync
+            Shipping APIs
+            Payment Gateway
+```
+
+### Generating Mermaid to PNG
+
+For documents requiring image files, use the Mermaid CLI:
+
+```bash
+# Install mermaid-cli
+npm install -g @mermaid-js/mermaid-cli
+
+# Generate PNG from .mmd file
+mmdc -i diagram.mmd -o diagrams/output.png -t neutral -b transparent
+
+# Generate SVG (sharper, scalable)
+mmdc -i diagram.mmd -o diagrams/output.svg -t neutral
+
+# With custom width
+mmdc -i diagram.mmd -o diagrams/output.png -w 1200
+```
+
+### Mermaid Themes
+
+```bash
+# Available themes: default, neutral, dark, forest
+mmdc -i diagram.mmd -o output.png -t forest
+```
+
+| Theme | Best For |
+|-------|----------|
+| `default` | General purpose, blue tones |
+| `neutral` | Professional documents, grayscale-friendly |
+| `dark` | Dark mode UIs, presentations |
+| `forest` | Environmental/green themed projects |
+
+### Mermaid in Project Planning Documents
+
+**Recommended usage in markdown documentation:**
+
+```markdown
+## System Architecture
+
+The system follows a microservices architecture:
+
+```mermaid
+flowchart LR
+    Client --> Gateway --> Services --> Database
+```
+
+## API Sequence
+
+```mermaid
+sequenceDiagram
+    Client->>API: Request
+    API->>Service: Process
+    Service-->>API: Response
+    API-->>Client: Result
+```
+```
+
+### When to Use Which
+
+| Scenario | Recommendation |
+|----------|----------------|
+| Final deliverable PDFs | Nano Banana Pro AI |
+| GitHub/GitLab docs | Mermaid (inline) |
+| Architecture Decision Records | Mermaid |
+| Client presentations | Nano Banana Pro AI |
+| Sprint planning docs | Mermaid (Gantt charts) |
+| Quick whiteboard-style | Mermaid |
+| Complex custom visuals | Nano Banana Pro AI |
+| Collaborative editing | Mermaid |
+
+### Mermaid Resources
+
+- **Live Editor**: https://mermaid.live
+- **Documentation**: https://mermaid.js.org/
+- **GitHub Rendering**: Native support in markdown files
+- **VS Code Extension**: "Mermaid Markdown Syntax Highlighting"
