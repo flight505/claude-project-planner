@@ -1,11 +1,5 @@
 ---
-name: setup
 description: Configure Claude Project Planner - detects existing API keys or guides you through setup
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-  - AskUserQuestion
 ---
 
 # Project Planner Setup

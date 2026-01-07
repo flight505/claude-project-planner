@@ -2,7 +2,7 @@
   "name": "claude-project-planner",
   "metadata": {
     "description": "AI-powered project planning toolkit - generates comprehensive software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps backed by real research.",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "homepage": "https://github.com/flight505/claude-project-planner"
   },
   "owner": {
