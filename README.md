@@ -1,6 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0.8-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 **An AI-powered project planning toolkit** that combines deep research with comprehensive software architecture design. Generate complete project specifications, architecture documents, sprint plans, building blocks, cost analyses, and implementation roadmaps—all backed by real-time research and verified data.
 
@@ -23,6 +24,11 @@ Project Planner breaks down complex software projects into Claude Code-buildable
 - **Technology Research** - Stack comparisons with real benchmarks
 - **Competitive Analysis** - Market positioning and differentiation
 - **AI-Powered Diagrams** - C4, sequence, ERD, deployment diagrams via Nano Banana Pro
+
+### 📣 Go-to-Market (New in v1.0.6)
+- **Marketing Campaign Planning** - Social media strategy and content calendars
+- **Platform Playbooks** - LinkedIn, X/Twitter, Instagram, TikTok strategies
+- **Influencer Strategy** - Tier framework and outreach templates
 
 ## Quick Start
 
@@ -72,12 +78,22 @@ export ANTHROPIC_API_KEY='your_key'
 
 ## Usage
 
+### Commands
+
+After installing the plugin, use these commands:
+
+| Command | Description |
+|---------|-------------|
+| `/full-plan` | **Complete project planning** - runs all 6 phases (market research, architecture, feasibility, sprints, marketing, review) |
+| `/tech-plan` | **Technical planning only** - architecture, costs, risks, sprints (no marketing) |
+| `/project-planner:setup` | **Configuration wizard** - detect/configure API keys |
+
 ### Plugin Usage (Recommended)
 
 After installing the plugin, simply ask Claude:
 
 ```bash
-# Full project planning
+# Full project planning (or use /full-plan)
 > Plan a B2B SaaS inventory management system with multi-tenant architecture,
   PostgreSQL database, React frontend, and deployment on AWS.
 
@@ -100,6 +116,10 @@ After installing the plugin, simply ask Claude:
 # Risk assessment
 > Identify technical and business risks for migrating from monolith to microservices.
   Include mitigation strategies and contingency plans.
+
+# Marketing campaign (NEW)
+> Create a product launch campaign for our developer tool.
+  Include content calendar, platform strategies, and influencer outreach.
 ```
 
 ### CLI Usage
@@ -138,13 +158,14 @@ asyncio.run(main())
 
 ## Available Skills
 
-When installed as a plugin, you get access to 14 specialized skills:
+When installed as a plugin, you get access to **18 specialized skills**:
 
 ### Core Research
 | Skill | Description |
 |-------|-------------|
 | `research-lookup` | Real-time technology and market research via Perplexity |
 | `competitive-analysis` | Market positioning, competitor profiling, feature comparison |
+| `market-research-reports` | Comprehensive market analysis reports |
 
 ### Architecture & Design
 | Skill | Description |
@@ -165,14 +186,21 @@ When installed as a plugin, you get access to 14 specialized skills:
 |-------|-------------|
 | `feasibility-analysis` | Technical, resource, and market feasibility |
 | `plan-review` | Project plan validation against best practices |
-| `market-research-reports` | Comprehensive market analysis reports |
+
+### Go-to-Market
+| Skill | Description |
+|-------|-------------|
+| `marketing-campaign` | Social media strategy, content calendars, platform playbooks, influencer outreach |
 
 ### Utilities
 | Skill | Description |
 |-------|-------------|
 | `generate-image` | AI image generation for diagrams and visuals |
 | `markitdown` | Document conversion (PDF, DOCX, PPTX to Markdown) |
-| `document-skills` | General document processing utilities |
+| `document-skills/docx` | Word document processing |
+| `document-skills/pdf` | PDF processing |
+| `document-skills/pptx` | PowerPoint processing |
+| `document-skills/xlsx` | Excel processing |
 
 ## Output Structure
 
@@ -209,6 +237,12 @@ planning_outputs/
     │   ├── sprint_plan.md
     │   ├── timeline.md
     │   └── milestones.md
+    │
+    ├── marketing/               # Go-to-market (NEW)
+    │   ├── campaign_brief.md
+    │   ├── content_calendar.md
+    │   ├── platform_strategies/
+    │   └── influencer_strategy.md
     │
     ├── diagrams/                # Architecture diagrams
     │   ├── architecture.png
@@ -318,8 +352,9 @@ sprints:
 6. 📅 Create 6-sprint implementation plan
 7. 💰 Analyze costs with AWS/GCP pricing
 8. ⚠️ Assess 10-15 risks with mitigations
-9. ✅ Conduct plan review
-10. 📋 Deliver comprehensive SUMMARY.md
+9. 📣 Create go-to-market strategy (with `/full-plan`)
+10. ✅ Conduct plan review
+11. 📋 Deliver comprehensive SUMMARY.md
 
 ## Documentation
 
@@ -327,6 +362,7 @@ sprints:
 - [API Reference](docs/API.md) - Python API documentation
 - [Skills Overview](docs/SKILLS.md) - All available skills
 - [Development Guide](docs/DEVELOPMENT.md) - Contributing guide
+- [Changelog](CHANGELOG.md) - Version history
 
 ## License
 
