@@ -262,6 +262,14 @@ This skill integrates with OpenRouter (openrouter.ai) to access Perplexity's Son
 - Account with sufficient credits for research queries
 - Proper attribution and citation of sources
 
+**Python Dependencies** (for CLI usage):
+If using the `research_lookup.py` script directly, install dependencies:
+```bash
+pip install requests
+# Or install all plugin dependencies:
+pip install -r requirements.txt
+```
+
 **Academic Mode Configuration**:
 - System message configured to prioritize scholarly sources
 - Search focused on peer-reviewed journals and academic publications

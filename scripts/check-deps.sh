@@ -1,0 +1,22 @@
+#!/bin/bash
+# Check and report on Python dependencies for Claude Project Planner
+# This script runs on SessionStart to verify dependencies are available
+
+# Check if requests module is available (required for research-lookup)
+python3 -c "import requests" 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "⚠️  Python 'requests' module not installed."
+    echo "   Research-lookup skill requires: pip install requests"
+    echo ""
+    echo "   To install all plugin dependencies:"
+    echo "   pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+fi
+
+# Check for OPENROUTER_API_KEY (required for research-lookup)
+if [ -z "$OPENROUTER_API_KEY" ]; then
+    echo "ℹ️  OPENROUTER_API_KEY not set. Research-lookup skill will not work."
+    echo "   Get an API key at: https://openrouter.ai/keys"
+fi
+
+# Silent success - don't clutter output if everything is fine
+exit 0

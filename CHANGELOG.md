@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.9] - 2025-01-07
+
+### ✨ Added
+
+#### Python Dependency Management
+
+- **`requirements.txt`** - Added Python dependency manifest for plugin scripts
+  - `requests` for research-lookup API calls
+  - `python-docx`, `python-pptx`, `openpyxl`, `PyPDF2` for document processing
+  - `markitdown` for document conversion
+
+- **SessionStart Hook** - Added automatic dependency check on session start
+  - `hooks.json` with SessionStart configuration
+  - `scripts/check-deps.sh` warns if `requests` or `OPENROUTER_API_KEY` missing
+  - Non-blocking warnings (won't fail session start)
+
+### 📝 Documentation
+
+- Updated `research-lookup/SKILL.md` with Python dependency instructions
+
+---
+
 ## [1.0.8] - 2025-01-07
 
 ### 📝 Documentation
