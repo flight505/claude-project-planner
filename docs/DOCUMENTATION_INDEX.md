@@ -78,7 +78,7 @@
 | **Peer Review** | [Features: Peer Review](FEATURES.md#peer-review-with-scholareval) | [peer-review](SKILLS.md#3-peer-review), [scholar-evaluation](SKILLS.md#4-scholar-evaluation) |
 | **Citation Management** | [Skills: Citations](SKILLS.md#citation-management) | [citation-management](SKILLS.md) |
 | **Document Conversion** | [Features: Conversion](FEATURES.md#document-conversion) | [markitdown](SKILLS.md#12-markitdown---universal-file-to-markdown-converter) |
-| **Scientific Schematics** | [Features: Schematics](FEATURES.md#scientific-schematics) | [scientific-schematics](SKILLS.md#10-scientific-schematics-and-diagrams) |
+| **Scientific Schematics** | [Features: Schematics](FEATURES.md#project-diagrams) | [project-diagrams](SKILLS.md#10-project-diagrams-and-diagrams) |
 
 ### I Want to Develop or Contribute
 

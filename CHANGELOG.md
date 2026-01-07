@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.11] - 2025-01-07
+
+### 🔧 Fixed
+
+#### Comprehensive Code Review Fixes
+
+Multi-agent code review identified and fixed remaining issues from Scientific Writer → Project Planner transformation.
+
+- **CRITICAL: Fixed undefined variable crash** in `generate_market_visuals.py`
+  - Line 468: Changed `VISUALS` → `visuals_to_generate`
+  - Would have caused runtime crash when using `--only` filter flag
+
+- **Fixed skill name references** across 11 files
+  - Changed all `scientific-schematics` → `project-diagrams`
+  - Affected files: SKILL.md files, visual_generation_guide.md, market_report_template.tex, docs/*.md
+
+- **Fixed duplicate line** in `generate_market_visuals.py`
+  - Lines 113-114 both contained `"project-diagrams"` in tuple definition
+  - Removed duplicate entry
+
+- **Added deprecation notice** to `scripts/README.md`
+  - Legacy PyPI scripts were for `scientific-writer` package
+  - Plugin versioning now via `.claude-plugin/plugin.json` and `marketplace.json`
+
+---
+
 ## [1.0.10] - 2025-01-07
 
 ### 🔧 Fixed

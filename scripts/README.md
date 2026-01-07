@@ -1,6 +1,11 @@
 # Scripts for Package Management
 
-This directory contains automation scripts for managing the scientific-writer package.
+> ⚠️ **LEGACY NOTICE**: These scripts were created for the original `scientific-writer` PyPI package.
+> The project has been transformed into **Claude Project Planner**, a Claude Code plugin.
+> Plugin versioning is managed via `.claude-plugin/plugin.json` and `marketplace.json`.
+> These scripts may need updates if you want to publish to PyPI as `project-planner`.
+
+This directory contains automation scripts for managing the package.
 
 ## Version Management
 

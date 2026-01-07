@@ -416,7 +416,7 @@ Claude will use validation scripts to check quality and compliance.
 - `poster_quality_checklist.md`: Comprehensive pre-printing checklist
 
 **Features**:
-- **AI-Powered Visual Generation**: Generate all figures using scientific-schematics before creating poster
+- **AI-Powered Visual Generation**: Generate all figures using project-diagrams before creating poster
 - **Poster-Size Font Requirements**: Guidelines for readable text in AI-generated graphics (72pt+ for key numbers)
 - **Overflow Prevention**: Content limits (5-6 sections max, 300-800 words) to prevent cutoff
 - Ensures posters span the full page without excessive margins
@@ -522,7 +522,7 @@ Claude will check if slide count is appropriate and provide timing recommendatio
 ---
 
 ### 10. Scientific Schematics and Diagrams
-**Location**: `.claude/skills/scientific-schematics/`
+**Location**: `.claude/skills/project-diagrams/`
 
 **Capabilities**:
 - Create methodology flowcharts (CONSORT diagrams for clinical trials)
@@ -578,7 +578,7 @@ Claude will check if slide count is appropriate and provide timing recommendatio
 **Capabilities**:
 - Generate comprehensive market research reports (50+ pages) in consulting-firm style
 - Professional LaTeX formatting with custom `market_research.sty` style package
-- Extensive visual generation (25-30 diagrams per report) using scientific-schematics
+- Extensive visual generation (25-30 diagrams per report) using project-diagrams
 - Multi-framework strategic analysis (Porter's Five Forces, PESTLE, SWOT, BCG Matrix)
 - TAM/SAM/SOM market sizing with data-driven projections
 - Competitive landscape analysis with positioning matrices

@@ -3,7 +3,7 @@
 Market Research Report Visual Generator
 
 Batch generates visuals for a market research report using
-scientific-schematics and generate-image skills.
+project-diagrams and generate-image skills.
 
 Default behavior: Generate 5-6 core visuals only
 Use --all flag to generate all 28 extended visuals
@@ -34,7 +34,7 @@ CORE_VISUALS = [
     # Priority 1: Market Growth Trajectory
     (
         "01_market_growth_trajectory.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Bar chart {topic} market growth 2020 to 2034. Historical bars 2020-2024 in dark blue, "
         "projected bars 2025-2034 in light blue. Y-axis billions USD, X-axis years. "
         "CAGR annotation. Data labels on each bar. Vertical dashed line "
@@ -44,7 +44,7 @@ CORE_VISUALS = [
     # Priority 2: TAM/SAM/SOM
     (
         "02_tam_sam_som.png",
-        "scientific-schematics",
+        "project-diagrams",
         "TAM SAM SOM concentric circles for {topic} market. Outer circle TAM Total Addressable "
         "Market. Middle circle SAM Serviceable Addressable Market. Inner circle SOM Serviceable "
         "Obtainable Market. Each labeled with acronym, full name. "
@@ -54,7 +54,7 @@ CORE_VISUALS = [
     # Priority 3: Porter's Five Forces
     (
         "03_porters_five_forces.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Porter's Five Forces diagram for {topic}. Center box Competitive Rivalry with rating. "
         "Four surrounding boxes with arrows to center: Top Threat of New Entrants, "
         "Left Bargaining Power Suppliers, Right Bargaining Power Buyers, "
@@ -65,7 +65,7 @@ CORE_VISUALS = [
     # Priority 4: Competitive Positioning Matrix
     (
         "04_competitive_positioning.png",
-        "scientific-schematics",
+        "project-diagrams",
         "2x2 competitive positioning matrix {topic}. X-axis Market Focus Niche to Broad. "
         "Y-axis Solution Approach Product to Platform. Quadrants: Upper-right Platform Leaders, "
         "Upper-left Niche Platforms, Lower-right Product Leaders, Lower-left Specialists. "
@@ -76,7 +76,7 @@ CORE_VISUALS = [
     # Priority 5: Risk Heatmap
     (
         "05_risk_heatmap.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Risk heatmap matrix {topic}. X-axis Impact Low Medium High Critical. "
         "Y-axis Probability Unlikely Possible Likely Very Likely. "
         "Cell colors: Green low risk, Yellow medium, Orange high, Red critical. "
@@ -99,7 +99,7 @@ EXTENDED_VISUALS = [
     # Industry Ecosystem
     (
         "07_industry_ecosystem.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Industry ecosystem value chain diagram for {topic} market. Horizontal flow left "
         "to right: Suppliers box → Manufacturers box → Distributors box → End Users box. "
         "Below each main box show 3-4 smaller boxes with example player types. Solid arrows "
@@ -110,8 +110,7 @@ EXTENDED_VISUALS = [
     # Regional Breakdown
     (
         "08_regional_breakdown.png",
-        "scientific-schematics",
-        "scientific-schematics",
+        "project-diagrams",
         "Pie chart regional market breakdown for {topic}. North America 40% dark blue, "
         "Europe 28% medium blue, Asia-Pacific 22% teal, Latin America 6% light blue, "
         "Middle East Africa 4% gray blue. Show percentage for each slice. Legend on right. "
@@ -121,7 +120,7 @@ EXTENDED_VISUALS = [
     # Segment Growth
     (
         "09_segment_growth.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Horizontal bar chart {topic} segment growth comparison. Y-axis 5-6 segment names, "
         "X-axis CAGR percentage 0-30%. Bars colored green highest to blue lowest. "
         "Data labels with percentages. Sorted highest to lowest. "
@@ -131,7 +130,7 @@ EXTENDED_VISUALS = [
     # Driver Impact Matrix
     (
         "10_driver_impact_matrix.png",
-        "scientific-schematics",
+        "project-diagrams",
         "2x2 matrix driver impact assessment for {topic}. X-axis Impact Low to High, "
         "Y-axis Probability Low to High. Quadrants: Upper-right CRITICAL DRIVERS red, "
         "Upper-left MONITOR yellow, Lower-right WATCH CAREFULLY yellow, "
@@ -142,7 +141,7 @@ EXTENDED_VISUALS = [
     # PESTLE Analysis
     (
         "11_pestle_analysis.png",
-        "scientific-schematics",
+        "project-diagrams",
         "PESTLE hexagonal diagram for {topic} market. Center hexagon labeled Market Analysis. "
         "Six surrounding hexagons: Political red, Economic blue, Social green, "
         "Technological orange, Legal purple, Environmental teal. Each outer hexagon "
@@ -153,7 +152,7 @@ EXTENDED_VISUALS = [
     # Trends Timeline
     (
         "12_trends_timeline.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Horizontal timeline {topic} trends 2024 to 2030. Plot 6-8 emerging trends at "
         "different years. Each trend with icon, name, brief description. Color code: "
         "Technology trends blue, Market trends green, Regulatory trends orange. "
@@ -163,7 +162,7 @@ EXTENDED_VISUALS = [
     # Market Share Chart
     (
         "13_market_share.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Pie chart market share {topic} top 10 companies. Company A 18% dark blue, "
         "Company B 15% medium blue, Company C 12% teal, Company D 10% light blue, "
         "5 more companies 5-8% each various blues, Others 15% gray. "
@@ -174,7 +173,7 @@ EXTENDED_VISUALS = [
     # Strategic Groups Map
     (
         "14_strategic_groups.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Strategic group map {topic}. X-axis Geographic Scope Regional to Global. "
         "Y-axis Product Breadth Narrow to Broad. Draw 4-5 oval bubbles for strategic groups. "
         "Each bubble contains 2-4 company names. Bubble size = collective market share. "
@@ -185,7 +184,7 @@ EXTENDED_VISUALS = [
     # Customer Segments
     (
         "15_customer_segments.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Treemap customer segmentation {topic}. Large Enterprise 45% dark blue, "
         "Mid-Market 30% medium blue, SMB 18% light blue, Consumer 7% teal. "
         "Each segment shows name and percentage. Title: Customer Segmentation by Market Share. "
@@ -193,7 +192,7 @@ EXTENDED_VISUALS = [
     ),
     (
         "16_segment_attractiveness.png",
-        "scientific-schematics",
+        "project-diagrams",
         "2x2 segment attractiveness matrix {topic}. X-axis Segment Size Small to Large. "
         "Y-axis Growth Rate Low to High. Quadrants: Upper-right PRIORITY Invest Heavily green, "
         "Upper-left INVEST TO GROW yellow, Lower-right HARVEST orange, "
@@ -202,7 +201,7 @@ EXTENDED_VISUALS = [
     ),
     (
         "17_customer_journey.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Customer journey horizontal flowchart {topic}. 5 stages left to right: Awareness, "
         "Consideration, Decision, Implementation, Advocacy. Each stage shows Key Activities, "
         "Pain Points, Touchpoints in rows below. Icons for each stage. "
@@ -212,7 +211,7 @@ EXTENDED_VISUALS = [
     # Technology Roadmap
     (
         "18_technology_roadmap.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Technology roadmap {topic} 2024 to 2030. Three parallel horizontal tracks: "
         "Core Technology blue, Emerging Technology green, Enabling Technology orange. "
         "Milestones and tech introductions marked on each track. Vertical lines connect "
@@ -220,7 +219,7 @@ EXTENDED_VISUALS = [
     ),
     (
         "19_innovation_curve.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Gartner Hype Cycle curve for {topic} technologies. Five phases: Innovation Trigger "
         "rising, Peak of Inflated Expectations at top, Trough of Disillusionment at bottom, "
         "Slope of Enlightenment rising, Plateau of Productivity stable. "
@@ -230,7 +229,7 @@ EXTENDED_VISUALS = [
     # Regulatory Timeline
     (
         "20_regulatory_timeline.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Regulatory timeline {topic} 2020 to 2028. Past regulations dark blue solid markers, "
         "current green marker, upcoming light blue dashed. Each shows regulation name, date, "
         "brief description. Vertical NOW line at 2024. Professional appearance clear labels"
@@ -239,7 +238,7 @@ EXTENDED_VISUALS = [
     # Risk Mitigation Matrix
     (
         "21_risk_mitigation.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Risk mitigation diagram {topic}. Left column risks in orange/red boxes. "
         "Right column mitigation strategies in green/blue boxes. Arrows connecting "
         "risks to mitigations. Group by category. Risk severity by color intensity. "
@@ -249,7 +248,7 @@ EXTENDED_VISUALS = [
     # Opportunity Matrix
     (
         "22_opportunity_matrix.png",
-        "scientific-schematics",
+        "project-diagrams",
         "2x2 opportunity matrix {topic}. X-axis Market Attractiveness Low to High. "
         "Y-axis Ability to Win Low to High. Quadrants: Upper-right PURSUE AGGRESSIVELY green, "
         "Upper-left BUILD CAPABILITIES yellow, Lower-right SELECTIVE INVESTMENT yellow, "
@@ -260,7 +259,7 @@ EXTENDED_VISUALS = [
     # Recommendation Priority Matrix
     (
         "23_recommendation_priority.png",
-        "scientific-schematics",
+        "project-diagrams",
         "2x2 priority matrix {topic} recommendations. X-axis Effort Low to High. "
         "Y-axis Impact Low to High. Quadrants: Upper-left QUICK WINS green Do First, "
         "Upper-right MAJOR PROJECTS blue Plan Carefully, Lower-left FILL-INS gray Do If Time, "
@@ -270,7 +269,7 @@ EXTENDED_VISUALS = [
     # Implementation Timeline
     (
         "24_implementation_timeline.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Gantt chart implementation {topic} 24 months. Phase 1 Foundation months 1-6 dark blue. "
         "Phase 2 Build months 4-12 medium blue. Phase 3 Scale months 10-18 teal. "
         "Phase 4 Optimize months 16-24 light blue. Overlapping bars. "
@@ -280,7 +279,7 @@ EXTENDED_VISUALS = [
     # Milestone Tracker
     (
         "25_milestone_tracker.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Milestone tracker {topic} horizontal timeline 8-10 milestones. "
         "Each shows date, name, status: Completed green check, In Progress yellow circle, "
         "Upcoming gray circle. Group by phase. Phase labels above. "
@@ -290,7 +289,7 @@ EXTENDED_VISUALS = [
     # Financial Projections
     (
         "26_financial_projections.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Combined bar and line chart {topic} 5-year projections. Bar chart revenue "
         "primary Y-axis dollars. Line chart growth rate secondary Y-axis percent. "
         "Three scenarios: Conservative gray, Base Case blue, Optimistic green. "
@@ -300,7 +299,7 @@ EXTENDED_VISUALS = [
     # Scenario Analysis
     (
         "27_scenario_analysis.png",
-        "scientific-schematics",
+        "project-diagrams",
         "Grouped bar chart {topic} scenario comparison. X-axis metrics: Revenue Y5, "
         "EBITDA Y5, Market Share, ROI. Three bars per metric: Conservative gray, "
         "Base Case blue, Optimistic green. Data labels. Legend. "
@@ -313,8 +312,8 @@ def get_script_path(tool: str) -> Path:
     """Get the path to the appropriate generation script."""
     base_path = Path(__file__).parent.parent.parent  # skills directory
     
-    if tool == "scientific-schematics":
-        return base_path / "scientific-schematics" / "scripts" / "generate_schematic.py"
+    if tool == "project-diagrams":
+        return base_path / "project-diagrams" / "scripts" / "generate_schematic.py"
     elif tool == "generate-image":
         return base_path / "generate-image" / "scripts" / "generate_image.py"
     else:
@@ -350,7 +349,7 @@ def generate_visual(
         return False
     
     # Build command
-    if tool == "scientific-schematics":
+    if tool == "project-diagrams":
         cmd = [
             sys.executable,
             str(script_path),
@@ -465,7 +464,7 @@ def main():
     if args.only:
         pattern = args.only.lower()
         visuals_to_generate = [
-            v for v in VISUALS 
+            v for v in visuals_to_generate
             if pattern in v[0].lower() or pattern in v[2].lower()
         ]
         print(f"Filtered to {len(visuals_to_generate)} visuals matching '{args.only}'\n")

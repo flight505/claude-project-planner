@@ -62,7 +62,7 @@ Claude Project Planner can be used in three ways:
 | **Grant Proposal** | [Features: Grant Proposals](FEATURES.md#grant-proposals) → [Skills: Research Grants](SKILLS.md#5-research-grants) |
 | **Research Poster** | [Features: Research Posters](FEATURES.md#research-posters) → [Skills: LaTeX Posters](SKILLS.md#6-latex-research-posters) |
 | **Literature Review** | [Features: Literature Reviews](FEATURES.md#literature-reviews) → [Skills: Literature Review](SKILLS.md#2-literature-review) |
-| **Scientific Diagram** | [Features: Scientific Schematics](FEATURES.md#scientific-schematics) → [Skills: Scientific Schematics](SKILLS.md#6-scientific-schematics-and-diagrams) |
+| **Scientific Diagram** | [Features: Scientific Schematics](FEATURES.md#project-diagrams) → [Skills: Scientific Schematics](SKILLS.md#6-project-diagrams-and-diagrams) |
 
 ### I Want to...
 
@@ -160,7 +160,7 @@ When looking for specific information:
 - `generate_paper()` → [API.md](API.md)
 - `project-planner` → [README.md](../README.md)
 - `NSF`/`NIH`/`DOE`/`DARPA` → [SKILLS.md](SKILLS.md#5-research-grants)
-- `CONSORT`/`circuit`/`pathway` → [SKILLS.md](SKILLS.md#6-scientific-schematics-and-diagrams)
+- `CONSORT`/`circuit`/`pathway` → [SKILLS.md](SKILLS.md#6-project-diagrams-and-diagrams)
 - `MarkItDown` → [SKILLS.md](SKILLS.md#7-markitdown---universal-file-to-markdown-converter)
 - `ScholarEval` → [SKILLS.md](SKILLS.md#4-scholar-evaluation)
 - `data files` → [FEATURES.md](FEATURES.md#automatic-data-handling)
