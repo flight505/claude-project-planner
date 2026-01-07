@@ -1,7 +1,7 @@
 {
   "name": "claude-project-planner",
   "description": "Comprehensive project planning and architecture research skills for Claude Code - generates software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps backed by real research.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "homepage": "https://github.com/flight505/claude-project-planner",
   "commands": "./commands",
   "skills": [
@@ -21,6 +21,7 @@
     "./project_planner/.claude/skills/document-skills/docx",
     "./project_planner/.claude/skills/document-skills/pdf",
     "./project_planner/.claude/skills/document-skills/pptx",
-    "./project_planner/.claude/skills/document-skills/xlsx"
+    "./project_planner/.claude/skills/document-skills/xlsx",
+    "./project_planner/.claude/skills/marketing-campaign"
   ]
 }
