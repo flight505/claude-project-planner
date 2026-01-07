@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.10] - 2025-01-07
+
+### 🔧 Fixed
+
+#### Project Diagrams doc-type Support
+
+- **Fixed `--doc-type` argument mismatch** - Scripts now accept project-planning doc types
+  - Added: `specification`, `architecture`, `proposal`, `sprint`
+  - Updated both `generate_schematic.py` and `generate_schematic_ai.py`
+  - Updated quality thresholds in `QUALITY_THRESHOLDS` dictionary
+  - Maintains backward compatibility with scientific writer doc types
+
+**New doc-types with quality thresholds:**
+| Type | Threshold | Description |
+|------|-----------|-------------|
+| `specification` | 8.5/10 | Technical specs, PRDs |
+| `architecture` | 8.0/10 | Architecture documents |
+| `proposal` | 8.0/10 | Business proposals |
+| `sprint` | 7.5/10 | Sprint planning docs |
+
+---
+
 ## [1.0.9] - 2025-01-07
 
 ### ✨ Added

@@ -41,15 +41,19 @@ How it works:
   - Publication-ready output
 
 Document Types (quality thresholds):
-  journal      8.5/10  - Nature, Science, peer-reviewed journals
-  conference   8.0/10  - Conference papers
-  thesis       8.0/10  - Dissertations, theses
-  grant        8.0/10  - Grant proposals
-  preprint     7.5/10  - arXiv, bioRxiv, etc.
-  report       7.5/10  - Technical reports
-  poster       7.0/10  - Academic posters
-  presentation 6.5/10  - Slides, talks
-  default      7.5/10  - General purpose
+  specification 8.5/10 - Technical specs, PRDs
+  architecture  8.0/10 - Architecture documents
+  proposal      8.0/10 - Business proposals
+  journal       8.5/10 - Nature, Science, peer-reviewed journals
+  conference    8.0/10 - Conference papers
+  thesis        8.0/10 - Dissertations, theses
+  grant         8.0/10 - Grant proposals
+  sprint        7.5/10 - Sprint planning docs
+  preprint      7.5/10 - arXiv, bioRxiv, etc.
+  report        7.5/10 - Technical reports
+  poster        7.0/10 - Academic posters
+  presentation  6.5/10 - Slides, talks
+  default       7.5/10 - General purpose
 
 Examples:
   # Generate for journal paper (strict quality)
@@ -77,7 +81,8 @@ Environment Variables:
     parser.add_argument("-o", "--output", required=True,
                        help="Output file path")
     parser.add_argument("--doc-type", default="default",
-                       choices=["journal", "conference", "poster", "presentation",
+                       choices=["specification", "architecture", "proposal", "sprint",
+                               "journal", "conference", "poster", "presentation",
                                "report", "grant", "thesis", "preprint", "default"],
                        help="Document type for quality threshold (default: default)")
     parser.add_argument("--iterations", type=int, default=2,

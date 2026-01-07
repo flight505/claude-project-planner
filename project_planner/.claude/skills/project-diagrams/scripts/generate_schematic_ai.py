@@ -87,6 +87,12 @@ class ScientificSchematicGenerator:
     # Quality thresholds by document type (score out of 10)
     # Higher thresholds for more formal publications
     QUALITY_THRESHOLDS = {
+        # Project Planning doc types
+        "specification": 8.5, # Technical specs, PRDs - highest standards
+        "architecture": 8.0,  # Architecture documents - high standards
+        "proposal": 8.0,      # Business proposals - must be compelling
+        "sprint": 7.5,        # Sprint planning docs - professional
+        # Scientific Writer doc types (kept for compatibility)
         "journal": 8.5,      # Nature, Science, etc. - highest standards
         "conference": 8.0,   # Conference papers - high standards
         "poster": 7.0,       # Academic posters - good quality
@@ -764,15 +770,19 @@ Examples:
   python generate_schematic_ai.py "Circuit diagram" -o circuit.png -v
 
 Document Types (quality thresholds):
-  journal      8.5/10  - Nature, Science, peer-reviewed journals
-  conference   8.0/10  - Conference papers
-  thesis       8.0/10  - Dissertations, theses
-  grant        8.0/10  - Grant proposals
-  preprint     7.5/10  - arXiv, bioRxiv, etc.
-  report       7.5/10  - Technical reports
-  poster       7.0/10  - Academic posters
-  presentation 6.5/10  - Slides, talks
-  default      7.5/10  - General purpose
+  specification 8.5/10 - Technical specs, PRDs
+  architecture  8.0/10 - Architecture documents
+  proposal      8.0/10 - Business proposals
+  journal       8.5/10 - Nature, Science, peer-reviewed journals
+  conference    8.0/10 - Conference papers
+  thesis        8.0/10 - Dissertations, theses
+  grant         8.0/10 - Grant proposals
+  sprint        7.5/10 - Sprint planning docs
+  preprint      7.5/10 - arXiv, bioRxiv, etc.
+  report        7.5/10 - Technical reports
+  poster        7.0/10 - Academic posters
+  presentation  6.5/10 - Slides, talks
+  default       7.5/10 - General purpose
 
 Note: Multiple iterations only occur if quality is BELOW the threshold.
       If the first generation meets the threshold, no extra API calls are made.
@@ -788,7 +798,8 @@ Environment:
     parser.add_argument("--iterations", type=int, default=2,
                        help="Maximum refinement iterations (default: 2, max: 2)")
     parser.add_argument("--doc-type", default="default",
-                       choices=["journal", "conference", "poster", "presentation", 
+                       choices=["specification", "architecture", "proposal", "sprint",
+                               "journal", "conference", "poster", "presentation",
                                "report", "grant", "thesis", "preprint", "default"],
                        help="Document type for quality threshold (default: default)")
     parser.add_argument("--api-key", help="OpenRouter API key (or set OPENROUTER_API_KEY)")
