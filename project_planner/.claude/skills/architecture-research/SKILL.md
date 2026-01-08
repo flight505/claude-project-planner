@@ -32,7 +32,7 @@ Use the **project-diagrams** skill to generate:
 - Data flow diagrams
 
 ```bash
-python scripts/generate_schematic.py "diagram description" -o diagrams/output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram description" -o diagrams/output.png
 ```
 
 ---
@@ -266,7 +266,7 @@ Shows the system in context with users and external systems.
 - Relationships and data flows
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "C4 Context diagram: [System Name] in center. \
    Users: [User types]. \
    External systems: [Systems]. \
@@ -285,7 +285,7 @@ Shows high-level technology choices.
 - Technology choices annotated
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "C4 Container diagram: \
    Web App (React), API (Node.js), Database (PostgreSQL). \
    Show communication protocols between containers." \

@@ -34,7 +34,7 @@ echo ""
 # Example 1: Simple flowchart
 echo "Example 1: CONSORT Flowchart"
 echo "----------------------------"
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "CONSORT participant flow diagram. Assessed for eligibility (n=500). Excluded (n=150) with reasons: age<18 (n=80), declined (n=50), other (n=20). Randomized (n=350) into Treatment (n=175) and Control (n=175). Lost to follow-up: 15 and 10. Final analysis: 160 and 165." \
   -o figures/consort_example.png \
   --iterations 2
@@ -48,7 +48,7 @@ echo ""
 # Example 2: Neural network (shorter for demo)
 echo "Example 2: Simple Neural Network"
 echo "--------------------------------"
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "Simple feedforward neural network diagram. Input layer with 4 nodes, hidden layer with 6 nodes, output layer with 2 nodes. Show all connections. Label layers clearly." \
   -o figures/neural_net_example.png \
   --iterations 2
@@ -60,7 +60,7 @@ echo ""
 # Example 3: Biological pathway (minimal)
 echo "Example 3: Signaling Pathway"
 echo "---------------------------"
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "Simple signaling pathway: Receptor → Kinase A → Kinase B → Transcription Factor → Gene. Show arrows with 'activation' labels. Use different colors for each component." \
   -o figures/pathway_example.png \
   --iterations 2

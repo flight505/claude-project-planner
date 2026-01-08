@@ -173,7 +173,7 @@ def test_file_paths():
     base_dir = Path(__file__).parent
     required_files = [
         "scripts/generate_schematic_ai.py",
-        "scripts/generate_schematic.py",
+        ".claude/skills/project-diagrams/scripts/generate_schematic.py",
         "SKILL.md",
         "README.md"
     ]
@@ -232,7 +232,7 @@ def main():
         print("\nNext steps:")
         print("1. Set OPENROUTER_API_KEY environment variable")
         print("2. Test with actual API call:")
-        print("   python scripts/generate_schematic.py 'test diagram' -o test.png")
+        print("   python .claude/skills/project-diagrams/scripts/generate_schematic.py 'test diagram' -o test.png")
         return 0
     else:
         print(f"\n✗ {total - passed} test(s) failed. Please review errors above.")

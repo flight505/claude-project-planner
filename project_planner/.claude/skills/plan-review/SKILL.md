@@ -33,7 +33,7 @@ Use the **project-diagrams** skill to generate:
 - Cost breakdown charts
 
 ```bash
-python scripts/generate_schematic.py "diagram description" -o diagrams/output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram description" -o diagrams/output.png
 ```
 
 ---

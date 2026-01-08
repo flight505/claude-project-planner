@@ -32,7 +32,7 @@ Use the **project-diagrams** skill to generate:
 - Competitor landscape maps
 
 ```bash
-python scripts/generate_schematic.py "diagram description" -o diagrams/output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram description" -o diagrams/output.png
 ```
 
 ---

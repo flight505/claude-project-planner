@@ -1,6 +1,6 @@
 [project]
 name = "project-planner"
-version = "1.0.0"
+version = "1.0.12"
 description = "AI-powered project planning tool - generates comprehensive software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,6 +26,12 @@ dependencies = [
 #     Install: sudo apt-get install texlive-full (Ubuntu/Debian)
 #   - Windows: MiKTeX (https://miktex.org/) or TeX Live
 
+[project.optional-dependencies]
+pptx = [
+    "pillow>=10.0.0",
+    "python-pptx>=0.6.21",
+]
+
 [project.scripts]
 project-planner = "project_planner.cli:cli_main"
 
@@ -36,8 +42,8 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["project_planner"]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
 ]

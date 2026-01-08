@@ -13,13 +13,13 @@ Nano Banana Pro creates publication-quality diagrams automatically - no coding, 
 export OPENROUTER_API_KEY='your_api_key_here'
 
 # Generate any scientific diagram
-python scripts/generate_schematic.py "CONSORT participant flow diagram" -o figures/consort.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "CONSORT participant flow diagram" -o figures/consort.png
 
 # Neural network architecture
-python scripts/generate_schematic.py "Transformer encoder-decoder architecture" -o figures/transformer.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "Transformer encoder-decoder architecture" -o figures/transformer.png
 
 # Biological pathway
-python scripts/generate_schematic.py "MAPK signaling pathway" -o figures/pathway.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "MAPK signaling pathway" -o figures/pathway.png
 ```
 
 ### What You Get
@@ -73,7 +73,7 @@ pip install requests
 ### Example 1: CONSORT Flowchart
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "CONSORT participant flow diagram for RCT. \
    Assessed for eligibility (n=500). \
    Excluded (n=150): age<18 (n=80), declined (n=50), other (n=20). \
@@ -93,7 +93,7 @@ python scripts/generate_schematic.py \
 ### Example 2: Neural Network Architecture
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "Transformer architecture with encoder on left (input embedding, \
    positional encoding, multi-head attention, feed-forward) and \
    decoder on right (masked attention, cross-attention, feed-forward). \
@@ -105,7 +105,7 @@ python scripts/generate_schematic.py \
 ### Example 3: Biological Pathway
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "MAPK signaling pathway: EGFR receptor → RAS → RAF → MEK → ERK → nucleus. \
    Label each step with phosphorylation. Use different colors for each kinase." \
   -o figures/mapk.png
@@ -114,7 +114,7 @@ python scripts/generate_schematic.py \
 ### Example 4: System Architecture
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "IoT system block diagram: sensors (bottom) → microcontroller → \
    WiFi module and display (middle) → cloud server → mobile app (top). \
    Label all connections with protocols." \
@@ -124,7 +124,7 @@ python scripts/generate_schematic.py \
 ## Command-Line Options
 
 ```bash
-python scripts/generate_schematic.py [OPTIONS] "description" -o output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py [OPTIONS] "description" -o output.png
 
 Options:
   --iterations N          Number of AI refinement iterations (default: 2, max: 2)
@@ -264,7 +264,7 @@ pip install -r requirements.txt
 
 ```bash
 # Use verbose mode to see detailed errors
-python scripts/generate_schematic.py "diagram" -o out.png -v
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram" -o out.png -v
 
 # Check API status
 curl https://openrouter.ai/api/v1/models

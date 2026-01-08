@@ -33,7 +33,7 @@ If your document does not already contain diagrams:
 
 **How to generate diagrams:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "your diagram description" -o figures/output.png
 ```
 
 The AI will automatically:

@@ -214,7 +214,7 @@ For each section:
 - Risk heat map
 
 ```bash
-python scripts/generate_schematic.py "System architecture for [project]: [components and interactions]" -o diagrams/architecture.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "System architecture for [project]: [components and interactions]" -o diagrams/architecture.png
 ```
 
 ### Research Verification

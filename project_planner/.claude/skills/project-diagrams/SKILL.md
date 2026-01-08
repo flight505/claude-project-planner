@@ -70,19 +70,19 @@ This skill should be used when:
 
 ```bash
 # System architecture (highest quality: 8.5/10)
-python scripts/generate_schematic.py "Microservices architecture with API gateway, auth service, user service, and PostgreSQL" -o diagrams/architecture.png --doc-type specification
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "Microservices architecture with API gateway, auth service, user service, and PostgreSQL" -o diagrams/architecture.png --doc-type specification
 
 # C4 Context diagram
-python scripts/generate_schematic.py "C4 Context diagram showing e-commerce system with payment gateway, inventory, customers" -o diagrams/c4_context.png --doc-type architecture
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "C4 Context diagram showing e-commerce system with payment gateway, inventory, customers" -o diagrams/c4_context.png --doc-type architecture
 
 # Sequence diagram
-python scripts/generate_schematic.py "Sequence diagram: user authentication flow with client, API, auth service, database" -o diagrams/auth_sequence.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "Sequence diagram: user authentication flow with client, API, auth service, database" -o diagrams/auth_sequence.png
 
 # Data flow diagram
-python scripts/generate_schematic.py "Data flow: user input -> API -> validation -> business logic -> database -> response" -o diagrams/data_flow.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "Data flow: user input -> API -> validation -> business logic -> database -> response" -o diagrams/data_flow.png
 
 # AWS deployment
-python scripts/generate_schematic.py "AWS deployment: Route53 -> CloudFront -> ALB -> ECS Fargate -> RDS Aurora" -o diagrams/aws_deployment.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "AWS deployment: Route53 -> CloudFront -> ALB -> ECS Fargate -> RDS Aurora" -o diagrams/aws_deployment.png
 ```
 
 ## Diagram Types for Project Planning
@@ -90,7 +90,7 @@ python scripts/generate_schematic.py "AWS deployment: Route53 -> CloudFront -> A
 ### 1. System Architecture Diagrams
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "System architecture for SaaS application: \
    Frontend (React) -> API Gateway -> Microservices (Auth, Users, Payments). \
    Services connect to PostgreSQL and Redis. Event bus (Kafka) for async. \
@@ -102,7 +102,7 @@ python scripts/generate_schematic.py \
 
 ```bash
 # Context Level
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "C4 Context diagram: Central 'Inventory System' box. \
    External actors: Warehouse Staff, Suppliers, Customers. \
    External systems: ERP, Payment Gateway, Shipping. \
@@ -110,7 +110,7 @@ python scripts/generate_schematic.py \
   -o diagrams/c4_context.png
 
 # Container Level
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "C4 Container diagram: Web App (React) -> API Gateway (Kong) -> \
    Microservices: Inventory (Node.js), Orders (Python), Notifications (Go). \
    Databases: PostgreSQL, MongoDB. Message Queue: RabbitMQ." \
@@ -120,7 +120,7 @@ python scripts/generate_schematic.py \
 ### 3. Sequence Diagrams
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "Sequence diagram for checkout: User, Frontend, API, Cart, Payment, Order, Database. \
    Flow: checkout click -> validate cart -> process payment -> create order -> store -> response. \
    Include error path for payment failure." \
@@ -130,7 +130,7 @@ python scripts/generate_schematic.py \
 ### 4. Data Model / ERD
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "ERD for e-commerce: Users has_many Orders has_many OrderItems belongs_to Products. \
    Products belongs_to Categories. Show PKs, FKs, crow's foot notation." \
   -o diagrams/data_model.png
@@ -139,7 +139,7 @@ python scripts/generate_schematic.py \
 ### 5. Cloud Infrastructure
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "AWS architecture: VPC with public/private subnets in 2 AZs. \
    Public: ALB, NAT. Private: ECS Fargate, RDS Aurora. \
    Route53 -> CloudFront -> ALB. CloudWatch monitoring." \
@@ -149,7 +149,7 @@ python scripts/generate_schematic.py \
 ### 6. CI/CD Pipeline
 
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "CI/CD pipeline: GitHub push -> Build -> Test -> Security Scan -> \
    Deploy Staging -> Integration Tests -> Approval -> Production. \
    Tools: GitHub Actions, Docker, Jest, Snyk, ArgoCD, K8s." \

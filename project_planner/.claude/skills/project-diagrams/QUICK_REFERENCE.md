@@ -16,7 +16,7 @@ echo 'export OPENROUTER_API_KEY="sk-or-v1-your_key"' >> ~/.bashrc  # or ~/.zshrc
 
 ```bash
 # Describe your diagram, Nano Banana Pro creates it
-python scripts/generate_schematic.py "your diagram description" -o output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "your diagram description" -o output.png
 
 # That's it! Automatic:
 # - Iterative refinement (3 rounds)
@@ -28,28 +28,28 @@ python scripts/generate_schematic.py "your diagram description" -o output.png
 
 ### CONSORT Flowchart
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "CONSORT flow: screened n=500, excluded n=150, randomized n=350" \
   -o consort.png
 ```
 
 ### Neural Network
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "Transformer architecture with encoder and decoder stacks" \
   -o transformer.png
 ```
 
 ### Biological Pathway
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "MAPK pathway: EGFR → RAS → RAF → MEK → ERK" \
   -o mapk.png
 ```
 
 ### Circuit Diagram
 ```bash
-python scripts/generate_schematic.py \
+python .claude/skills/project-diagrams/scripts/generate_schematic.py \
   "Op-amp circuit with 1kΩ resistor and 10µF capacitor" \
   -o circuit.png
 ```
@@ -182,17 +182,17 @@ Typical cost per diagram (max 2 iterations):
 
 ```bash
 # Show help
-python scripts/generate_schematic.py --help
+python .claude/skills/project-diagrams/scripts/generate_schematic.py --help
 
 # Verbose mode for debugging
-python scripts/generate_schematic.py "diagram" -o out.png -v
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram" -o out.png -v
 ```
 
 ## Quick Start Checklist
 
 - [ ] Set `OPENROUTER_API_KEY` environment variable
 - [ ] Run `python test_ai_generation.py` (should pass 6/6)
-- [ ] Try: `python scripts/generate_schematic.py "test diagram" -o test.png`
+- [ ] Try: `python .claude/skills/project-diagrams/scripts/generate_schematic.py "test diagram" -o test.png`
 - [ ] Review output files (test_v1.png, v2, v3, review_log.json)
 - [ ] Read SKILL.md for detailed documentation
 - [ ] Check README.md for examples

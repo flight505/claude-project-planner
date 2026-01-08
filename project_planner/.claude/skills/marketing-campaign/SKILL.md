@@ -34,7 +34,7 @@ Use the **project-diagrams** skill to generate:
 - Budget allocation pie charts
 
 ```bash
-python scripts/generate_schematic.py "diagram description" -o diagrams/output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram description" -o diagrams/output.png
 ```
 
 Use the **generate-image** skill for:

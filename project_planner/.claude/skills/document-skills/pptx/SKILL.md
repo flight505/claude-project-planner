@@ -23,7 +23,7 @@ If your document does not already contain diagrams:
 
 **How to generate schematics:**
 ```bash
-python scripts/generate_schematic.py "your diagram description" -o figures/output.png
+python .claude/skills/project-diagrams/scripts/generate_schematic.py "your diagram description" -o figures/output.png
 ```
 
 The AI will automatically:
@@ -193,7 +193,7 @@ When creating a new PowerPoint presentation from scratch, use the **html2pptx** 
    - Add charts and tables to placeholder areas using PptxGenJS API
    - Save the presentation using `pptx.writeFile()`
 4. **Visual validation**: Generate thumbnails and inspect for layout issues
-   - Create thumbnail grid: `python scripts/thumbnail.py output.pptx workspace/thumbnails --cols 4`
+   - Create thumbnail grid: `python .claude/skills/document-skills/pptx/scripts/thumbnail.py output.pptx workspace/thumbnails --cols 4`
    - Read and carefully examine the thumbnail image for:
      - **Text cutoff**: Text being cut off by header bars, shapes, or slide edges
      - **Text overlap**: Text overlapping with other text or shapes
@@ -221,7 +221,7 @@ To create a presentation that follows an existing template's design, duplicate a
 1. **Extract template text AND create visual thumbnail grid**:
    * Extract text: `python -m markitdown template.pptx > template-content.md`
    * Read `template-content.md`: Read the entire file to understand the contents of the template presentation. **NEVER set any range limits when reading this file.**
-   * Create thumbnail grids: `python scripts/thumbnail.py template.pptx`
+   * Create thumbnail grids: `python .claude/skills/document-skills/pptx/scripts/thumbnail.py template.pptx`
    * See [Creating Thumbnail Grids](#creating-thumbnail-grids) section for more details
 
 2. **Analyze template and save inventory to a file**:
@@ -444,13 +444,13 @@ To create a presentation that follows an existing template's design, duplicate a
 To create visual thumbnail grids of PowerPoint slides for quick analysis and reference:
 
 ```bash
-python scripts/thumbnail.py template.pptx [output_prefix]
+python .claude/skills/document-skills/pptx/scripts/thumbnail.py template.pptx [output_prefix]
 ```
 
 **Features**:
 - Creates: `thumbnails.jpg` (or `thumbnails-1.jpg`, `thumbnails-2.jpg`, etc. for large decks)
 - Default: 5 columns, max 30 slides per grid (5×6)
-- Custom prefix: `python scripts/thumbnail.py template.pptx my-grid`
+- Custom prefix: `python .claude/skills/document-skills/pptx/scripts/thumbnail.py template.pptx my-grid`
   - Note: The output prefix should include the path if you want output in a specific directory (e.g., `workspace/my-grid`)
 - Adjust columns: `--cols 4` (range: 3-6, affects slides per grid)
 - Grid limits: 3 cols = 12 slides/grid, 4 cols = 20, 5 cols = 30, 6 cols = 42
@@ -465,10 +465,10 @@ python scripts/thumbnail.py template.pptx [output_prefix]
 **Examples**:
 ```bash
 # Basic usage
-python scripts/thumbnail.py presentation.pptx
+python .claude/skills/document-skills/pptx/scripts/thumbnail.py presentation.pptx
 
 # Combine options: custom name, columns
-python scripts/thumbnail.py template.pptx analysis --cols 4
+python .claude/skills/document-skills/pptx/scripts/thumbnail.py template.pptx analysis --cols 4
 ```
 
 ## Converting Slides to Images
