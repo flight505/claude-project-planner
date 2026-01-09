@@ -10,7 +10,6 @@ import requests
 import time
 from datetime import datetime
 from typing import Dict, List, Optional, Any
-from urllib.parse import quote
 
 
 class ResearchLookup:
@@ -348,6 +347,138 @@ Focus exclusively on scholarly sources: peer-reviewed journals, academic papers,
         except Exception as e:
             return {"error": str(e)}
 
+    def save_citations(
+        self,
+        result: Dict[str, Any],
+        output_path: str,
+        markdown_file: Optional[str] = None
+    ) -> str:
+        """
+        Save citations from a lookup result to a sidecar JSON file.
+
+        Args:
+            result: The lookup result dictionary containing citations
+            output_path: Directory to save the citations file
+            markdown_file: Optional associated markdown filename (used for naming)
+
+        Returns:
+            Path to the saved citations file
+        """
+        from pathlib import Path
+
+        output_dir = Path(output_path)
+        output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Determine filename
+        if markdown_file:
+            base_name = Path(markdown_file).stem
+        else:
+            # Create name from query
+            query = result.get("query", "research")
+            base_name = query[:50].lower().replace(" ", "_").replace("/", "_")
+            base_name = "".join(c for c in base_name if c.isalnum() or c == "_")
+
+        citations_file = output_dir / f"{base_name}.citations.json"
+
+        # Extract and format citations
+        citations = []
+        citation_id = 1
+
+        # Process API-provided sources first (most reliable)
+        for source in result.get("sources", []):
+            citations.append({
+                "id": f"cite-{citation_id}",
+                "title": source.get("title", ""),
+                "url": source.get("url", ""),
+                "date": source.get("date", ""),
+                "snippet": source.get("snippet", ""),
+                "author": "",  # Perplexity doesn't always provide author
+                "accessed": datetime.now().strftime("%Y-%m-%d")
+            })
+            citation_id += 1
+
+        # Add text-extracted citations (DOIs and academic URLs)
+        for cite in result.get("citations", []):
+            if cite.get("type") in ("doi", "url"):
+                citations.append({
+                    "id": f"cite-{citation_id}",
+                    "title": "",
+                    "url": cite.get("url", ""),
+                    "doi": cite.get("doi", ""),
+                    "date": "",
+                    "author": "",
+                    "accessed": datetime.now().strftime("%Y-%m-%d")
+                })
+                citation_id += 1
+
+        # Create citation data structure
+        citation_data = {
+            "query": result.get("query", ""),
+            "timestamp": result.get("timestamp", ""),
+            "model": result.get("model", ""),
+            "citations": citations,
+            "inline_refs": []  # Placeholder for inline reference tracking
+        }
+
+        # Write to file
+        citations_file.write_text(
+            json.dumps(citation_data, indent=2, ensure_ascii=False),
+            encoding="utf-8"
+        )
+
+        return str(citations_file)
+
+    def lookup_and_save(
+        self,
+        query: str,
+        output_dir: str,
+        markdown_file: Optional[str] = None,
+        save_markdown: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Perform lookup and save both markdown and citations.
+
+        Args:
+            query: The research query
+            output_dir: Directory to save outputs
+            markdown_file: Optional markdown filename (auto-generated if not provided)
+            save_markdown: Whether to also save the response as markdown
+
+        Returns:
+            Result dictionary with additional 'saved_files' key
+        """
+        from pathlib import Path
+
+        result = self.lookup(query)
+
+        if not result.get("success"):
+            return result
+
+        output_path = Path(output_dir)
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        saved_files = {}
+
+        # Determine markdown filename
+        if not markdown_file:
+            query_slug = query[:50].lower().replace(" ", "_").replace("/", "_")
+            query_slug = "".join(c for c in query_slug if c.isalnum() or c == "_")
+            markdown_file = f"{query_slug}.md"
+
+        # Save markdown if requested
+        if save_markdown:
+            md_path = output_path / markdown_file
+            md_content = f"# {query}\n\n{result['response']}"
+            md_path.write_text(md_content, encoding="utf-8")
+            saved_files["markdown"] = str(md_path)
+
+        # Save citations
+        citations_path = self.save_citations(result, str(output_path), markdown_file)
+        saved_files["citations"] = citations_path
+
+        result["saved_files"] = saved_files
+        return result
+
 
 def main():
     """Command-line interface for testing the research lookup tool."""
@@ -362,6 +493,8 @@ def main():
                         help="Force specific model: 'pro' for fast lookup, 'reasoning' for deep analysis")
     parser.add_argument("-o", "--output", help="Write output to file instead of stdout")
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
+    parser.add_argument("--save-citations", help="Save citations to JSON file in specified directory")
+    parser.add_argument("--save-markdown", help="Save response as markdown in specified directory")
 
     args = parser.parse_args()
     
@@ -412,6 +545,25 @@ def main():
         else:
             print(f"Researching: {args.query}", file=sys.stderr)
             results = [research.lookup(args.query)]
+
+        # Save citations if requested
+        if args.save_citations or args.save_markdown:
+            save_dir = args.save_citations or args.save_markdown
+            for result in results:
+                if result.get("success"):
+                    citations_file = research.save_citations(result, save_dir)
+                    print(f"Citations saved: {citations_file}", file=sys.stderr)
+
+                    if args.save_markdown:
+                        from pathlib import Path
+                        query_slug = result.get("query", "research")[:50]
+                        query_slug = query_slug.lower().replace(" ", "_").replace("/", "_")
+                        query_slug = "".join(c for c in query_slug if c.isalnum() or c == "_")
+                        md_file = Path(save_dir) / f"{query_slug}.md"
+                        md_content = f"# {result.get('query', 'Research')}\n\n{result['response']}"
+                        md_file.parent.mkdir(parents=True, exist_ok=True)
+                        md_file.write_text(md_content, encoding="utf-8")
+                        print(f"Markdown saved: {md_file}", file=sys.stderr)
 
         # Output as JSON if requested
         if args.json:
