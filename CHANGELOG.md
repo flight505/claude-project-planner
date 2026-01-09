@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.14] - 2025-01-09
+
+### ✨ Added
+
+#### AI Visual Generation (Nano Banana Integration)
+
+- **Visual generation in `/generate-report`** - Interactive menu for AI-generated visuals
+  - Question 4: "Generate AI visuals for the report?" (Yes/Cover only/No)
+  - Question 4b: Cover image style selection (Modern Tech, Corporate, Industry-Specific, Custom)
+  - Question 4c: Diagram type selection (Architecture, Component, Data Flow)
+
+- **Cover image generation** - Professional cover images via Gemini 3 Pro
+  - Style-specific prompts (tech, corporate, healthcare, finance, SaaS)
+  - Custom style option for user-defined aesthetics
+  - Automatic project context extraction for relevant imagery
+
+- **Diagram generation** - AI-generated technical diagrams
+  - Architecture overview diagrams
+  - Component/building block diagrams
+  - Data flow diagrams
+  - Prompts enhanced with project-specific context from planning outputs
+
+- **Integration with `generate-image` skill**
+  - Uses existing `scripts/generate_image.py` infrastructure
+  - Requires `OPENROUTER_API_KEY` environment variable
+  - Graceful degradation if API unavailable
+
+### 📝 Documentation
+
+- Updated `report-generation/SKILL.md` with visual generation section
+- Added style prompt reference table
+- Documented diagram generation patterns
+
+---
+
 ## [1.0.13] - 2025-01-09
 
 ### ✨ Added

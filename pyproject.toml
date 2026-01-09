@@ -1,6 +1,6 @@
 [project]
 name = "project-planner"
-version = "1.0.13"
+version = "1.0.14"
 description = "AI-powered project planning tool - generates comprehensive software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -12,9 +12,10 @@ When the user invokes `/generate-report`, compile the project planning outputs i
 
 1. **Locate** planning outputs folder
 2. **Scan** available content and citations
-3. **Ask** user preferences via interactive menu
-4. **Compile** report based on selections
-5. **Generate** output in requested format
+3. **Ask** user preferences via interactive menu (sections, citations, format, visuals)
+4. **Generate visuals** if requested (cover image, diagrams via AI)
+5. **Compile** report based on selections
+6. **Generate** output in requested format
 
 ## Step 1: Locate Planning Outputs
 
@@ -116,6 +117,59 @@ options:
     description: "Single compiled .md file"
 ```
 
+### Question 4: Visual Generation (AI Images)
+
+Ask if user wants AI-generated visuals for the report:
+
+```
+header: "Visuals"
+question: "Generate AI visuals for the report?"
+multiSelect: false
+options:
+  - label: "Yes - Generate cover image and diagrams"
+    description: "Use AI (Gemini 3 Pro) to create professional visuals"
+  - label: "Cover image only"
+    description: "Generate just a professional cover image"
+  - label: "No visuals"
+    description: "Use existing images only, no AI generation"
+```
+
+If user selects visual generation, ask follow-up questions:
+
+### Question 4b: Cover Image Style (if visuals enabled)
+
+```
+header: "Cover Style"
+question: "What style for the cover image?"
+multiSelect: false
+options:
+  - label: "Modern Tech/Abstract"
+    description: "Geometric patterns, gradients, professional tech aesthetic"
+  - label: "Corporate/Business"
+    description: "Clean, minimal, executive presentation style"
+  - label: "Industry-Specific"
+    description: "Visuals related to your project domain (e.g., healthcare, finance)"
+  - label: "Custom"
+    description: "Describe your preferred style"
+```
+
+If user selects "Custom" or "Industry-Specific", ask them to describe the style they want.
+
+### Question 4c: Diagram Generation (if full visuals enabled)
+
+```
+header: "Diagrams"
+question: "Which diagrams should be generated?"
+multiSelect: true
+options:
+  - label: "Architecture Overview"
+    description: "High-level system architecture diagram"
+  - label: "Component Diagram"
+    description: "Building blocks and their relationships"
+  - label: "Data Flow"
+    description: "How data moves through the system"
+```
+
 ## Step 4: Process User Selections
 
 After receiving answers, parse the selections:
@@ -183,6 +237,97 @@ If the compile script doesn't exist or fails, perform manual compilation:
    - DOCX: `pandoc output.md -o output.docx --toc`
    - MD: Keep as-is
 
+## Step 5.5: Generate Visuals (if requested)
+
+If user requested visual generation, create images before final compilation:
+
+### Generate Cover Image
+
+Build a prompt based on user's style preference and project context:
+
+**Modern Tech/Abstract style:**
+```
+"Professional report cover image, modern tech aesthetic, abstract geometric patterns
+with blue and white gradients, subtle circuit board elements, clean minimalist design,
+corporate document style, 16:9 aspect ratio"
+```
+
+**Corporate/Business style:**
+```
+"Professional business report cover, clean minimal design, subtle gradient background,
+executive presentation style, muted blue and gray tones, elegant typography space,
+corporate document aesthetic"
+```
+
+**Industry-Specific style:**
+Incorporate project domain elements:
+- Healthcare: "medical imagery, DNA helix, health tech visualization"
+- Finance: "financial charts, secure vault imagery, fintech aesthetic"
+- E-commerce: "shopping icons, digital marketplace, retail tech"
+- SaaS: "cloud computing, dashboard interface, software visualization"
+
+Execute image generation:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+  "<cover_prompt>" \
+  --output "<planning_folder>/diagrams/cover_image.png" \
+  --model "google/gemini-3-pro-image-preview"
+```
+
+### Generate Diagrams (if requested)
+
+For each requested diagram type, construct an appropriate prompt:
+
+**Architecture Overview:**
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+  "System architecture diagram for <project_name>, showing <key_components>,
+   clean technical illustration style, labeled boxes and arrows,
+   professional documentation diagram" \
+  --output "<planning_folder>/diagrams/architecture_overview.png"
+```
+
+**Component Diagram:**
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+  "Software component diagram showing building blocks: <list_components>,
+   with connections and dependencies, UML-style boxes, clean technical style" \
+  --output "<planning_folder>/diagrams/component_diagram.png"
+```
+
+**Data Flow Diagram:**
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+  "Data flow diagram for <project_name>, showing how data moves from
+   <source> through <processing> to <destination>, arrows indicating flow direction,
+   clean technical documentation style" \
+  --output "<planning_folder>/diagrams/data_flow.png"
+```
+
+### Prompt Construction Tips
+
+When building prompts, extract context from the planning outputs:
+1. Read `SUMMARY.md` for project name and key features
+2. Read `components/building_blocks.yaml` for component names
+3. Read `specifications/technical_spec.md` for technology stack
+
+Enhance prompts with:
+- Project-specific terminology
+- Key component names
+- Technology stack references
+- Industry context
+
+### Visual Generation Error Handling
+
+| Error | Resolution |
+|-------|------------|
+| OPENROUTER_API_KEY missing | Inform user, skip visuals, continue with report |
+| Generation fails | Log warning, continue without that image |
+| Timeout | Retry once, then skip |
+
+If visual generation fails, inform user and continue:
+> "Note: Could not generate cover image (API error). Proceeding with text-only report."
+
 ## Step 6: Report Completion
 
 After successful generation:
@@ -206,6 +351,7 @@ Included sections:
 - Cost Analysis & Risk Assessment
 
 Citations: 12 references in IEEE format
+Visuals: Cover image + 2 diagrams generated
 
 The report includes a cover page, table of contents, and numbered sections.
 ```
