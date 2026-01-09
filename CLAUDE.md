@@ -12,6 +12,7 @@ See `.claude/PLANNER.md` for comprehensive system instructions.
 |---------|-------------|
 | `/full-plan` | Complete project planning with all phases (market, architecture, costs, sprints, marketing) |
 | `/tech-plan` | Technical-only planning (architecture, costs, risks, sprints - no marketing) |
+| `/generate-report` | Compile planning outputs into professional report (PDF/DOCX/MD) with optional IEEE citations |
 | `/project-planner:setup` | Interactive configuration for API keys and environment |
 
 ## Key Capabilities
@@ -30,6 +31,7 @@ See `.claude/PLANNER.md` for comprehensive system instructions.
 | **Research** | `research-lookup` | Real-time technology research |
 | **Marketing Campaign** | `marketing-campaign` | Social media strategy, content calendars, influencer outreach |
 | **Market Research** | `market-research-reports` | Comprehensive market analysis |
+| **Report Generation** | `report-generation` | Compile outputs to PDF/DOCX with IEEE citations, TOC, cover page |
 
 ## Output Structure
 
@@ -64,3 +66,12 @@ When using `/full-plan`, the following phases are executed in order:
 3. **Real data only** - No placeholder estimates or invented benchmarks
 4. **Generate diagrams extensively** - Use `project-diagrams` for all architectures
 5. **Complete tasks fully** - Never stop mid-task to ask permission
+
+## Development
+
+**Before committing changes**, bump the version number in these files:
+- `pyproject.toml` - Package version
+- `.claude-plugin/plugin.json` - Plugin version
+- `README.md` - Version badge
+
+This triggers auto-update for users who have the plugin installed.
