@@ -310,6 +310,36 @@ If the compile script doesn't exist or fails, perform manual compilation:
    - DOCX: `pandoc output.md -o output.docx --toc`
    - MD: Keep as-is
 
+## Step 5.4: Render Mermaid Diagrams to PNG
+
+Before generating the final report, convert any Mermaid markdown files to PNG images:
+
+```bash
+# Batch render all Mermaid diagrams in the planning folder
+python "${CLAUDE_PLUGIN_ROOT}/../project-diagrams/scripts/render_mermaid.py" \
+  "<planning_folder>/diagrams/" --batch --json
+```
+
+**This uses the multi-tier fallback system:**
+
+| Priority | Method | When Used |
+|----------|--------|-----------|
+| 1 | Local mmdc | If `mermaid-cli` is installed |
+| 2 | Kroki.io API | If internet is available (free, no auth) |
+| 3 | Nano Banana AI | If `OPENROUTER_API_KEY` is set |
+| 4 | Keep markdown | Last resort, works in some viewers |
+
+**Handle results:**
+- Files in `success[]`: Include rendered PNG in report
+- Files in `failed[]`: Log warning, include markdown reference
+- Files in `skipped[]`: PNG already exists and is up-to-date
+
+**If Mermaid files exist but no PNG was generated:**
+> "Note: Some diagrams could not be rendered to PNG. The Mermaid source is preserved in the diagrams folder."
+
+**Recommend installation if all fallbacks fail:**
+> "For best diagram quality, install Mermaid CLI: `npm install -g @mermaid-js/mermaid-cli`"
+
 ## Step 5.5: Generate Visuals (if requested)
 
 If user requested visual generation, create images before final compilation:

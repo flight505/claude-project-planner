@@ -391,7 +391,37 @@ mindmap
 
 ### Generating Mermaid to PNG
 
-For documents requiring image files, use the Mermaid CLI:
+For documents requiring image files, use the automatic renderer with fallbacks:
+
+```bash
+# Automatic rendering with fallback (mmdc → Kroki.io → Nano Banana)
+python .claude/skills/project-diagrams/scripts/render_mermaid.py diagram.md -o output.png
+
+# Batch render all Mermaid files in a directory
+python .claude/skills/project-diagrams/scripts/render_mermaid.py diagrams/ --batch
+
+# Force a specific method
+python .claude/skills/project-diagrams/scripts/render_mermaid.py diagram.md --method kroki
+python .claude/skills/project-diagrams/scripts/render_mermaid.py diagram.md --method nano-banana
+
+# Check if mmdc is available
+python .claude/skills/project-diagrams/scripts/render_mermaid.py --check-mmdc
+```
+
+**Multi-Tier Fallback System:**
+
+| Priority | Method | Requirements | Quality |
+|----------|--------|--------------|---------|
+| 1 | Local mmdc | `npm install -g @mermaid-js/mermaid-cli` | Best (offline) |
+| 2 | Kroki.io API | Internet connection | Good (free API) |
+| 3 | Nano Banana AI | `OPENROUTER_API_KEY` | Good (AI-generated) |
+| 4 | Keep markdown | None | Rendered by viewer |
+
+The renderer automatically tries each method in order until one succeeds.
+
+#### Manual mmdc Usage
+
+If you prefer direct control:
 
 ```bash
 # Install mermaid-cli

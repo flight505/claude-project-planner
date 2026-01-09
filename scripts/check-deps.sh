@@ -1,5 +1,5 @@
 #!/bin/bash
-# Check and report on Python dependencies for Claude Project Planner
+# Check and report on dependencies for Claude Project Planner
 # This script runs on SessionStart to verify dependencies are available
 
 # Check if requests module is available (required for research-lookup)
@@ -12,10 +12,22 @@ if [ $? -ne 0 ]; then
     echo "   pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
 fi
 
-# Check for OPENROUTER_API_KEY (required for research-lookup)
+# Check for OPENROUTER_API_KEY (required for research-lookup and AI diagrams)
 if [ -z "$OPENROUTER_API_KEY" ]; then
-    echo "ℹ️  OPENROUTER_API_KEY not set. Research-lookup skill will not work."
+    echo "ℹ️  OPENROUTER_API_KEY not set. Research-lookup and AI diagram generation will not work."
     echo "   Get an API key at: https://openrouter.ai/keys"
+fi
+
+# Check for Mermaid CLI (optional but recommended for diagram rendering)
+if ! command -v mmdc &> /dev/null; then
+    echo "ℹ️  Mermaid CLI (mmdc) not installed. Diagram rendering will use Kroki.io fallback."
+    echo "   For best quality local rendering, install: npm install -g @mermaid-js/mermaid-cli"
+fi
+
+# Check for Pandoc (required for PDF/DOCX report generation)
+if ! command -v pandoc &> /dev/null; then
+    echo "ℹ️  Pandoc not installed. Report generation will be limited to Markdown format."
+    echo "   For PDF/DOCX reports, install: brew install pandoc (macOS) or apt install pandoc (Linux)"
 fi
 
 # Silent success - don't clutter output if everything is fine

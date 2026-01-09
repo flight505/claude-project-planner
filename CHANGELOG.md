@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.16] - 2025-01-09
+
+### ✨ Added
+
+#### Mermaid Diagram Rendering with Multi-Tier Fallback
+
+- **`render_mermaid.py` Script** - Robust Mermaid-to-PNG converter with automatic fallbacks
+  - **Priority 1: Local mmdc** - Best quality, offline (requires `npm install -g @mermaid-js/mermaid-cli`)
+  - **Priority 2: Kroki.io API** - Free online renderer, no installation needed
+  - **Priority 3: Nano Banana AI** - AI-generated diagram from Mermaid description
+  - **Priority 4: Keep markdown** - Last resort, works in GitHub/GitLab viewers
+
+- **Batch Rendering** - Render all Mermaid files in a directory
+  ```bash
+  python render_mermaid.py diagrams/ --batch
+  ```
+
+- **Step 5.4 in `/generate-report`** - Automatically renders Mermaid diagrams before report compilation
+  - Ensures diagrams are available as PNG for PDF/DOCX reports
+  - Reports rendering results and suggests mmdc installation if needed
+
+### 🔧 Changed
+
+- **SessionStart Hook** - Now checks for mmdc, Pandoc, and OPENROUTER_API_KEY
+  - Provides helpful installation instructions when dependencies are missing
+  - Non-blocking warnings (won't fail session start)
+
+### 📝 Documentation
+
+- Updated `project-diagrams/SKILL.md` with automatic rendering documentation
+- Added fallback system table explaining rendering priorities
+- Updated `commands/generate-report.md` with Step 5.4 for Mermaid rendering
+
+---
+
 ## [1.0.15] - 2025-01-09
 
 ### ✨ Added
