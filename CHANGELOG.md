@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.13] - 2025-01-09
+
+### ✨ Added
+
+#### Report Generation with IEEE Citations
+
+- **`/generate-report` Command** - Interactive report compilation wizard
+  - Scans planning outputs folder and presents interactive menu
+  - User selects which sections to include (multiSelect)
+  - Optional IEEE-style citations with numbered reference list
+  - Output formats: PDF (via Pandoc/LaTeX), DOCX, or Markdown
+  - Generates cover page, table of contents, and numbered sections
+
+- **`report-generation` Skill** - Comprehensive report compilation capabilities
+  - `compile_report.py` - Main compilation script
+    - Merges markdown files in logical section order
+    - Processes citations and generates IEEE reference list
+    - Supports custom templates and exclusions
+  - `citation_formatter.py` - IEEE citation formatting utility
+    - Formats citations as `[1]`, `[2]`, etc. in order of appearance
+    - Generates BibTeX output for Pandoc citeproc
+  - Assets: `ieee.csl`, `report_template.tex`, `cover_page.md`
+  - References: `ieee_format.md`, `pandoc_options.md`
+
+- **Citation Storage in Research Lookup**
+  - New `save_citations()` method saves citations to sidecar `.citations.json` files
+  - New `lookup_and_save()` method for combined markdown + citations output
+  - New CLI options: `--save-citations`, `--save-markdown`
+  - Citations flow: research skills → `.citations.json` → report generation
+
+### 📝 Documentation
+
+- Updated CLAUDE.md with `/generate-report` command and `report-generation` skill
+- Added Development section with version bump reminder (triggers auto-update)
+
+---
+
 ## [1.0.11] - 2025-01-07
 
 ### 🔧 Fixed
