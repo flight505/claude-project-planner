@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.15] - 2025-01-09
+
+### ✨ Added
+
+#### Content-Aware Diagram Suggestions
+
+- **Redesigned Q4c in `/generate-report`** - Diagram suggestions now analyze actual report content
+  - **Step 4c.1: Extract Content Context** - Reads SUMMARY.md, building_blocks.yaml, and tech specs
+  - **Step 4c.2: Generate Contextual Suggestions** - Maps discovered keywords to relevant diagrams
+  - **Step 4c.3: Present Dynamic Options** - Shows project-specific options, not generic types
+
+- **Content-to-Diagram Mapping** - Intelligent suggestion based on discovered content:
+  | Content Found | Suggested Diagram |
+  |---------------|-------------------|
+  | Microservices, API Gateway | "[Project] Microservices Architecture" |
+  | PostgreSQL, MongoDB, Redis | "[Project] Data Storage Architecture" |
+  | Auth, Login, OAuth | "User Authentication Flow" |
+  | Cart, Checkout, Payment | "E-commerce Transaction Flow" |
+  | AWS Lambda, S3, DynamoDB | "AWS Serverless Infrastructure" |
+  | Kubernetes, Docker | "Container Orchestration Diagram" |
+
+- **Industry-Specific Examples** - Dynamic options differ by project type:
+  - E-commerce: "Order Processing Flow", "Inventory Management Architecture"
+  - Healthcare SaaS: "Patient Data Flow Architecture", "Clinical Decision Support System"
+
+### 📝 Documentation
+
+- Updated `commands/generate-report.md` with 3-step content-aware workflow
+- Added content extraction examples using grep/cat patterns
+- Added explanation of why content-awareness matters for AI image quality
+
+---
+
 ## [1.0.14] - 2025-01-09
 
 ### ✨ Added

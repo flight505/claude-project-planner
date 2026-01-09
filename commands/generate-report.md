@@ -155,20 +155,93 @@ options:
 
 If user selects "Custom" or "Industry-Specific", ask them to describe the style they want.
 
-### Question 4c: Diagram Generation (if full visuals enabled)
+### Question 4c: Content-Aware Diagram Suggestions (if full visuals enabled)
+
+**Before presenting Q4c, analyze the selected content to suggest relevant visuals.**
+
+#### Step 4c.1: Extract Content Context
+
+Read key files from selected sections to understand what the report covers:
+
+```bash
+# Get project summary
+cat <planning_folder>/SUMMARY.md | head -50
+
+# Get building block names
+grep -E "^  - name:|^    name:" <planning_folder>/components/building_blocks.yaml
+
+# Get technology stack mentions
+grep -iE "aws|azure|gcp|postgresql|mongodb|react|node|python" <planning_folder>/specifications/*.md
+
+# Get key topics from research
+grep -E "^#|^##" <planning_folder>/research/*.md | head -20
+```
+
+#### Step 4c.2: Generate Contextual Suggestions
+
+Based on extracted content, build specific diagram suggestions. Examples:
+
+| If content mentions... | Suggest diagram |
+|------------------------|-----------------|
+| Microservices, API Gateway | "[Project] Microservices Architecture" |
+| PostgreSQL, MongoDB, Redis | "[Project] Data Storage Architecture" |
+| Auth, Login, OAuth | "User Authentication Flow" |
+| Cart, Checkout, Payment | "E-commerce Transaction Flow" |
+| AWS Lambda, S3, DynamoDB | "AWS Serverless Infrastructure" |
+| Kubernetes, Docker | "Container Orchestration Diagram" |
+| CI/CD, GitHub Actions | "Deployment Pipeline" |
+| Multiple user types | "User Journey Map" |
+
+#### Step 4c.3: Present Dynamic Options
+
+Present Q4c with **content-specific suggestions** (not generic types):
 
 ```
 header: "Diagrams"
-question: "Which diagrams should be generated?"
+question: "Which visuals should be generated for your report?"
 multiSelect: true
 options:
-  - label: "Architecture Overview"
-    description: "High-level system architecture diagram"
-  - label: "Component Diagram"
-    description: "Building blocks and their relationships"
-  - label: "Data Flow"
-    description: "How data moves through the system"
+  - label: "<Specific diagram based on content>"
+    description: "<Why this is relevant based on what was found>"
+  - label: "<Another specific diagram>"
+    description: "<Relevance explanation>"
+  - label: "<Third suggestion>"
+    description: "<Relevance explanation>"
+  - label: "Suggest something else"
+    description: "Describe what visual you'd like"
 ```
+
+**Example for an e-commerce project:**
+```
+header: "Diagrams"
+question: "Which visuals should be generated for your report?"
+multiSelect: true
+options:
+  - label: "Inventory Management System Architecture"
+    description: "Based on your microservices + PostgreSQL architecture"
+  - label: "Order Processing Flow"
+    description: "Visualize Cart → Checkout → Payment → Fulfillment flow"
+  - label: "AWS Infrastructure Diagram"
+    description: "Based on Lambda, RDS, S3 in your cost analysis"
+```
+
+**Example for a healthcare SaaS:**
+```
+header: "Diagrams"
+question: "Which visuals should be generated for your report?"
+multiSelect: true
+options:
+  - label: "Patient Data Flow Architecture"
+    description: "HIPAA-compliant data handling from your technical spec"
+  - label: "Clinical Decision Support System"
+    description: "Based on your ML pipeline building blocks"
+  - label: "Multi-tenant Healthcare Platform"
+    description: "Tenant isolation from your architecture research"
+```
+
+#### Why Content-Aware Matters
+
+Generic diagrams ("Architecture Overview") produce vague AI images. Specific prompts ("Inventory Management Microservices with PostgreSQL and Redis caching") produce relevant, useful visuals that actually match the report content.
 
 ## Step 4: Process User Selections
 
