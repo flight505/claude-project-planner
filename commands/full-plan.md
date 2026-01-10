@@ -47,13 +47,13 @@ When `--parallel` is specified, independent tasks within each phase run concurre
 1. Before each phase, prepare input context from previous phases:
    ```bash
    python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" input-context \
-     "planning_outputs/<project>" <phase_num>
+     "planning_outputs/<project_name>" <phase_num>
    ```
 
 2. Get execution plan showing parallel/sequential groups:
    ```bash
    python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" plan \
-     "planning_outputs/<project>" <phase_num>
+     "planning_outputs/<project_name>" <phase_num>
    ```
 
 3. **For parallel groups**: Launch all tasks simultaneously using parallel tool calls
@@ -61,14 +61,14 @@ When `--parallel` is specified, independent tasks within each phase run concurre
 5. After each group, merge outputs into phase context:
    ```bash
    python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" merge-context \
-     "planning_outputs/<project>" <phase_num>
+     "planning_outputs/<project_name>" <phase_num>
    ```
 
 **Context Sharing:**
 
 Parallel tasks share context via `.context/` directory:
 ```
-planning_outputs/<project>/
+planning_outputs/<project_name>/
 ├── .context/
 │   ├── phase1_input.md    # Context from prior phases
 │   ├── phase1_output.md   # Key findings from Phase 1
@@ -99,9 +99,9 @@ When `--validate` is specified, after completing Phase 2 (Architecture):
 ```bash
 # Run validation script directly
 python "${CLAUDE_PLUGIN_ROOT}/scripts/multi-model-validator.py" \
-  --architecture-file "planning_outputs/<project>/02_architecture/architecture_document.md" \
-  --building-blocks "planning_outputs/<project>/02_architecture/building_blocks.md" \
-  --output "planning_outputs/<project>/02_architecture/validation_report.md"
+  --architecture-file "planning_outputs/<project_name>/02_architecture/architecture_document.md" \
+  --building-blocks "planning_outputs/<project_name>/02_architecture/building_blocks.md" \
+  --output "planning_outputs/<project_name>/02_architecture/validation_report.md"
 ```
 
 ## Output Structure
@@ -411,17 +411,23 @@ Also use TodoWrite to track phases for the user's visibility:
 
 ```
 todos:
-  - content: "Phase 1: Market Research & Competitive Analysis"
+  - content: "Complete Phase 1: Market Research & Competitive Analysis"
+    activeForm: "Completing Phase 1: Market Research"
     status: "completed"
-  - content: "Phase 2: Architecture & Building Blocks"
+  - content: "Complete Phase 2: Architecture & Building Blocks"
+    activeForm: "Completing Phase 2: Architecture Design"
     status: "in_progress"
-  - content: "Phase 3: Feasibility, Costs & Risk Assessment"
+  - content: "Complete Phase 3: Feasibility, Costs & Risk Assessment"
+    activeForm: "Completing Phase 3: Feasibility Analysis"
     status: "pending"
-  - content: "Phase 4: Implementation Planning & Sprints"
+  - content: "Complete Phase 4: Implementation Planning & Sprints"
+    activeForm: "Completing Phase 4: Sprint Planning"
     status: "pending"
-  - content: "Phase 5: Go-to-Market Strategy"
+  - content: "Complete Phase 5: Go-to-Market Strategy"
+    activeForm: "Completing Phase 5: Go-to-Market"
     status: "pending"
-  - content: "Phase 6: Review & Executive Summary"
+  - content: "Complete Phase 6: Review & Executive Summary"
+    activeForm: "Completing Phase 6: Plan Review"
     status: "pending"
 ```
 

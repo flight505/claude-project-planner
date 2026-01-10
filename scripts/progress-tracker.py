@@ -23,19 +23,73 @@ from typing import Optional
 
 # Phase definitions for each plan type
 FULL_PLAN_PHASES = [
-    {"num": 1, "name": "Market Research", "skills": ["research-lookup", "competitive-analysis", "market-research-reports"], "est_minutes": 30},
-    {"num": 2, "name": "Architecture Design", "skills": ["architecture-research", "building-blocks", "project-diagrams"], "est_minutes": 45},
-    {"num": 3, "name": "Feasibility & Costs", "skills": ["feasibility-analysis", "risk-assessment", "service-cost-analysis"], "est_minutes": 30},
-    {"num": 4, "name": "Implementation Planning", "skills": ["sprint-planning", "project-diagrams"], "est_minutes": 30},
-    {"num": 5, "name": "Go-to-Market", "skills": ["marketing-campaign", "project-diagrams"], "est_minutes": 30},
-    {"num": 6, "name": "Review & Synthesis", "skills": ["plan-review"], "est_minutes": 30},
+    {
+        "num": 1,
+        "name": "Market Research",
+        "skills": [
+            "research-lookup",
+            "competitive-analysis",
+            "market-research-reports",
+        ],
+        "est_minutes": 30,
+    },
+    {
+        "num": 2,
+        "name": "Architecture Design",
+        "skills": ["architecture-research", "building-blocks", "project-diagrams"],
+        "est_minutes": 45,
+    },
+    {
+        "num": 3,
+        "name": "Feasibility & Costs",
+        "skills": ["feasibility-analysis", "risk-assessment", "service-cost-analysis"],
+        "est_minutes": 30,
+    },
+    {
+        "num": 4,
+        "name": "Implementation Planning",
+        "skills": ["sprint-planning", "project-diagrams"],
+        "est_minutes": 30,
+    },
+    {
+        "num": 5,
+        "name": "Go-to-Market",
+        "skills": ["marketing-campaign", "project-diagrams"],
+        "est_minutes": 30,
+    },
+    {
+        "num": 6,
+        "name": "Review & Synthesis",
+        "skills": ["plan-review"],
+        "est_minutes": 30,
+    },
 ]
 
 TECH_PLAN_PHASES = [
-    {"num": 1, "name": "Architecture Design", "skills": ["architecture-research", "building-blocks", "project-diagrams"], "est_minutes": 45},
-    {"num": 2, "name": "Feasibility & Costs", "skills": ["feasibility-analysis", "risk-assessment", "service-cost-analysis"], "est_minutes": 30},
-    {"num": 3, "name": "Implementation Planning", "skills": ["sprint-planning", "project-diagrams"], "est_minutes": 30},
-    {"num": 4, "name": "Review & Synthesis", "skills": ["plan-review"], "est_minutes": 30},
+    {
+        "num": 1,
+        "name": "Architecture Design",
+        "skills": ["architecture-research", "building-blocks", "project-diagrams"],
+        "est_minutes": 45,
+    },
+    {
+        "num": 2,
+        "name": "Feasibility & Costs",
+        "skills": ["feasibility-analysis", "risk-assessment", "service-cost-analysis"],
+        "est_minutes": 30,
+    },
+    {
+        "num": 3,
+        "name": "Implementation Planning",
+        "skills": ["sprint-planning", "project-diagrams"],
+        "est_minutes": 30,
+    },
+    {
+        "num": 4,
+        "name": "Review & Synthesis",
+        "skills": ["plan-review"],
+        "est_minutes": 30,
+    },
 ]
 
 
@@ -145,9 +199,9 @@ def generate_progress_md(project_folder: Path, state: dict) -> str:
         "",
         "## Overall Progress",
         "",
-        f"```",
+        "```",
         f"[{bar}] {progress['percentage']}%",
-        f"```",
+        "```",
         "",
         f"**Phases:** {progress['completed_phases']}/{progress['total_phases']} completed",
         f"**Elapsed:** {format_duration(progress['elapsed_minutes'])}",
@@ -168,7 +222,11 @@ def generate_progress_md(project_folder: Path, state: dict) -> str:
 
         # Calculate duration for completed phases
         duration = "-"
-        if phase.get("status") == "completed" and phase.get("start_time") and phase.get("end_time"):
+        if (
+            phase.get("status") == "completed"
+            and phase.get("start_time")
+            and phase.get("end_time")
+        ):
             start = datetime.fromisoformat(phase["start_time"])
             end = datetime.fromisoformat(phase["end_time"])
             dur_mins = (end - start).total_seconds() / 60
@@ -182,18 +240,22 @@ def generate_progress_md(project_folder: Path, state: dict) -> str:
         if len(phase.get("skills", [])) > 2:
             skills += "..."
 
-        lines.append(f"| {icon} {phase_num}. {name} | {status} | {duration} | {skills} |")
+        lines.append(
+            f"| {icon} {phase_num}. {name} | {status} | {duration} | {skills} |"
+        )
 
     # Add current activity section
-    lines.extend([
-        "",
-        "## Current Activity",
-        "",
-        f"> {current_activity}",
-        "",
-        "---",
-        f"*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Current Activity",
+            "",
+            f"> {current_activity}",
+            "",
+            "---",
+            f"*Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*",
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -205,7 +267,9 @@ def write_progress_md(project_folder: Path, state: dict) -> None:
     progress_path.write_text(content, encoding="utf-8")
 
 
-def cmd_init(project_folder: Path, plan_type: str, project_name: Optional[str] = None) -> None:
+def cmd_init(
+    project_folder: Path, plan_type: str, project_name: Optional[str] = None
+) -> None:
     """Initialize progress tracking for a project."""
     project_folder.mkdir(parents=True, exist_ok=True)
 
@@ -234,7 +298,9 @@ def cmd_init(project_folder: Path, plan_type: str, project_name: Optional[str] =
     print(f"✓ Progress tracking initialized for {plan_type} plan")
 
 
-def cmd_start(project_folder: Path, phase_num: int, activity: Optional[str] = None) -> None:
+def cmd_start(
+    project_folder: Path, phase_num: int, activity: Optional[str] = None
+) -> None:
     """Mark a phase as started."""
     state = load_state(project_folder)
     phase_key = str(phase_num)
@@ -275,7 +341,9 @@ def cmd_complete(project_folder: Path, phase_num: int) -> None:
             break
 
     if next_phase:
-        state["current_activity"] = f"Phase {phase_num} complete. Preparing {next_phase}..."
+        state["current_activity"] = (
+            f"Phase {phase_num} complete. Preparing {next_phase}..."
+        )
     else:
         state["current_activity"] = "All phases complete! Generating final outputs..."
 
@@ -315,7 +383,9 @@ def cmd_status(project_folder: Path) -> None:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Progress tracker for Claude Project Planner")
+    parser = argparse.ArgumentParser(
+        description="Progress tracker for Claude Project Planner"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # init command
@@ -332,17 +402,23 @@ def main():
 
     # complete command
     complete_parser = subparsers.add_parser("complete", help="Complete a phase")
-    complete_parser.add_argument("project_folder", type=Path, help="Project output folder")
+    complete_parser.add_argument(
+        "project_folder", type=Path, help="Project output folder"
+    )
     complete_parser.add_argument("phase_num", type=int, help="Phase number")
 
     # activity command
     activity_parser = subparsers.add_parser("activity", help="Update current activity")
-    activity_parser.add_argument("project_folder", type=Path, help="Project output folder")
+    activity_parser.add_argument(
+        "project_folder", type=Path, help="Project output folder"
+    )
     activity_parser.add_argument("activity_text", type=str, help="Activity text")
 
     # status command
     status_parser = subparsers.add_parser("status", help="Get current status as JSON")
-    status_parser.add_argument("project_folder", type=Path, help="Project output folder")
+    status_parser.add_argument(
+        "project_folder", type=Path, help="Project output folder"
+    )
 
     args = parser.parse_args()
 

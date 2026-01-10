@@ -132,7 +132,9 @@ def save_checkpoint(
     phase_state = {
         "phase": phase_num,
         "saved_at": datetime.now().isoformat(),
-        "outputs_created": [o for o in completed_outputs if o.startswith(f"0{phase_num}_")],
+        "outputs_created": [
+            o for o in completed_outputs if o.startswith(f"0{phase_num}_")
+        ],
         "context": context_summary or "",
         "key_decisions": key_decisions or [],
     }
@@ -183,15 +185,17 @@ def list_checkpoints(search_path: Path = Path("planning_outputs")) -> list:
     for checkpoint_file in search_path.rglob(CHECKPOINT_FILE):
         try:
             checkpoint = json.loads(checkpoint_file.read_text(encoding="utf-8"))
-            checkpoints.append({
-                "folder": str(checkpoint_file.parent),
-                "project_name": checkpoint.get("project_name", "Unknown"),
-                "plan_type": checkpoint.get("plan_type", "unknown"),
-                "last_completed_phase": checkpoint.get("last_completed_phase", 0),
-                "next_phase": checkpoint.get("next_phase", 1),
-                "updated_at": checkpoint.get("updated_at", "Unknown"),
-                "total_outputs": len(checkpoint.get("completed_outputs", [])),
-            })
+            checkpoints.append(
+                {
+                    "folder": str(checkpoint_file.parent),
+                    "project_name": checkpoint.get("project_name", "Unknown"),
+                    "plan_type": checkpoint.get("plan_type", "unknown"),
+                    "last_completed_phase": checkpoint.get("last_completed_phase", 0),
+                    "next_phase": checkpoint.get("next_phase", 1),
+                    "updated_at": checkpoint.get("updated_at", "Unknown"),
+                    "total_outputs": len(checkpoint.get("completed_outputs", [])),
+                }
+            )
         except (json.JSONDecodeError, IOError):
             continue
 
@@ -272,23 +276,29 @@ def generate_resume_context(project_folder: Path) -> str:
     # Add stored context summary
     context_summary = checkpoint.get("context_summary", "")
     if context_summary:
-        context_parts.extend([
-            "## Context Summary",
-            "",
-            context_summary,
-            "",
-        ])
+        context_parts.extend(
+            [
+                "## Context Summary",
+                "",
+                context_summary,
+                "",
+            ]
+        )
 
     # List completed outputs
-    context_parts.extend([
-        "## Completed Outputs",
-        "",
-    ])
+    context_parts.extend(
+        [
+            "## Completed Outputs",
+            "",
+        ]
+    )
     for output in checkpoint.get("completed_outputs", [])[:20]:  # First 20
         context_parts.append(f"- {output}")
 
     if len(checkpoint.get("completed_outputs", [])) > 20:
-        context_parts.append(f"- ... and {len(checkpoint['completed_outputs']) - 20} more files")
+        context_parts.append(
+            f"- ... and {len(checkpoint['completed_outputs']) - 20} more files"
+        )
 
     return "\n".join(context_parts)
 
@@ -312,6 +322,7 @@ def clear_checkpoint(project_folder: Path) -> bool:
 
     if state_dir.exists():
         import shutil
+
         shutil.rmtree(state_dir)
         cleared = True
         print(f"✓ State directory cleared: {state_dir}")
@@ -361,7 +372,9 @@ def cmd_load(args):
 
 def cmd_list(args):
     """Handle list command."""
-    search_path = Path(args.search_path) if args.search_path else Path("planning_outputs")
+    search_path = (
+        Path(args.search_path) if args.search_path else Path("planning_outputs")
+    )
     checkpoints = list_checkpoints(search_path)
 
     if args.json:
@@ -377,7 +390,9 @@ def cmd_list(args):
             progress = int((cp.get("last_completed_phase", 0) / total_phases) * 100)
             print(f"📁 {cp['project_name']}")
             print(f"   Folder: {cp['folder']}")
-            print(f"   Plan: {cp['plan_type']} | Phase {cp['last_completed_phase']}/{total_phases} ({progress}%)")
+            print(
+                f"   Plan: {cp['plan_type']} | Phase {cp['last_completed_phase']}/{total_phases} ({progress}%)"
+            )
             print(f"   Updated: {cp['updated_at']}")
             print(f"   Files: {cp['total_outputs']}")
             print()
@@ -397,13 +412,15 @@ def cmd_status(args):
 
         print(f"Project: {status['project_name']}")
         print(f"Plan Type: {status['plan_type'].title()} Plan")
-        print(f"Progress: {status['progress_percentage']}% ({status['last_completed_phase']}/{status['total_phases']} phases)")
+        print(
+            f"Progress: {status['progress_percentage']}% ({status['last_completed_phase']}/{status['total_phases']} phases)"
+        )
         print(f"Next Phase: {status['next_phase']}")
         print(f"Can Resume: {'Yes' if status['can_resume'] else 'No (complete)'}")
         print(f"Completed Files: {len(status['completed_outputs'])}")
 
         if status.get("context_summary"):
-            print(f"\nContext Summary:")
+            print("\nContext Summary:")
             print(f"  {status['context_summary'][:200]}...")
 
 
@@ -427,15 +444,25 @@ def cmd_clear(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Checkpoint manager for Claude Project Planner")
+    parser = argparse.ArgumentParser(
+        description="Checkpoint manager for Claude Project Planner"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # save command
-    save_parser = subparsers.add_parser("save", help="Save checkpoint after phase completion")
+    save_parser = subparsers.add_parser(
+        "save", help="Save checkpoint after phase completion"
+    )
     save_parser.add_argument("project_folder", type=str, help="Project output folder")
-    save_parser.add_argument("phase_num", type=int, help="Phase number that was completed")
-    save_parser.add_argument("--context", type=str, help="Context summary for continuation")
-    save_parser.add_argument("--decisions", type=str, help="Key decisions (semicolon-separated)")
+    save_parser.add_argument(
+        "phase_num", type=int, help="Phase number that was completed"
+    )
+    save_parser.add_argument(
+        "--context", type=str, help="Context summary for continuation"
+    )
+    save_parser.add_argument(
+        "--decisions", type=str, help="Key decisions (semicolon-separated)"
+    )
 
     # load command
     load_parser = subparsers.add_parser("load", help="Load checkpoint")
@@ -454,7 +481,9 @@ def main():
 
     # context command
     context_parser = subparsers.add_parser("context", help="Generate resume context")
-    context_parser.add_argument("project_folder", type=str, help="Project output folder")
+    context_parser.add_argument(
+        "project_folder", type=str, help="Project output folder"
+    )
 
     # clear command
     clear_parser = subparsers.add_parser("clear", help="Clear checkpoint (start fresh)")

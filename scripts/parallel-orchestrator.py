@@ -2,8 +2,8 @@
 """
 Parallel Task Orchestrator for Claude Project Planner.
 
-Executes independent tasks within phases in parallel while maintaining
-context integrity between phases.
+Orchestrates parallel task execution within phases while maintaining
+sequential execution between phases for context integrity.
 
 Usage:
     python parallel-orchestrator.py execute <project_folder> <phase_num>
@@ -18,12 +18,30 @@ Phase Parallelization Groups:
 """
 
 import argparse
+import concurrent.futures
 import json
+import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
+
+# Task execution timeout in seconds (5 minutes)
+TASK_TIMEOUT_SECONDS = 300
+
+# Maximum parallel workers (prevents thread explosion)
+MAX_PARALLEL_WORKERS = 4
+
+# Phase directory mapping
+PHASE_DIR_MAP = {
+    1: "01_market_research",
+    2: "02_architecture",
+    3: "03_feasibility",
+    4: "04_implementation",
+    5: "05_go_to_market",
+    6: "06_review",
+}
 
 # Phase configuration with parallelization groups
 PHASE_CONFIG = {
@@ -35,14 +53,20 @@ PHASE_CONFIG = {
                 "type": "parallel",
                 "tasks": [
                     {"skill": "research-lookup", "output": "market_data.md"},
-                    {"skill": "competitive-analysis", "output": "competitive_analysis.md"},
+                    {
+                        "skill": "competitive-analysis",
+                        "output": "competitive_analysis.md",
+                    },
                 ],
             },
             {
                 "group_id": "1.2",
                 "type": "sequential",
                 "tasks": [
-                    {"skill": "market-research-reports", "output": "market_overview.md"},
+                    {
+                        "skill": "market-research-reports",
+                        "output": "market_overview.md",
+                    },
                 ],
                 "depends_on": "1.1",
             },
@@ -50,7 +74,10 @@ PHASE_CONFIG = {
                 "group_id": "1.3",
                 "type": "sequential",
                 "tasks": [
-                    {"skill": "project-diagrams", "output": "diagrams/market_positioning.mmd"},
+                    {
+                        "skill": "project-diagrams",
+                        "output": "diagrams/market_positioning.mmd",
+                    },
                 ],
                 "depends_on": "1.2",
             },
@@ -63,7 +90,10 @@ PHASE_CONFIG = {
                 "group_id": "2.1",
                 "type": "sequential",
                 "tasks": [
-                    {"skill": "architecture-research", "output": "architecture_document.md"},
+                    {
+                        "skill": "architecture-research",
+                        "output": "architecture_document.md",
+                    },
                 ],
             },
             {
@@ -78,7 +108,10 @@ PHASE_CONFIG = {
                 "group_id": "2.3",
                 "type": "sequential",
                 "tasks": [
-                    {"skill": "project-diagrams", "output": "diagrams/architecture.mmd"},
+                    {
+                        "skill": "project-diagrams",
+                        "output": "diagrams/architecture.mmd",
+                    },
                 ],
                 "depends_on": "2.2",
             },
@@ -91,16 +124,25 @@ PHASE_CONFIG = {
                 "group_id": "3.1",
                 "type": "parallel",
                 "tasks": [
-                    {"skill": "feasibility-analysis", "output": "feasibility_analysis.md"},
+                    {
+                        "skill": "feasibility-analysis",
+                        "output": "feasibility_analysis.md",
+                    },
                     {"skill": "risk-assessment", "output": "risk_assessment.md"},
-                    {"skill": "service-cost-analysis", "output": "service_cost_analysis.md"},
+                    {
+                        "skill": "service-cost-analysis",
+                        "output": "service_cost_analysis.md",
+                    },
                 ],
             },
             {
                 "group_id": "3.2",
                 "type": "sequential",
                 "tasks": [
-                    {"skill": "project-diagrams", "output": "diagrams/cost_breakdown.mmd"},
+                    {
+                        "skill": "project-diagrams",
+                        "output": "diagrams/cost_breakdown.mmd",
+                    },
                 ],
                 "depends_on": "3.1",
             },
@@ -140,7 +182,10 @@ PHASE_CONFIG = {
                 "group_id": "5.2",
                 "type": "sequential",
                 "tasks": [
-                    {"skill": "project-diagrams", "output": "diagrams/campaign_timeline.mmd"},
+                    {
+                        "skill": "project-diagrams",
+                        "output": "diagrams/campaign_timeline.mmd",
+                    },
                 ],
                 "depends_on": "5.1",
             },
@@ -165,12 +210,12 @@ KEY_FINDINGS_PATTERNS = {
     "research-lookup": [
         r"(?:market size|TAM|SAM|SOM)[:\s]+(\$?[\d.]+\s*(?:billion|million|B|M))",
         r"(?:growth rate|CAGR)[:\s]+([\d.]+%)",
-        r"(?:key trend|major trend)[:\s]+(.+?)(?:\n|$)",
+        r"(?:key trend|major trend)[:\s]+([^\n]+)",
     ],
     "competitive-analysis": [
         r"(?:competitor|key player)[:\s]+([^,\n]+)",
         r"(?:market share)[:\s]+([\d.]+%)",
-        r"(?:differentiator|gap)[:\s]+(.+?)(?:\n|$)",
+        r"(?:differentiator|gap)[:\s]+([^\n]+)",
     ],
     "architecture-research": [
         r"(?:tech stack|technology)[:\s]+([^,\n]+)",
@@ -184,18 +229,18 @@ KEY_FINDINGS_PATTERNS = {
     ],
     "feasibility-analysis": [
         r"(?:viability|feasibility score)[:\s]+([\d.]+(?:/10)?)",
-        r"(?:blocker|concern)[:\s]+(.+?)(?:\n|$)",
-        r"(?:recommendation)[:\s]+(.+?)(?:\n|$)",
+        r"(?:blocker|concern)[:\s]+([^\n]+)",
+        r"(?:recommendation)[:\s]+([^\n]+)",
     ],
     "risk-assessment": [
         r"(?:risk|threat)[:\s]+([^,\n]+)",
         r"(?:severity|impact)[:\s]+([^,\n]+)",
-        r"(?:mitigation)[:\s]+(.+?)(?:\n|$)",
+        r"(?:mitigation)[:\s]+([^\n]+)",
     ],
     "service-cost-analysis": [
         r"(?:monthly cost|total cost)[:\s]+(\$?[\d,]+)",
         r"(?:service|provider)[:\s]+([^,\n]+)",
-        r"(?:breakdown)[:\s]+(.+?)(?:\n|$)",
+        r"(?:breakdown)[:\s]+([^\n]+)",
     ],
     "sprint-planning": [
         r"(?:sprint|iteration)[:\s]+([\d]+)",
@@ -208,7 +253,7 @@ KEY_FINDINGS_PATTERNS = {
 class ParallelOrchestrator:
     """Orchestrates parallel task execution within planning phases."""
 
-    def __init__(self, project_folder: Path):
+    def __init__(self, project_folder: Path) -> None:
         self.project_folder = Path(project_folder)
         self.context_dir = self.project_folder / ".context"
         self.state_file = self.project_folder / ".parallel_state.json"
@@ -221,7 +266,7 @@ class ParallelOrchestrator:
     def _load_state(self) -> dict:
         """Load parallel execution state."""
         if self.state_file.exists():
-            with open(self.state_file) as f:
+            with open(self.state_file, encoding="utf-8") as f:
                 return json.load(f)
         return {
             "created_at": datetime.now().isoformat(),
@@ -231,7 +276,7 @@ class ParallelOrchestrator:
 
     def _save_state(self, state: dict) -> None:
         """Save parallel execution state."""
-        with open(self.state_file, "w") as f:
+        with open(self.state_file, "w", encoding="utf-8") as f:
             json.dump(state, f, indent=2)
 
     def get_phase_input_context(self, phase_num: int) -> str:
@@ -242,8 +287,15 @@ class ParallelOrchestrator:
         for prev_phase in range(1, phase_num):
             output_file = self.context_dir / f"phase{prev_phase}_output.md"
             if output_file.exists():
-                with open(output_file) as f:
-                    context_parts.append(f"## Phase {prev_phase} Context\n\n{f.read()}")
+                try:
+                    with open(output_file, encoding="utf-8") as f:
+                        context_parts.append(
+                            f"## Phase {prev_phase} Context\n\n{f.read()}"
+                        )
+                except OSError as e:
+                    print(
+                        f"Warning: Could not read {output_file}: {e}", file=sys.stderr
+                    )
 
         return "\n\n---\n\n".join(context_parts)
 
@@ -252,7 +304,7 @@ class ParallelOrchestrator:
         context = self.get_phase_input_context(phase_num)
         input_file = self.context_dir / f"phase{phase_num}_input.md"
 
-        with open(input_file, "w") as f:
+        with open(input_file, "w", encoding="utf-8") as f:
             f.write(f"# Phase {phase_num} Input Context\n\n")
             f.write(f"Generated: {datetime.now().isoformat()}\n\n")
             f.write(context if context else "*No prior context available*")
@@ -260,19 +312,19 @@ class ParallelOrchestrator:
         return input_file
 
     def extract_key_findings(self, skill: str, content: str) -> list[str]:
-        """Extract key findings from task output using skill-specific patterns."""
-        import re
+        """Extract key findings from task output using skill-specific patterns.
 
-        findings = []
+        For patterns with multiple capture groups, only the first group is used.
+        """
+        findings: list[str] = []
         patterns = KEY_FINDINGS_PATTERNS.get(skill, [])
 
         for pattern in patterns:
             matches = re.findall(pattern, content, re.IGNORECASE | re.MULTILINE)
             for match in matches[:3]:  # Limit to top 3 matches per pattern
-                if isinstance(match, tuple):
-                    findings.append(match[0].strip())
-                else:
-                    findings.append(match.strip())
+                # For multi-group patterns, only use the primary capture group
+                finding = match[0] if isinstance(match, tuple) else match
+                findings.append(finding.strip())
 
         return findings
 
@@ -287,9 +339,13 @@ class ParallelOrchestrator:
             status = result.get("status", "unknown")
             output_file = result.get("output_file")
             findings = result.get("key_findings", [])
+            error = result.get("error")
 
             output_parts.append(f"## {skill}\n")
             output_parts.append(f"Status: {status}\n")
+
+            if error:
+                output_parts.append(f"Error: {error}\n")
 
             if output_file and Path(output_file).exists():
                 output_parts.append(f"Output: {output_file}\n")
@@ -301,14 +357,19 @@ class ParallelOrchestrator:
 
             output_parts.append("\n")
 
-        output_file = self.context_dir / f"phase{phase_num}_output.md"
-        with open(output_file, "w") as f:
+        output_file_path = self.context_dir / f"phase{phase_num}_output.md"
+        with open(output_file_path, "w", encoding="utf-8") as f:
             f.write("".join(output_parts))
 
-        return output_file
+        return output_file_path
 
     def execute_task(self, task: dict, phase_num: int, group_id: str) -> dict:
-        """Execute a single task and return results."""
+        """Prepare a single task for execution and return tracking result.
+
+        Note: This method prepares task metadata and output paths. The actual
+        skill execution is performed by Claude Code, not this script. This
+        script orchestrates and tracks the parallel execution planning.
+        """
         skill = task["skill"]
         output = task["output"]
         start_time = time.time()
@@ -324,16 +385,10 @@ class ParallelOrchestrator:
             "error": None,
         }
 
-        # Determine output path
-        phase_dir_map = {
-            1: "01_market_research",
-            2: "02_architecture",
-            3: "03_feasibility",
-            4: "04_implementation",
-            5: "05_go_to_market",
-            6: "06_review",
-        }
-        phase_dir = self.project_folder / phase_dir_map.get(phase_num, f"phase{phase_num}")
+        # Determine output path using module-level constant
+        phase_dir = self.project_folder / PHASE_DIR_MAP.get(
+            phase_num, f"phase{phase_num}"
+        )
         output_path = phase_dir / output
 
         # Ensure output directory exists
@@ -341,39 +396,89 @@ class ParallelOrchestrator:
 
         result["output_file"] = str(output_path)
 
-        # For now, we just mark the task as ready for execution
-        # The actual skill execution is done by Claude Code, not this script
-        # This script orchestrates and tracks the parallel execution
-
+        # Mark task as ready for Claude Code to execute
         result["status"] = "ready"
         result["duration_seconds"] = time.time() - start_time
 
         return result
 
     def execute_parallel_group(self, group: dict, phase_num: int) -> list[dict]:
-        """Execute a parallel group of tasks."""
+        """Execute a parallel group of tasks with proper error handling."""
         tasks = group["tasks"]
         group_id = group["group_id"]
         group_type = group["type"]
 
-        results = []
+        results: list[dict] = []
 
         if group_type == "parallel" and len(tasks) > 1:
-            # Execute tasks in parallel using ThreadPoolExecutor
-            with ThreadPoolExecutor(max_workers=len(tasks)) as executor:
+            # Limit workers to prevent thread explosion
+            max_workers = min(len(tasks), MAX_PARALLEL_WORKERS)
+
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
                 futures = {
                     executor.submit(self.execute_task, task, phase_num, group_id): task
                     for task in tasks
                 }
 
                 for future in as_completed(futures):
-                    result = future.result()
-                    results.append(result)
+                    task = futures[future]
+                    try:
+                        result = future.result(timeout=TASK_TIMEOUT_SECONDS)
+                        results.append(result)
+                    except concurrent.futures.TimeoutError:
+                        print(
+                            f"Warning: Task '{task['skill']}' timed out",
+                            file=sys.stderr,
+                        )
+                        results.append(
+                            {
+                                "skill": task["skill"],
+                                "output": task["output"],
+                                "group_id": group_id,
+                                "phase_num": phase_num,
+                                "status": "timeout",
+                                "error": f"Task execution exceeded {TASK_TIMEOUT_SECONDS}s timeout",
+                                "key_findings": [],
+                            }
+                        )
+                    except Exception as exc:
+                        print(
+                            f"Warning: Task '{task['skill']}' failed: {exc}",
+                            file=sys.stderr,
+                        )
+                        results.append(
+                            {
+                                "skill": task["skill"],
+                                "output": task["output"],
+                                "group_id": group_id,
+                                "phase_num": phase_num,
+                                "status": "failed",
+                                "error": str(exc),
+                                "key_findings": [],
+                            }
+                        )
         else:
             # Execute sequentially
             for task in tasks:
-                result = self.execute_task(task, phase_num, group_id)
-                results.append(result)
+                try:
+                    result = self.execute_task(task, phase_num, group_id)
+                    results.append(result)
+                except Exception as exc:
+                    print(
+                        f"Warning: Task '{task['skill']}' failed: {exc}",
+                        file=sys.stderr,
+                    )
+                    results.append(
+                        {
+                            "skill": task["skill"],
+                            "output": task["output"],
+                            "group_id": group_id,
+                            "phase_num": phase_num,
+                            "status": "failed",
+                            "error": str(exc),
+                            "key_findings": [],
+                        }
+                    )
 
         return results
 
@@ -386,7 +491,7 @@ class ParallelOrchestrator:
         state = self._load_state()
 
         # Initialize phase state
-        phase_state = {
+        phase_state: dict = {
             "name": phase["name"],
             "started_at": datetime.now().isoformat(),
             "status": "in_progress",
@@ -429,9 +534,16 @@ class ParallelOrchestrator:
         for result in all_results:
             output_file = result.get("output_file")
             if output_file and Path(output_file).exists():
-                with open(output_file) as f:
-                    content = f.read()
-                result["key_findings"] = self.extract_key_findings(result["skill"], content)
+                try:
+                    with open(output_file, encoding="utf-8") as f:
+                        content = f.read()
+                    result["key_findings"] = self.extract_key_findings(
+                        result["skill"], content
+                    )
+                except OSError as e:
+                    print(
+                        f"Warning: Could not read {output_file}: {e}", file=sys.stderr
+                    )
 
         # Merge outputs into phase context
         output_context_file = self.merge_task_outputs(phase_num, all_results)
@@ -451,7 +563,7 @@ class ParallelOrchestrator:
         """Get current orchestration status."""
         state = self._load_state()
 
-        status = {
+        status: dict = {
             "project_folder": str(self.project_folder),
             "context_dir": str(self.context_dir),
             "phases": {},
@@ -484,7 +596,7 @@ class ParallelOrchestrator:
             return {"error": f"Unknown phase: {phase_num}"}
 
         config = PHASE_CONFIG[phase_num]
-        plan = {
+        plan: dict = {
             "phase_num": phase_num,
             "name": config["name"],
             "groups": [],
@@ -493,7 +605,7 @@ class ParallelOrchestrator:
         }
 
         for group in config["parallel_groups"]:
-            group_info = {
+            group_info: dict = {
                 "group_id": group["group_id"],
                 "type": group["type"],
                 "depends_on": group.get("depends_on"),
@@ -501,10 +613,12 @@ class ParallelOrchestrator:
             }
 
             for task in group["tasks"]:
-                group_info["tasks"].append({
-                    "skill": task["skill"],
-                    "output": task["output"],
-                })
+                group_info["tasks"].append(
+                    {
+                        "skill": task["skill"],
+                        "output": task["output"],
+                    }
+                )
                 plan["total_tasks"] += 1
                 if group["type"] == "parallel":
                     plan["parallel_tasks"] += 1
@@ -514,14 +628,17 @@ class ParallelOrchestrator:
         return plan
 
 
-def main():
+def main() -> None:
+    """Main entry point for the parallel orchestrator CLI."""
     parser = argparse.ArgumentParser(
         description="Parallel Task Orchestrator for Claude Project Planner"
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Execute command
-    execute_parser = subparsers.add_parser("execute", help="Execute a phase with parallelization")
+    execute_parser = subparsers.add_parser(
+        "execute", help="Execute a phase with parallelization"
+    )
     execute_parser.add_argument("project_folder", help="Project folder path")
     execute_parser.add_argument("phase_num", type=int, help="Phase number to execute")
 
@@ -535,12 +652,16 @@ def main():
     plan_parser.add_argument("phase_num", type=int, help="Phase number")
 
     # Merge context command
-    merge_parser = subparsers.add_parser("merge-context", help="Merge task outputs into phase context")
+    merge_parser = subparsers.add_parser(
+        "merge-context", help="Merge task outputs into phase context"
+    )
     merge_parser.add_argument("project_folder", help="Project folder path")
     merge_parser.add_argument("phase_num", type=int, help="Phase number")
 
     # Input context command
-    input_parser = subparsers.add_parser("input-context", help="Get input context for a phase")
+    input_parser = subparsers.add_parser(
+        "input-context", help="Get input context for a phase"
+    )
     input_parser.add_argument("project_folder", help="Project folder path")
     input_parser.add_argument("phase_num", type=int, help="Phase number")
 
@@ -576,7 +697,7 @@ def main():
         input_file = orchestrator.save_phase_input_context(args.phase_num)
         print(f"Input context saved: {input_file}")
         print("\n--- Content ---\n")
-        with open(input_file) as f:
+        with open(input_file, encoding="utf-8") as f:
             print(f.read())
 
 
