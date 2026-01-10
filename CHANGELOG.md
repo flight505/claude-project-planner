@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.17] - 2025-01-10
+
+### ✨ Added
+
+#### Quality Gate Hooks
+- **PostToolUse validation hook** - Validates planning outputs before they're saved
+  - Detects placeholder text ([TODO], [TBD], Lorem ipsum)
+  - Validates research files have citations
+  - Checks building blocks YAML for required fields
+  - Validates cost estimates are in reasonable ranges
+  - Warns on short outputs or missing structure
+- Non-blocking warnings (informational, doesn't stop execution)
+
+#### Live Progress Dashboard
+- **`progress-tracker.py` script** - Real-time progress tracking for planning phases
+  - Visual progress bar with percentage complete
+  - Phase-by-phase status table (pending, in_progress, completed)
+  - Current activity display
+  - Elapsed time and estimated remaining time
+  - Generates live-updating `progress.md` file
+
+#### Checkpoint/Resume System
+- **`checkpoint-manager.py` script** - Save and restore planning state
+  - Checkpoints saved after each phase completion
+  - Stores key decisions and context summaries
+  - Tracks all completed outputs
+- **`/resume-plan` command** - Resume interrupted planning sessions
+  - Lists available checkpoints
+  - Restores context from last completed phase
+  - Continues from where it stopped
+  - Can clear checkpoint to start fresh
+
+#### Multi-Model Architecture Validation
+- **`architecture-validator` agent** - Coordinates multi-model consensus
+- **`multi-model-validator.py` script** - Queries multiple AI models for validation
+  - Validates architecture decisions with Gemini, GPT-4o, Claude
+  - Scores decisions on scalability, security, cost, maintainability
+  - Generates consensus report with confidence levels
+  - Identifies decisions that need review
+- **`--validate` flag for `/full-plan`** - Enable multi-model validation after Phase 2
+
+### 🔧 Changed
+
+- `/full-plan` command now includes checkpoint instructions after each phase
+- `/full-plan` command includes progress tracking integration
+- SessionStart hook checks remain non-blocking and informational
+
+### 📝 Documentation
+
+- Updated `/full-plan` with Optional Flags section
+- Added checkpoint save commands after each phase
+- Added progress tracker integration instructions
+- Created `/resume-plan` command documentation
+
+---
+
 ## [1.0.16] - 2025-01-09
 
 ### ✨ Added

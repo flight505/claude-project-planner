@@ -17,6 +17,36 @@ Before starting, gather from the user:
 
 If any critical information is missing, ask before proceeding.
 
+## Optional Flags
+
+| Flag | Description |
+|------|-------------|
+| `--validate` | Run multi-model architecture validation after Phase 2 |
+| `--skip-marketing` | Skip Phase 5 (Go-to-Market) - equivalent to `/tech-plan` |
+
+### Multi-Model Validation (--validate)
+
+When `--validate` is specified, after completing Phase 2 (Architecture):
+
+1. **Invoke the `architecture-validator` agent**
+2. The agent queries multiple AI models (Gemini, GPT-4o, Claude) for consensus
+3. Each model evaluates architecture decisions on:
+   - Scalability (1-10)
+   - Security risk (1-10)
+   - Cost effectiveness (1-10)
+   - Maintainability (1-10)
+4. A validation report is generated: `02_architecture/validation_report.md`
+
+**If any decision is "rejected" by consensus**, pause and ask user before proceeding to Phase 3.
+
+```bash
+# Run validation script directly
+python "${CLAUDE_PLUGIN_ROOT}/scripts/multi-model-validator.py" \
+  --architecture-file "planning_outputs/<project>/02_architecture/architecture_document.md" \
+  --building-blocks "planning_outputs/<project>/02_architecture/building_blocks.md" \
+  --output "planning_outputs/<project>/02_architecture/validation_report.md"
+```
+
 ## Output Structure
 
 Create all outputs in: `planning_outputs/<project_name>/`
@@ -72,6 +102,15 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 
 **Log:** `[HH:MM:SS] PHASE 1 COMPLETE: Market research and competitive analysis`
 
+**Checkpoint:** Save progress after Phase 1:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  "planning_outputs/<project_name>" 1 \
+  --context "Market research complete. Key findings: <summary>" \
+  --decisions "Target market: <segment>;Key competitors: <list>;Market opportunity: <insight>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 1
+```
+
 ### Phase 2: Architecture & Technical Design
 **Skills to use:** `architecture-research`, `building-blocks`, `research-lookup`
 
@@ -93,6 +132,15 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 
 **Log:** `[HH:MM:SS] PHASE 2 COMPLETE: Architecture and building blocks defined`
 
+**Checkpoint:** Save progress after Phase 2:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  "planning_outputs/<project_name>" 2 \
+  --context "Architecture defined. Stack: <tech_stack>. Components: <count>" \
+  --decisions "Stack: <tech>;Pattern: <pattern>;Database: <db>;Cloud: <provider>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 2
+```
+
 ### Phase 3: Feasibility & Risk Analysis
 **Skills to use:** `feasibility-analysis`, `risk-assessment`, `service-cost-analysis`
 
@@ -112,6 +160,15 @@ Execute these phases IN ORDER. Each phase uses specific skills.
    - Output: `03_feasibility/service_cost_analysis.md`
 
 **Log:** `[HH:MM:SS] PHASE 3 COMPLETE: Feasibility and costs analyzed`
+
+**Checkpoint:** Save progress after Phase 3:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  "planning_outputs/<project_name>" 3 \
+  --context "Feasibility confirmed. Monthly cost: $<cost>. Risks: <count>" \
+  --decisions "Budget: $<amount>;Top risk: <risk>;Feasibility: <score>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 3
+```
 
 ### Phase 4: Implementation Planning
 **Skills to use:** `sprint-planning`, `building-blocks`
@@ -134,6 +191,15 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 
 **Log:** `[HH:MM:SS] PHASE 4 COMPLETE: Sprint plan and milestones defined`
 
+**Checkpoint:** Save progress after Phase 4:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  "planning_outputs/<project_name>" 4 \
+  --context "Sprint plan complete. Sprints: <count>. MVP in Sprint <num>" \
+  --decisions "MVP scope: <features>;Timeline: <weeks> weeks;Team size: <size>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 4
+```
+
 ### Phase 5: Go-to-Market Strategy
 **Skills to use:** `marketing-campaign`, `research-lookup`
 
@@ -154,6 +220,15 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 
 **Log:** `[HH:MM:SS] PHASE 5 COMPLETE: Go-to-market strategy defined`
 
+**Checkpoint:** Save progress after Phase 5:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  "planning_outputs/<project_name>" 5 \
+  --context "GTM strategy complete. Channels: <list>. Launch timeline: <days> days" \
+  --decisions "Primary channel: <channel>;Launch budget: $<amount>;KPIs: <metrics>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 5
+```
+
 ### Phase 6: Review & Executive Summary
 **Skills to use:** `plan-review`
 
@@ -169,26 +244,83 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 
 **Log:** `[HH:MM:SS] PHASE 6 COMPLETE: Plan reviewed and summarized`
 
+**Final Checkpoint:** Mark plan as complete:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  "planning_outputs/<project_name>" 6 \
+  --context "Plan complete. All phases executed successfully." \
+  --decisions "Review status: <pass/fail>;Critical gaps: <count>;Recommended next steps: <action>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 6
+```
+
 ## Progress Tracking
 
-Create `planning_outputs/<project_name>/progress.md` and update it after each phase:
+**IMPORTANT:** Use the progress tracker to maintain real-time progress visibility.
 
-```markdown
-# Project Plan Progress
+### Initialize Progress (at start)
 
-## Project: [Name]
-## Started: [Timestamp]
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" init \
+  "planning_outputs/<project_name>" "full" --name "<Project Name>"
+```
 
-### Phase Status
-- [ ] Phase 1: Market Research
-- [ ] Phase 2: Architecture
-- [ ] Phase 3: Feasibility
-- [ ] Phase 4: Implementation
-- [ ] Phase 5: Go-to-Market
-- [ ] Phase 6: Review
+### Update Progress (during execution)
 
-### Activity Log
-[Timestamp entries here]
+Before each phase:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" start \
+  "planning_outputs/<project_name>" <phase_num> --activity "Starting <phase_name>..."
+```
+
+During a phase (for major activities):
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" activity \
+  "planning_outputs/<project_name>" "Generating architecture diagrams..."
+```
+
+After each phase:
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete \
+  "planning_outputs/<project_name>" <phase_num>
+```
+
+### Progress Dashboard
+
+The tracker automatically generates `progress.md` with:
+
+```
+[████████████░░░░░░░░] 60%
+
+| Phase | Status | Duration | Skills |
+|-------|--------|----------|--------|
+| ✅ 1. Market Research | Completed | 25 min | research-lookup, competitive... |
+| ✅ 2. Architecture Design | Completed | 38 min | architecture-research... |
+| ✅ 3. Feasibility & Costs | Completed | 22 min | feasibility-analysis... |
+| 🔄 4. Implementation Planning | In Progress | 12 min (running) | sprint-planning... |
+| ⏳ 5. Go-to-Market | Pending | - | marketing-campaign... |
+| ⏳ 6. Review & Synthesis | Pending | - | plan-review |
+
+> Current Activity: Creating sprint plan with user stories...
+```
+
+### TodoWrite Integration
+
+Also use TodoWrite to track phases for the user's visibility:
+
+```
+todos:
+  - content: "Phase 1: Market Research & Competitive Analysis"
+    status: "completed"
+  - content: "Phase 2: Architecture & Building Blocks"
+    status: "in_progress"
+  - content: "Phase 3: Feasibility, Costs & Risk Assessment"
+    status: "pending"
+  - content: "Phase 4: Implementation Planning & Sprints"
+    status: "pending"
+  - content: "Phase 5: Go-to-Market Strategy"
+    status: "pending"
+  - content: "Phase 6: Review & Executive Summary"
+    status: "pending"
 ```
 
 ## Completion Checklist
