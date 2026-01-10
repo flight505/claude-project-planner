@@ -4,7 +4,9 @@
   "version": "1.0.18",
   "homepage": "https://github.com/flight505/claude-project-planner",
   "commands": "./commands",
-  "agents": "./agents",
+  "agents": [
+    "./agents/architecture-validator.md"
+  ],
   "skills": [
     "./project_planner/.claude/skills/research-lookup",
     "./project_planner/.claude/skills/project-diagrams",
