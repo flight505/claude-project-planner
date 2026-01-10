@@ -3,6 +3,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Version](https://img.shields.io/badge/version-1.0.18-blue.svg)](https://github.com/flight505/claude-project-planner)
 
+<p align="center">
+  <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
+</p>
+
 **An AI-powered project planning toolkit** that combines deep research with comprehensive software architecture design. Generate complete project specifications, architecture documents, sprint plans, building blocks, cost analyses, and implementation roadmaps—all backed by real-time research and verified data.
 
 Project Planner breaks down complex software projects into Claude Code-buildable components, enabling incremental delivery with clear specifications and acceptance criteria.
