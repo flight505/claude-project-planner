@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.18] - 2025-01-10
+
+### ✨ Added
+
+#### Smart Parallelization for Planning Phases
+
+- **`parallel-orchestrator.py` script** - Orchestrates parallel task execution within phases
+  - Identifies independent tasks that can run simultaneously
+  - Maintains sequential execution between phases for context integrity
+  - Context sharing via `.context/` directory (phase input/output files)
+  - Key findings extraction for context propagation
+  - Error isolation (failed parallel tasks don't cascade)
+
+- **`--parallel` flag for `/full-plan`** - Enable smart parallelization
+  - Phase 1: research-lookup + competitive-analysis run in parallel (~33% savings)
+  - Phase 3: feasibility + risk + cost analyses run in parallel (~60% savings)
+  - Total estimated time savings: ~14% (195 min → 167 min)
+  - Sequential tasks respect dependencies within each phase
+
+- **Context sharing mechanism**
+  - `.context/phase{N}_input.md` - Aggregated context from prior phases
+  - `.context/phase{N}_output.md` - Key findings extracted from phase tasks
+  - Automatic context merge after parallel task groups complete
+
+### 📝 Documentation
+
+- Added `docs/PARALLELIZATION.md` - Comprehensive parallelization strategy guide
+- Updated `/full-plan` command with parallel execution instructions
+- Added phase-by-phase parallelization analysis and time savings estimates
+
+---
+
 ## [1.0.17] - 2025-01-10
 
 ### ✨ Added

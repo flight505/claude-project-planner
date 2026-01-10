@@ -21,8 +21,65 @@ If any critical information is missing, ask before proceeding.
 
 | Flag | Description |
 |------|-------------|
+| `--parallel` | Enable smart parallelization of independent tasks within phases |
 | `--validate` | Run multi-model architecture validation after Phase 2 |
 | `--skip-marketing` | Skip Phase 5 (Go-to-Market) - equivalent to `/tech-plan` |
+
+### Smart Parallelization (--parallel)
+
+When `--parallel` is specified, independent tasks within each phase run concurrently:
+
+**Parallel Task Groups:**
+
+| Phase | Parallel Tasks | Sequential Tasks | Time Savings |
+|-------|---------------|------------------|--------------|
+| Phase 1 | research-lookup + competitive-analysis | market-research-reports, diagrams | ~33% |
+| Phase 2 | *(none - sequential dependencies)* | all | 0% |
+| Phase 3 | feasibility + risk + cost | diagrams | ~60% |
+| Phase 4 | *(none - sequential dependencies)* | all | 0% |
+| Phase 5 | *(none - sequential dependencies)* | all | 0% |
+| Phase 6 | *(none - sequential dependencies)* | all | 0% |
+
+**Total estimated time savings: ~14%** (biggest win in Phase 3)
+
+**How it works:**
+
+1. Before each phase, prepare input context from previous phases:
+   ```bash
+   python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" input-context \
+     "planning_outputs/<project>" <phase_num>
+   ```
+
+2. Get execution plan showing parallel/sequential groups:
+   ```bash
+   python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" plan \
+     "planning_outputs/<project>" <phase_num>
+   ```
+
+3. **For parallel groups**: Launch all tasks simultaneously using parallel tool calls
+4. **For sequential groups**: Wait for dependencies, then execute in order
+5. After each group, merge outputs into phase context:
+   ```bash
+   python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" merge-context \
+     "planning_outputs/<project>" <phase_num>
+   ```
+
+**Context Sharing:**
+
+Parallel tasks share context via `.context/` directory:
+```
+planning_outputs/<project>/
+├── .context/
+│   ├── phase1_input.md    # Context from prior phases
+│   ├── phase1_output.md   # Key findings from Phase 1
+│   ├── phase2_input.md    # = phase1_output + additions
+│   └── ...
+```
+
+**Error Handling:**
+- Failed parallel tasks don't cascade to other parallel tasks
+- Failed tasks are marked in state for retry
+- Phase continues with successful tasks, reports failures at end
 
 ### Multi-Model Validation (--validate)
 
@@ -85,20 +142,39 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 ### Phase 1: Research & Market Analysis
 **Skills to use:** `research-lookup`, `competitive-analysis`, `market-research-reports`
 
-1. **Market Research**
+**With `--parallel` flag:**
+```
+Group 1.1 (PARALLEL): research-lookup + competitive-analysis
+Group 1.2 (sequential): market-research-reports (uses Group 1.1 context)
+Group 1.3 (sequential): project-diagrams
+```
+
+1. **Market Research + Competitive Analysis** *(can run in parallel)*
    - Use `research-lookup` to gather industry data, trends, and benchmarks
+   - Use `competitive-analysis` skill to analyze competitors
+   - **If `--parallel`**: Launch both skills simultaneously using parallel tool calls
+   - Output: `01_market_research/market_data.md`, `01_market_research/competitive_analysis.md`
+
+2. **Market Research Reports** *(sequential - needs prior context)*
    - Use `market-research-reports` for comprehensive market analysis
+   - This task uses findings from parallel group above
    - Output: `01_market_research/market_overview.md`
 
-2. **Competitive Analysis**
-   - Use `competitive-analysis` skill to analyze competitors
-   - Identify market gaps and opportunities
-   - Output: `01_market_research/competitive_analysis.md`
-
-3. **Generate Diagrams**
+3. **Generate Diagrams** *(sequential)*
    - Use `project-diagrams` for market positioning charts
    - Use `project-diagrams` for competitive landscape visualization
    - Output: `01_market_research/diagrams/`
+
+**Parallel Execution (if `--parallel`):**
+```bash
+# Get execution plan
+python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" plan \
+  "planning_outputs/<project_name>" 1
+
+# After parallel tasks complete, merge context
+python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" merge-context \
+  "planning_outputs/<project_name>" 1
+```
 
 **Log:** `[HH:MM:SS] PHASE 1 COMPLETE: Market research and competitive analysis`
 
@@ -144,20 +220,46 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_ou
 ### Phase 3: Feasibility & Risk Analysis
 **Skills to use:** `feasibility-analysis`, `risk-assessment`, `service-cost-analysis`
 
-1. **Feasibility Analysis**
-   - Use `feasibility-analysis` skill to assess viability
-   - Evaluate technical, financial, and operational feasibility
-   - Output: `03_feasibility/feasibility_analysis.md`
+**With `--parallel` flag (HIGHEST parallelization - 60% time savings):**
+```
+Group 3.1 (PARALLEL): feasibility-analysis + risk-assessment + service-cost-analysis
+Group 3.2 (sequential): project-diagrams
+```
 
-2. **Risk Assessment**
-   - Use `risk-assessment` skill to identify and mitigate risks
-   - Create risk matrix and mitigation strategies
-   - Output: `03_feasibility/risk_assessment.md`
+1. **Feasibility + Risk + Cost Analysis** *(ALL can run in parallel)*
 
-3. **Service Cost Analysis**
-   - Use `service-cost-analysis` skill for infrastructure costs
-   - Calculate TCO for cloud services, APIs, tools
-   - Output: `03_feasibility/service_cost_analysis.md`
+   These three analyses are independent and can run simultaneously:
+
+   - **Feasibility Analysis**: Use `feasibility-analysis` skill to assess viability
+     - Output: `03_feasibility/feasibility_analysis.md`
+
+   - **Risk Assessment**: Use `risk-assessment` skill to identify and mitigate risks
+     - Output: `03_feasibility/risk_assessment.md`
+
+   - **Service Cost Analysis**: Use `service-cost-analysis` skill for infrastructure costs
+     - Output: `03_feasibility/service_cost_analysis.md`
+
+   **If `--parallel`**: Launch ALL THREE skills simultaneously using parallel tool calls
+
+2. **Generate Diagrams** *(sequential - needs analysis results)*
+   - Use `project-diagrams` for cost breakdown visualization
+   - Use `project-diagrams` for risk matrix diagram
+   - Output: `03_feasibility/diagrams/`
+
+**Parallel Execution (if `--parallel`):**
+```bash
+# Prepare input context from Phase 2
+python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" input-context \
+  "planning_outputs/<project_name>" 3
+
+# Get execution plan
+python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" plan \
+  "planning_outputs/<project_name>" 3
+
+# After parallel tasks complete, merge context
+python "${CLAUDE_PLUGIN_ROOT}/scripts/parallel-orchestrator.py" merge-context \
+  "planning_outputs/<project_name>" 3
+```
 
 **Log:** `[HH:MM:SS] PHASE 3 COMPLETE: Feasibility and costs analyzed`
 
