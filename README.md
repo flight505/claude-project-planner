@@ -362,6 +362,7 @@ sprints:
 
 ## Documentation
 
+- [User Flow & UI Interface](docs/USER_FLOW.md) - Interactive planning diagrams and AskUserQuestion interface
 - [Features Guide](docs/FEATURES.md) - Comprehensive overview
 - [API Reference](docs/API.md) - Python API documentation
 - [Skills Overview](docs/SKILLS.md) - All available skills
