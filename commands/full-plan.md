@@ -501,6 +501,154 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
 python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 6
 ```
 
+## Post-Plan Analysis: Parallelization Recommendations
+
+**IMPORTANT:** After Phase 6 completes, if the plan was executed WITHOUT the `--parallel` flag, analyze parallelization opportunities and present recommendations to the user.
+
+### Step 1: Run Parallelization Analysis
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/analyze-parallelization.py" \
+  "planning_outputs/<timestamp>_<project_name>"
+```
+
+This analyzes the completed plan and calculates:
+- Sequential execution time (actual)
+- Parallel execution time (estimated)
+- Time savings percentage
+- Recommendation level (full, conservative, none)
+
+**Example Output:**
+```
+Parallelization Analysis
+Plan: 20260112_143022_my-saas-app
+
+Time Comparison:
+  Sequential execution: 120 minutes
+  Parallel execution:   103 minutes
+  Time savings:         17 minutes (14.2%)
+
+Recommendation: CONSERVATIVE
+  Moderate time savings (14%) with 2 parallel task groups. Worth considering.
+```
+
+### Step 2: Present Recommendation to User
+
+Based on the analysis result, use AskUserQuestion to present parallelization options:
+
+#### Scenario A: Significant Savings (≥20%)
+
+```python
+AskUserQuestion({
+    "questions": [
+        {
+            "question": "Your plan could save ~22% time with parallelization. Enable it for future similar projects?",
+            "header": "Optimize Planning",
+            "multiSelect": False,
+            "options": [
+                {
+                    "label": "Yes - Full parallelization (Recommended)",
+                    "description": "Run 3 task groups in parallel. Estimated time: 98 min vs 125 min sequential. Savings: 27 minutes"
+                },
+                {
+                    "label": "Conservative - Only 100% safe parallel tasks",
+                    "description": "Run 2 task groups in parallel. Estimated time: 110 min. Savings: 15 minutes"
+                },
+                {
+                    "label": "No - Keep sequential execution",
+                    "description": "No changes to planning workflow"
+                }
+            ]
+        }
+    ]
+})
+```
+
+#### Scenario B: Moderate Savings (10-19%)
+
+```python
+AskUserQuestion({
+    "questions": [
+        {
+            "question": "Your plan could save ~14% time with parallelization. Consider enabling for future projects?",
+            "header": "Optimize Planning",
+            "multiSelect": False,
+            "options": [
+                {
+                    "label": "Conservative - Only critical parallel tasks (Recommended)",
+                    "description": "Run Phase 3 analysis tasks in parallel only. Savings: 12 minutes (10%)"
+                },
+                {
+                    "label": "Yes - Full parallelization",
+                    "description": "Run 2 task groups in parallel. Savings: 17 minutes (14%)"
+                },
+                {
+                    "label": "No - Sequential is fine",
+                    "description": "Minimal savings, keep current workflow"
+                }
+            ]
+        }
+    ]
+})
+```
+
+#### Scenario C: Minimal Savings (<10%)
+
+```python
+AskUserQuestion({
+    "questions": [
+        {
+            "question": "Your plan would save only ~7% time with parallelization. Sequential execution is fine.",
+            "header": "Parallelization Analysis",
+            "multiSelect": False,
+            "options": [
+                {
+                    "label": "No - Sequential execution (Recommended)",
+                    "description": "Minimal savings (5 minutes), not worth complexity"
+                },
+                {
+                    "label": "Yes - Try parallelization anyway",
+                    "description": "Enable for learning/testing purposes"
+                }
+            ]
+        }
+    ]
+})
+```
+
+### Step 3: Handle User Selection
+
+Based on the user's choice:
+
+**If "Yes - Full parallelization" or "Conservative":**
+1. Save preference to `.claude/project-planner.local.md`:
+   ```bash
+   echo "prefer_parallelization: true" >> .claude/project-planner.local.md
+   ```
+2. Show example command for next time:
+   ```
+   ✓ Preference saved! For your next similar project, the system will use:
+     /full-plan my-next-project --parallel
+   ```
+
+**If "No - Keep sequential":**
+1. No action needed
+2. Inform user they can always enable with `--parallel` flag
+
+### When to Skip Analysis
+
+**Skip post-plan analysis if:**
+- Plan was already executed with `--parallel` flag
+- Plan is very simple (<10 phases/tasks)
+- User explicitly passed `--no-analysis` flag
+
+### See Also
+
+For detailed information about parallelization analysis:
+- **Guide:** `docs/PARALLELIZATION_GUIDE.md`
+- **Script:** `scripts/analyze-parallelization.py`
+- **Examples:** Real-world savings scenarios for different project types
+
 ## Progress Tracking
 
 **IMPORTANT:** Use the progress tracker to maintain real-time progress visibility.
