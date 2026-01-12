@@ -6,16 +6,162 @@ description: Generate a comprehensive project plan using all planning skills - a
 
 When the user invokes `/full-plan`, generate a **comprehensive project plan** by systematically using all relevant planning skills.
 
-## Required Input
+## Interactive Setup Workflow
 
-Before starting, gather from the user:
+The `/full-plan` command uses an interactive setup process to gather comprehensive project details:
+
+### Step 1: Create Planning Input Template
+
+Generate and open a detailed planning input template:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/create-plan-input.sh" "<project_name>"
+```
+
+This creates a `.{project_name}-plan-input.md` file and opens it in the user's editor (`$EDITOR` or nano).
+
+**The template includes sections for:**
+- Project Overview (name, description)
+- Target Audience (users, personas, market)
+- Goals & Success Metrics
+- Technical Requirements (features, integrations, data, compliance)
+- Constraints (timeline, budget, team, scalability)
+- Technology Preferences (stack, cloud, approach)
+- Go-to-Market Strategy
+- Additional Context (risks, assumptions, etc.)
+
+**User Action Required:** User fills out the template with their project details and saves the file.
+
+### Step 2: Background Dependency Installation
+
+While the user fills out the template, the **SessionStart hook** automatically starts installing dependencies in the background:
+
+```bash
+# Runs automatically via hooks/SessionStart.sh
+nohup "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-dependencies.sh" full &
+```
+
+This ensures all required packages are ready before planning begins.
+
+### Step 3: Parse and Validate Input
+
+After the user saves and closes the template, parse and validate their input:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/parse-plan-input.py" \
+  ".{project_name}-plan-input.md" \
+  --validate \
+  --output ".{project_name}-plan-data.json"
+```
+
+**Validation checks:**
+- Project Name (required)
+- Description (required)
+- Primary Users (required)
+- Primary Objective (required)
+- Core Features (required)
+
+If validation fails, prompt the user to complete missing fields.
+
+### Step 4: Interactive Configuration
+
+Use AskUserQuestion to gather additional preferences:
+
+```python
+questions = [
+    {
+        "question": "Which AI provider do you want to use for research?",
+        "header": "AI Provider",
+        "multiSelect": False,
+        "options": [
+            {
+                "label": "Google Gemini Deep Research (Recommended)",
+                "description": "Comprehensive multi-step research (up to 60 min). Requires GEMINI_API_KEY and Google AI Pro subscription ($19.99/month)"
+            },
+            {
+                "label": "Perplexity via OpenRouter",
+                "description": "Fast web-grounded research. Requires OPENROUTER_API_KEY (pay-per-use)"
+            },
+            {
+                "label": "Auto-detect",
+                "description": "Automatically choose based on available API keys"
+            }
+        ]
+    },
+    {
+        "question": "Enable smart parallelization for faster execution?",
+        "header": "Performance",
+        "multiSelect": False,
+        "options": [
+            {
+                "label": "Yes - Full parallelization (Recommended)",
+                "description": "Run independent tasks in parallel. ~14% time savings overall, up to 60% in Phase 3"
+            },
+            {
+                "label": "No - Sequential execution",
+                "description": "Run all tasks in order. More predictable but slower"
+            }
+        ]
+    },
+    {
+        "question": "Enable multi-model architecture validation after design phase?",
+        "header": "Validation",
+        "multiSelect": False,
+        "options": [
+            {
+                "label": "Yes - Multi-model validation (Recommended)",
+                "description": "Validate architecture with multiple AI models (Gemini, GPT-4o, Claude) for consensus"
+            },
+            {
+                "label": "No - Skip validation",
+                "description": "Proceed directly to implementation planning"
+            }
+        ]
+    }
+]
+```
+
+Store user selections for use in planning execution.
+
+### Step 5: Wait for Dependencies
+
+Before starting Phase 1, ensure all dependencies are installed:
+
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/wait-for-dependencies.py"
+```
+
+This blocks until background installation completes, showing a progress bar.
+
+**If installation fails:**
+1. Check log: `cat /tmp/claude-planner-deps.log`
+2. Manually install: `pip install -r requirements-full-plan.txt`
+3. Re-run `/full-plan`
+
+### Step 6: Begin Planning Execution
+
+With all input gathered and dependencies ready, proceed to Phase 1.
+
+## Legacy Input Method (Backward Compatible)
+
+For quick planning without the interactive template, you can still provide input via command arguments:
+
+```
+/full-plan <project_name> --description "Brief description" --users "Target users"
+```
+
+Or the system will prompt for required fields using AskUserQuestion if not provided.
+
+## Required Input (Summary)
+
+Before starting execution, ensure you have:
 1. **Project name and description** - What are we building?
 2. **Target audience** - Who is this for?
 3. **Key goals** - What problem does it solve?
 4. **Timeline constraints** - Any deadlines?
 5. **Budget constraints** - Any budget limits?
 
-If any critical information is missing, ask before proceeding.
+These are gathered via the interactive template or legacy prompts.
 
 ## Optional Flags
 

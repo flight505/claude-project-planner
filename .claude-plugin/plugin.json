@@ -27,5 +27,8 @@
     "./project_planner/.claude/skills/document-skills/xlsx",
     "./project_planner/.claude/skills/marketing-campaign",
     "./project_planner/.claude/skills/report-generation"
-  ]
+  ],
+  "hooks": {
+    "SessionStart": "./.claude-plugin/hooks/SessionStart.sh"
+  }
 }
