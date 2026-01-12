@@ -7,333 +7,325 @@
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
 </p>
 
-**An AI-powered project planning toolkit** that combines deep research with comprehensive software architecture design. Generate complete project specifications, architecture documents, sprint plans, building blocks, cost analyses, and implementation roadmaps—all backed by real-time research and verified data.
+**AI-powered project planning toolkit** that transforms ideas into comprehensive, buildable specifications. Generate complete project plans including architecture documents, sprint plans, cost analyses, and implementation roadmaps—all backed by real-time research.
 
-Project Planner breaks down complex software projects into Claude Code-buildable components, enabling incremental delivery with clear specifications and acceptance criteria.
+**✨ New in v1.3.1:** Interactive approval gates, iterative refinement with `/refine-plan`, and comprehensive setup UI that eliminates command-line flags.
 
-## Key Features
+---
 
-### 📋 Project Planning
-- **Building Blocks** - Decompose projects into discrete, buildable components
-- **Sprint Planning** - User stories with INVEST criteria and capacity management
-- **Architecture Design** - C4 model diagrams, ADRs, technology research
-- **Implementation Roadmaps** - Milestones, dependencies, critical path
-
-### 💰 Cost & Risk Analysis
-- **Service Cost Estimation** - AWS, GCP, Azure pricing with ROI projections
-- **Risk Assessment** - Risk registers with scoring and mitigation strategies
-- **Feasibility Analysis** - Technical, resource, and market viability
-
-### 🔍 Research-Backed
-- **Technology Research** - Stack comparisons with real benchmarks
-- **Competitive Analysis** - Market positioning and differentiation
-- **AI-Powered Diagrams** - C4, sequence, ERD, deployment diagrams via Nano Banana Pro
-
-### 📣 Go-to-Market (New in v1.0.6)
-- **Marketing Campaign Planning** - Social media strategy and content calendars
-- **Platform Playbooks** - LinkedIn, X/Twitter, Instagram, TikTok strategies
-- **Influencer Strategy** - Tier framework and outreach templates
-
-## Quick Start
-
-### Prerequisites
-- Python 3.10-3.12
-- `ANTHROPIC_API_KEY` (required)
-- `OPENROUTER_API_KEY` (optional, for research and image generation)
-- `GEMINI_API_KEY` (optional, for Deep Research and Veo 3.1 video generation)
-
-### AI Provider Options
-
-Project Planner supports multiple AI providers with automatic fallback:
-
-| Provider | Features | Requirements | Cost |
-|----------|----------|--------------|------|
-| **Anthropic** | Core planning, text generation | `ANTHROPIC_API_KEY` (required) | Pay-per-use |
-| **OpenRouter** | Research (Perplexity), Image Gen (Flux) | `OPENROUTER_API_KEY` | Pay-per-use |
-| **Google Gemini** | Deep Research, Veo 3.1 videos, Imagen 3 | `GEMINI_API_KEY` + Google AI Pro subscription | $19.99/month + $0.75/sec video |
-
-#### Google Gemini Integration (Optional)
-
-Enable advanced Google AI features:
-
-**Requirements:**
-1. **Google AI Pro subscription** ($19.99/month)
-   - Visit: https://one.google.com/intl/en/about/google-ai-plans/
-   - Provides 5 Deep Research reports/month
-   - Access to Veo 3.1 video generation
-
-2. **Get API Key**
-   - Visit: https://ai.google.dev/
-   - Create project and generate API key
-
-3. **Configure**
-   ```bash
-   export GEMINI_API_KEY='your-key'
-   # OR add to .env file
-   echo "GEMINI_API_KEY=your_key" >> .env
-   ```
-
-**Features Enabled:**
-- ✅ **Deep Research**: Comprehensive multi-step research (up to 60 minutes per query)
-- ✅ **Veo 3.1**: 8-second videos with native audio synchronization
-- ✅ **Imagen 3**: High-quality image generation
-- ✅ **1M Token Context**: Industry-leading context window
-
-**Cost Implications:**
-- Deep Research: Included in subscription (5/month on AI Pro, 200/day on AI Ultra)
-- Video Generation: $0.75/second ($6 per 8-second clip)
-- Image Generation: Included in API usage
-
-**Limitations:**
-- Gmail/Docs/Flow integration NOT available via API (consumer UI only)
-- Deep Research requires active subscription
-- Video limited to 8 seconds per generation (use extension for longer videos)
+## 🚀 Quick Start
 
 ### Installation
 
-#### Option 1: Claude Code Plugin (Recommended) ⭐
-
 ```bash
-# Add the plugin marketplace
-/plugin marketplace add https://github.com/flight505/claude-project-planner
-
-# Install the plugin
-/plugin install claude-project-planner
+# Install as Claude Code plugin (recommended)
+claude plugin install flight505/claude-project-planner
 
 # Restart Claude Code when prompted
 ```
 
-#### Option 2: Install from PyPI
+### Prerequisites
+
+- Python 3.10-3.12
+- `ANTHROPIC_API_KEY` (required)
+- `OPENROUTER_API_KEY` (recommended, for research)
+- `GEMINI_API_KEY` (optional, for Deep Research)
 
 ```bash
-pip install project-planner
-```
-
-#### Option 3: Install from source
-
-```bash
-git clone https://github.com/flight505/claude-project-planner.git
-cd claude-project-planner
-uv sync
-```
-
-### Configure API Keys
-
-```bash
-# .env file (recommended)
-echo "ANTHROPIC_API_KEY=your_key" > .env
-echo "OPENROUTER_API_KEY=your_openrouter_key" >> .env
-echo "GEMINI_API_KEY=your_gemini_key" >> .env  # Optional, for Deep Research + Veo 3.1
-
-# or export in your shell
+# Configure API keys
 export ANTHROPIC_API_KEY='your_key'
-export OPENROUTER_API_KEY='your_openrouter_key'
-export GEMINI_API_KEY='your_gemini_key'  # Optional
-
-# Verify configuration
-/project-planner:setup
+export OPENROUTER_API_KEY='your_key'  # Recommended for research
 ```
 
-**Provider Auto-Detection:**
+### Usage
 
-The plugin automatically detects available API keys and uses the best provider for each task:
-- **Text Generation**: Gemini 2.0 Flash Thinking (if available) → OpenRouter Claude 3.5
-- **Research**: Gemini Deep Research (if available) → Perplexity via OpenRouter
-- **Video**: Veo 3.1 (requires Gemini)
-- **Images**: OpenRouter Flux (lower cost) → Gemini Imagen 3
+```bash
+# Start comprehensive planning with interactive setup
+/full-plan my-project
 
-## Usage
+# You'll see 6 question groups covering ALL features:
+# 1. AI Provider (Gemini vs Perplexity)
+# 2. Parallelization (fast vs sequential)
+# 3. Interactive Approval (pause after each phase) ⭐ NEW
+# 4. Phase Selection (choose which phases to run) ⭐ NEW
+# 5. Quality Checks (multi-model validation, diagrams) ⭐ NEW
+# 6. Output Formats (PDF, PowerPoint, Markdown) ⭐ NEW
+```
 
-### Commands
+**That's it!** No flags to remember—discover all features through the interactive UI.
 
-After installing the plugin, use these commands:
+---
+
+## ✨ What's New in v1.3.1
+
+### 🎯 Interactive Approval Mode
+
+Pause after each phase to review and approve before continuing:
+
+```
+✓ PHASE 2 COMPLETE: Architecture & Technical Design (35 min)
+
+Key Decisions:
+  • Architecture Pattern: Microservices
+  • Tech Stack: Node.js, PostgreSQL, Redis
+  • Deployment: Kubernetes on AWS EKS
+
+Continue to next phase? [Continue | Revise | Pause]
+```
+
+**Choose:**
+- **Continue** → Proceed to next phase
+- **Revise** → Provide feedback and re-run with adjustments
+- **Pause** → Save state and resume later
+
+### 🔄 Iterative Refinement
+
+Revise completed phases with intelligent dependency handling:
+
+```bash
+# Revise a completed phase
+/refine-plan planning_outputs/20260112_my-project --phase 2 \
+  --feedback "Use monolithic architecture instead of microservices"
+
+# System automatically:
+# 1. Backs up original outputs
+# 2. Identifies dependent phases (3, 4, 6)
+# 3. Asks how to handle dependencies
+# 4. Re-runs with feedback incorporated
+```
+
+### 🎨 Comprehensive Setup UI
+
+No more command-line flags! Interactive UI presents all features:
+
+- **AI Provider Selection** - Gemini Deep Research vs Perplexity
+- **Performance** - Enable parallelization for 14% time savings
+- **Interactive Mode** - Approval gates after each phase
+- **Phase Selection** - Skip marketing for internal tools
+- **Quality Checks** - Multi-model validation, extra diagrams
+- **Output Formats** - PDF reports, PowerPoint slides
+
+<details>
+<summary><b>📸 See Setup UI Example</b></summary>
+
+```
+Starting /full-plan...
+
+┌─────────────────────────────────────────────────────┐
+│ 1. AI Provider                                      │
+│ ● Google Gemini Deep Research (Recommended)         │
+│ ○ Perplexity via OpenRouter                         │
+│ ○ Auto-detect from available keys                   │
+└─────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────┐
+│ 3. Workflow ⭐ NEW                                  │
+│ ● Yes - Interactive approval mode                   │
+│   Pause after each phase for review                 │
+│ ○ No - Fully autonomous                             │
+└─────────────────────────────────────────────────────┘
+
+Configuration Summary:
+  AI Provider: GEMINI
+  Parallelization: ENABLED
+  Interactive Mode: ENABLED ⭐
+  Phases: 1, 2, 3, 4, 6 (marketing skipped)
+  Quality: Multi-model validation + diagrams
+  Outputs: Markdown, YAML, PDF
+```
+
+</details>
+
+---
+
+## 🎯 Key Features
+
+- **📋 Comprehensive Planning** - Market research, architecture, costs, risks, sprints, marketing
+- **🏗️ Building Blocks** - Decompose projects into Claude Code-buildable components
+- **💰 Cost Analysis** - AWS/GCP/Azure pricing with ROI projections
+- **📊 AI-Generated Diagrams** - C4 model, sequence, ERD, deployment diagrams
+- **🔍 Research-Backed** - Real-time technology and market research
+- **🎯 Interactive Approval** - Review and revise after each phase (v1.3.1)
+- **🔄 Iterative Refinement** - Revise any phase with dependency handling (v1.3.1)
+- **📣 Go-to-Market** - Marketing campaigns, content calendars, influencer strategy
+
+---
+
+## 📚 Commands
 
 | Command | Description |
 |---------|-------------|
-| `/full-plan` | **Complete project planning** - runs all 6 phases (market research, architecture, feasibility, sprints, marketing, review) |
-| `/tech-plan` | **Technical planning only** - architecture, costs, risks, sprints (no marketing) |
-| `/project-planner:setup` | **Configuration wizard** - detect/configure API keys |
+| `/full-plan` | Complete project planning (all 6 phases) with interactive setup |
+| `/tech-plan` | Technical planning only (no marketing) |
+| `/refine-plan` | Revise a completed phase with feedback ⭐ NEW |
+| `/generate-report` | Compile outputs into PDF/DOCX with IEEE citations |
+| `/project-planner:setup` | Configure API keys |
 
-### Plugin Usage (Recommended)
+<details>
+<summary><b>📖 See Usage Examples</b></summary>
 
-After installing the plugin, simply ask Claude:
-
-```bash
-# Full project planning (or use /full-plan)
-> Plan a B2B SaaS inventory management system with multi-tenant architecture,
-  PostgreSQL database, React frontend, and deployment on AWS.
-
-# Architecture research
-> Research the best technology stack for a real-time collaboration app.
-  Compare WebSockets vs SSE vs polling for our use case.
-
-# Building blocks specification
-> Break down an e-commerce platform into buildable components.
-  Include user authentication, product catalog, cart, checkout, and admin dashboard.
-
-# Sprint planning
-> Create a sprint plan for the authentication service.
-  Include user registration, login, OAuth, and password reset features.
-
-# Cost analysis
-> Estimate monthly infrastructure costs for a SaaS app with 10,000 users.
-  Consider compute, database, storage, and third-party services.
-
-# Risk assessment
-> Identify technical and business risks for migrating from monolith to microservices.
-  Include mitigation strategies and contingency plans.
-
-# Marketing campaign (NEW)
-> Create a product launch campaign for our developer tool.
-  Include content calendar, platform strategies, and influencer outreach.
-```
-
-### CLI Usage
+### Full Planning
 
 ```bash
-# If installed via pip
-project-planner
+/full-plan my-saas-app
 
-# If installed from source with uv
-uv run project-planner
+# Interactive setup will ask about:
+# - AI provider preference
+# - Parallelization (14% faster)
+# - Interactive approval gates
+# - Which phases to include
+# - Quality checks to enable
+# - Output formats needed
+
+# Then executes 6 phases:
+# Phase 1: Market Research → Approval gate
+# Phase 2: Architecture → Approval gate
+# Phase 3: Feasibility & Costs → Approval gate
+# Phase 4: Implementation Planning → Approval gate
+# Phase 5: Go-to-Market → Approval gate
+# Phase 6: Review & Analysis
 ```
 
-### Python API
+### Iterative Refinement
 
-```python
-import asyncio
-from project_planner import generate_project
+```bash
+# After reviewing architecture, realize monolith is better
+/refine-plan planning_outputs/20260112_143022_my-saas --phase 2 \
+  --feedback "Use monolithic architecture. Microservices add unnecessary complexity for MVP."
 
-async def main():
-    async for update in generate_project(
-        query=(
-            "Plan a task management SaaS application. "
-            "Include user authentication, team management, "
-            "task CRUD operations, notifications, and analytics dashboard. "
-            "Target: 5,000 users in year 1, growing to 50,000 by year 3."
-        ),
-        output_dir="./planning_outputs"
-    ):
-        if update["type"] == "progress":
-            print(f"[{update['stage']}] {update['message']}")
-        else:
-            print(f"✓ Plan complete: {update['files']['summary']}")
-
-asyncio.run(main())
+# System responds:
+# "Phase 2 revision will affect Phases 3, 4, 6. How to handle?"
+# - Auto-rerun all (fastest, most consistent)
+# - Review individually (more control)
+# - Only revise Phase 2 (WARNING: inconsistencies)
 ```
 
-## Available Skills
+### Technical Planning (Skip Marketing)
 
-When installed as a plugin, you get access to **18 specialized skills**:
+```bash
+/tech-plan internal-tool
 
-### Core Research
-| Skill | Description |
-|-------|-------------|
-| `research-lookup` | Real-time technology and market research via Perplexity |
-| `competitive-analysis` | Market positioning, competitor profiling, feature comparison |
-| `market-research-reports` | Comprehensive market analysis reports |
-
-### Architecture & Design
-| Skill | Description |
-|-------|-------------|
-| `architecture-research` | Technology stack research, ADRs, C4 model documentation |
-| `project-diagrams` | AI-generated C4, sequence, ERD, deployment diagrams |
-| `building-blocks` | Component specifications for Claude Code to build |
-
-### Planning & Estimation
-| Skill | Description |
-|-------|-------------|
-| `sprint-planning` | User stories (INVEST), capacity management, timelines |
-| `service-cost-analysis` | Cloud pricing, ROI projections, cost optimization |
-| `risk-assessment` | Risk registers, scoring matrices, mitigation strategies |
-
-### Quality & Review
-| Skill | Description |
-|-------|-------------|
-| `feasibility-analysis` | Technical, resource, and market feasibility |
-| `plan-review` | Project plan validation against best practices |
-
-### Go-to-Market
-| Skill | Description |
-|-------|-------------|
-| `marketing-campaign` | Social media strategy, content calendars, platform playbooks, influencer outreach |
-
-### Utilities
-| Skill | Description |
-|-------|-------------|
-| `generate-image` | AI image generation for diagrams and visuals |
-| `markitdown` | Document conversion (PDF, DOCX, PPTX to Markdown) |
-| `document-skills/docx` | Word document processing |
-| `document-skills/pdf` | PDF processing |
-| `document-skills/pptx` | PowerPoint processing |
-| `document-skills/xlsx` | Excel processing |
-
-## Output Structure
-
-Project Planner creates organized output folders:
-
-```
-planning_outputs/
-└── YYYYMMDD_HHMMSS_<project_name>/
-    ├── progress.md              # Real-time progress log
-    ├── SUMMARY.md               # Executive summary
-    ├── PLAN_REVIEW.md           # Quality review
-    │
-    ├── specifications/          # Project requirements
-    │   ├── project_spec.md      # Business requirements
-    │   ├── technical_spec.md    # Technical specifications
-    │   └── api_spec.md          # API contracts
-    │
-    ├── research/                # Research findings
-    │   ├── market_research.md   # Market analysis
-    │   ├── technology_research.md
-    │   └── competitive_analysis.md
-    │
-    ├── analysis/                # Feasibility & costs
-    │   ├── feasibility.md
-    │   ├── cost_analysis.md
-    │   ├── risk_assessment.md
-    │   └── roi_projections.md
-    │
-    ├── components/              # Building blocks
-    │   ├── building_blocks.yaml # Component specifications
-    │   └── component_specs/     # Detailed specs per component
-    │
-    ├── planning/                # Sprint plans
-    │   ├── sprint_plan.md
-    │   ├── timeline.md
-    │   └── milestones.md
-    │
-    ├── marketing/               # Go-to-market (NEW)
-    │   ├── campaign_brief.md
-    │   ├── content_calendar.md
-    │   ├── platform_strategies/
-    │   └── influencer_strategy.md
-    │
-    ├── diagrams/                # Architecture diagrams
-    │   ├── architecture.png
-    │   ├── data_model.png
-    │   └── sequence_diagrams/
-    │
-    └── data/                    # Input data and references
+# Same as /full-plan but skips Phase 5 (marketing)
+# Perfect for internal tools, APIs, or prototypes
 ```
 
-## Building Blocks Format
+</details>
 
-Building blocks are specified in YAML for Claude Code to build:
+---
+
+## 🔧 Advanced Features
+
+<details>
+<summary><b>🤖 AI Provider Options</b></summary>
+
+### Supported Providers
+
+| Provider | Features | Requirements | Best For |
+|----------|----------|--------------|----------|
+| **Anthropic** | Core planning, text generation | `ANTHROPIC_API_KEY` (required) | Everything |
+| **OpenRouter** | Research (Perplexity), Image Gen | `OPENROUTER_API_KEY` | Fast research |
+| **Google Gemini** | Deep Research, Veo 3.1 videos | `GEMINI_API_KEY` + AI Pro ($19.99/mo) | Comprehensive research |
+
+### Google Gemini Setup (Optional)
+
+**Requirements:**
+1. Google AI Pro subscription ($19.99/month)
+   - Visit: https://one.google.com/intl/en/about/google-ai-plans/
+2. Get API key: https://ai.google.dev/
+
+**Features:**
+- ✅ **Deep Research**: 60-minute comprehensive research queries
+- ✅ **Veo 3.1**: 8-second videos with audio ($0.75/second)
+- ✅ **Imagen 3**: High-quality image generation
+- ✅ **1M Token Context**: Industry-leading context window
+
+```bash
+export GEMINI_API_KEY='your-key'
+```
+
+**Auto-Detection:**
+
+Plugin automatically uses best provider for each task:
+- **Research**: Gemini Deep Research → Perplexity
+- **Text**: Gemini 2.0 Flash Thinking → Claude 3.5
+- **Images**: Flux (OpenRouter) → Imagen 3 (Gemini)
+- **Videos**: Veo 3.1 (Gemini only)
+
+</details>
+
+<details>
+<summary><b>📁 Output Structure</b></summary>
+
+### Directory Layout
+
+```
+planning_outputs/YYYYMMDD_HHMMSS_<project>/
+├── SUMMARY.md              # Executive summary
+├── progress.md             # Real-time progress log
+├── .checkpoint.json        # Resume state
+│
+├── 01_market_research/
+│   ├── research_data.md
+│   ├── competitive_analysis.md
+│   ├── market_overview.md
+│   └── diagrams/
+│
+├── 02_architecture/
+│   ├── architecture_document.md
+│   ├── building_blocks.yaml  # Claude Code specs
+│   └── diagrams/
+│
+├── 03_feasibility/
+│   ├── feasibility_analysis.md
+│   ├── risk_assessment.md
+│   ├── service_cost_analysis.md
+│   └── diagrams/
+│
+├── 04_implementation/
+│   ├── sprint_plan.md
+│   └── diagrams/
+│
+├── 05_go_to_market/        # Optional
+│   ├── marketing_campaign.md
+│   ├── content_calendar.md
+│   └── diagrams/
+│
+├── 06_review/
+│   └── plan_review.md
+│
+└── .state/                 # Internal
+    ├── backups/            # Original outputs before revision
+    ├── revisions/          # Revision history
+    └── phase*_context.md   # Phase context
+```
+
+### Revision Tracking
+
+When using `/refine-plan`:
+- Originals backed up to `.state/backups/`
+- Revision history in `.state/revisions/`
+- Checkpoint tracks revision numbers
+
+</details>
+
+<details>
+<summary><b>🧱 Building Blocks Format</b></summary>
+
+### YAML Specification
+
+Building blocks are Claude Code-buildable components:
 
 ```yaml
 building_blocks:
   - name: "User Authentication Service"
     id: "BB-001"
     type: "backend"
-    description: "Handles authentication, authorization, and sessions"
+    description: "JWT-based auth with OAuth2"
 
     responsibilities:
       - "User registration with email verification"
       - "Login/logout with JWT tokens"
       - "OAuth2 integration (Google, GitHub)"
-      - "Password reset flow"
 
     dependencies:
       internal:
@@ -342,38 +334,43 @@ building_blocks:
       external:
         - name: "PostgreSQL"
           version: ">=14.0"
-        - name: "Redis"
-          version: ">=6.0"
 
     interfaces:
       api_endpoints:
         - method: "POST"
           path: "/api/v1/auth/register"
-          description: "Register new user"
         - method: "POST"
           path: "/api/v1/auth/login"
-          description: "Authenticate and get tokens"
-      events_published:
-        - name: "user.registered"
-        - name: "user.logged_in"
 
     complexity: "M"  # S, M, L, XL
     estimated_hours: 24
     story_points: 5
 
     test_criteria:
-      - "User can register with valid email/password"
+      - "User can register with valid email"
       - "Invalid credentials return 401"
-      - "JWT tokens are valid and properly scoped"
-      - "Rate limiting prevents brute force"
+      - "JWT tokens properly scoped"
 
     priority: "critical"
     sprint_assignment: "Sprint 1"
 ```
 
-## Sprint Planning Format
+### Why Building Blocks?
 
-Sprint plans follow INVEST criteria:
+1. **Claude Code Compatible** - Directly buildable specifications
+2. **Clear Dependencies** - Explicit internal and external deps
+3. **Testable** - Acceptance criteria included
+4. **Estimatable** - Story points and hours
+5. **Prioritized** - Sprint assignments
+
+</details>
+
+<details>
+<summary><b>📅 Sprint Planning Format</b></summary>
+
+### INVEST Criteria
+
+Sprints follow INVEST principles (Independent, Negotiable, Valuable, Estimable, Small, Testable):
 
 ```yaml
 sprints:
@@ -397,52 +394,169 @@ sprints:
         acceptance_criteria:
           - "Email validation works"
           - "Password meets strength requirements"
-          - "Confirmation email is sent"
+          - "Confirmation email sent"
         story_points: 5
         building_block: "BB-001"
 
     risks:
       - "OAuth integration may take longer"
+      - mitigation: "Spike task in previous sprint"
 ```
 
-## Example Workflow
+</details>
+
+<details>
+<summary><b>🎓 Available Skills</b></summary>
+
+### 18 Specialized Skills
+
+**Core Research:**
+- `research-lookup` - Real-time tech/market research
+- `competitive-analysis` - Market positioning
+- `market-research-reports` - Comprehensive analysis
+
+**Architecture & Design:**
+- `architecture-research` - Stack research, ADRs, C4 model
+- `building-blocks` - Component specifications
+- `project-diagrams` - AI-generated diagrams
+
+**Planning & Estimation:**
+- `sprint-planning` - User stories, INVEST criteria
+- `service-cost-analysis` - Cloud pricing, ROI
+- `risk-assessment` - Risk registers, mitigation
+
+**Quality & Review:**
+- `feasibility-analysis` - Technical/market feasibility
+- `plan-review` - Plan validation
+
+**Go-to-Market:**
+- `marketing-campaign` - Social media strategy, content calendars
+
+**Utilities:**
+- `generate-image` - AI image generation
+- `markitdown` - Document conversion
+- `document-skills/docx`, `pdf`, `pptx`, `xlsx` - Document processing
+- `report-generation` - Compile outputs to PDF/DOCX
+
+</details>
+
+<details>
+<summary><b>🐍 Python API</b></summary>
+
+### Programmatic Access
+
+```python
+import asyncio
+from project_planner import generate_project
+
+async def main():
+    async for update in generate_project(
+        query=(
+            "Plan a task management SaaS. "
+            "Include authentication, team management, "
+            "task CRUD, notifications, analytics. "
+            "Target: 5,000 users year 1."
+        ),
+        output_dir="./planning_outputs",
+        enable_interactive=True,  # v1.3.1
+        enable_parallelization=True
+    ):
+        if update["type"] == "progress":
+            print(f"[{update['stage']}] {update['message']}")
+        elif update["type"] == "approval_required":
+            # Handle approval gate
+            decision = input("Continue? [y/n/r]: ")
+            update["callback"](decision)
+        else:
+            print(f"✓ Complete: {update['files']['summary']}")
+
+asyncio.run(main())
+```
+
+</details>
+
+---
+
+## 📖 Documentation
+
+- **[Interactive Mode Guide](docs/INTERACTIVE_SETUP.md)** - Complete workflow for v1.3.1
+- **[Parallelization Guide](docs/PARALLELIZATION_GUIDE.md)** - Performance optimization
+- **[Refine Command](commands/refine-plan.md)** - Iterative refinement
+- **[User Flow Diagrams](docs/USER_FLOW.md)** - Visual workflow
+- **[Features Guide](docs/FEATURES.md)** - Comprehensive overview
+- **[API Reference](docs/API.md)** - Python API
+- **[Skills Overview](docs/SKILLS.md)** - All 18 skills
+- **[Development Guide](docs/DEVELOPMENT.md)** - Contributing
+- **[Changelog](CHANGELOG.md)** - Version history
+
+---
+
+## 🎬 Example Workflow
 
 **Request:** "Plan a B2B SaaS inventory management system"
 
-**Project Planner will:**
-1. ✅ Create project folder: `planning_outputs/20250106_143022_b2b_inventory_saas/`
-2. 🔍 Research competitive landscape and market size
-3. 🔍 Research technology options (frameworks, databases, cloud)
-4. 📐 Design system architecture with C4 diagrams
-5. 🧱 Break down into 15-20 building blocks
-6. 📅 Create 6-sprint implementation plan
-7. 💰 Analyze costs with AWS/GCP pricing
-8. ⚠️ Assess 10-15 risks with mitigations
-9. 📣 Create go-to-market strategy (with `/full-plan`)
-10. ✅ Conduct plan review
-11. 📋 Deliver comprehensive SUMMARY.md
+**With Interactive Mode (v1.3.1):**
 
-## Documentation
+1. **Setup UI** - Choose options (AI provider, parallelization, approval gates)
+2. **Phase 1: Market Research** → Review → Approve/Revise/Pause
+3. **Phase 2: Architecture** → Review → *User selects "Revise"*
+   - Feedback: "Use PostgreSQL instead of MongoDB"
+   - System re-runs Phase 2 with feedback
+4. **Phase 3: Feasibility & Costs** → Review → Approve
+5. **Phase 4: Implementation Planning** → Review → Approve
+6. **Phase 5: Go-to-Market** → Review → Approve
+7. **Phase 6: Review & Analysis** → Final summary
+8. **Post-Plan Analysis** - Parallelization recommendations
 
-- [User Flow & UI Interface](docs/USER_FLOW.md) - Interactive planning diagrams and AskUserQuestion interface
-- [Features Guide](docs/FEATURES.md) - Comprehensive overview
-- [API Reference](docs/API.md) - Python API documentation
-- [Skills Overview](docs/SKILLS.md) - All available skills
-- [Development Guide](docs/DEVELOPMENT.md) - Contributing guide
-- [Changelog](CHANGELOG.md) - Version history
+**Output:**
+```
+planning_outputs/20260112_143022_b2b_inventory_saas/
+├── SUMMARY.md (executive summary)
+├── 01_market_research/ (competitive landscape)
+├── 02_architecture/ (revised PostgreSQL design)
+├── 03_feasibility/ (costs, risks, ROI)
+├── 04_implementation/ (6 sprints, 18 building blocks)
+├── 05_go_to_market/ (launch campaign)
+├── 06_review/ (validation report)
+└── .state/
+    ├── backups/phase2_original/ (MongoDB design)
+    └── revisions/phase2_revision_001.md
+```
 
-## License
+---
+
+## 🔄 Version History
+
+- **v1.3.1** (2026-01-12) - Interactive approval gates, `/refine-plan` command, comprehensive setup UI
+- **v1.3.0** (2026-01-12) - Post-plan parallelization analysis
+- **v1.2.0** (2026-01-11) - Interactive setup UI with file-based input
+- **v1.1.0** (2026-01-10) - Google Gemini integration, provider abstraction
+- **v1.0.18** (2026-01-09) - Enhanced dependency management
+- **v1.0.6** - Go-to-market strategy and marketing campaigns
+- **v1.0.0** - Initial release
+
+[Full Changelog](CHANGELOG.md)
+
+---
+
+## 🤝 Support
+
+- **Issues**: [GitHub Issues](https://github.com/flight505/claude-project-planner/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/flight505/claude-project-planner/discussions)
+- **Troubleshooting**: [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+---
+
+## 📜 License
 
 MIT - see [LICENSE](LICENSE)
 
-## Support
+---
 
-- Open an issue on [GitHub](https://github.com/flight505/claude-project-planner/issues)
-- See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for common problems
+## 🙏 Credits
 
-## Credits
-
-Forked from [claude-scientific-writer](https://github.com/K-Dense-AI/claude-scientific-writer) by K-Dense AI. Transformed for software project planning use cases.
+Forked from [claude-scientific-writer](https://github.com/K-Dense-AI/claude-scientific-writer) by K-Dense AI.
+Transformed for software project planning use cases.
 
 ---
 
