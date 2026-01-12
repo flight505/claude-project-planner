@@ -63,65 +63,100 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/parse-plan-input.py" \
 
 If validation fails, prompt the user to complete missing fields.
 
-### Step 4: Interactive Configuration
+### Step 4: Comprehensive Interactive Configuration
 
-Use AskUserQuestion to gather additional preferences:
+Present **all planning capabilities** in one guided setup flow, eliminating need to remember flags:
 
-```python
-questions = [
-    {
-        "question": "Which AI provider do you want to use for research?",
-        "header": "AI Provider",
-        "multiSelect": False,
-        "options": [
-            {
-                "label": "Google Gemini Deep Research (Recommended)",
-                "description": "Comprehensive multi-step research (up to 60 min). Requires GEMINI_API_KEY and Google AI Pro subscription ($19.99/month)"
-            },
-            {
-                "label": "Perplexity via OpenRouter",
-                "description": "Fast web-grounded research. Requires OPENROUTER_API_KEY (pay-per-use)"
-            },
-            {
-                "label": "Auto-detect",
-                "description": "Automatically choose based on available API keys"
-            }
-        ]
-    },
-    {
-        "question": "Enable smart parallelization for faster execution?",
-        "header": "Performance",
-        "multiSelect": False,
-        "options": [
-            {
-                "label": "Yes - Full parallelization (Recommended)",
-                "description": "Run independent tasks in parallel. ~14% time savings overall, up to 60% in Phase 3"
-            },
-            {
-                "label": "No - Sequential execution",
-                "description": "Run all tasks in order. More predictable but slower"
-            }
-        ]
-    },
-    {
-        "question": "Enable multi-model architecture validation after design phase?",
-        "header": "Validation",
-        "multiSelect": False,
-        "options": [
-            {
-                "label": "Yes - Multi-model validation (Recommended)",
-                "description": "Validate architecture with multiple AI models (Gemini, GPT-4o, Claude) for consensus"
-            },
-            {
-                "label": "No - Skip validation",
-                "description": "Proceed directly to implementation planning"
-            }
-        ]
-    }
-]
+```bash
+# Generate comprehensive setup questions
+SETUP_QUESTIONS=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/setup-planning-config.py")
+
+# Present to user via AskUserQuestion
+# (This displays 6 question groups covering all features)
 ```
 
-Store user selections for use in planning execution.
+**Setup Questions Presented:**
+
+1. **AI Provider Selection**
+   - Google Gemini Deep Research (most comprehensive, requires API key + subscription)
+   - Perplexity via OpenRouter (fast, pay-per-use)
+   - Auto-detect from available keys
+
+2. **Performance Optimization**
+   - Enable parallelization (~14% overall time savings, 60% in Phase 3)
+   - Sequential execution (simpler, more predictable)
+
+3. **Interactive Approval Gates** ⭐ **NEW**
+   - Pause after each phase for review and approval
+   - Ability to revise phases if direction needs adjustment
+   - Best for critical projects where user wants control
+
+4. **Phase Selection** ⭐ **NEW**
+   - Choose which phases to include (multiSelect)
+   - Phase 1: Market Research (required)
+   - Phase 2: Architecture (required)
+   - Phase 3: Feasibility & Costs (recommended)
+   - Phase 4: Implementation Planning (required)
+   - Phase 5: Go-to-Market Strategy (optional - skip for internal tools)
+   - Phase 6: Plan Review (recommended)
+
+5. **Quality Checks** ⭐ **NEW**
+   - Multi-model architecture validation
+   - Comprehensive diagram generation
+   - Real-time research verification
+   - None (standard quality only)
+
+6. **Output Formats** ⭐ **NEW**
+   - Markdown + YAML (always included)
+   - Generate PDF report (professional documentation)
+   - Generate PowerPoint presentation (executive summary)
+
+**Parse User Selections:**
+
+```bash
+# Parse answers into configuration
+CONFIG=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/setup-planning-config.py" parse "$USER_ANSWERS")
+
+# Save configuration for execution
+CONFIG_FILE=".${project_name}-config.json"
+echo "$CONFIG" > "$CONFIG_FILE"
+
+# Display configuration summary
+python "${CLAUDE_PLUGIN_ROOT}/scripts/setup-planning-config.py" summary "$CONFIG_FILE"
+```
+
+**Example Configuration Summary:**
+
+```
+======================================================================
+Planning Configuration Summary
+======================================================================
+
+AI Provider: GEMINI
+Parallelization: ENABLED
+Interactive Mode: ENABLED
+
+Phases:
+  ✓ Phase 1: Market Research
+  ✓ Phase 2: Architecture & Design
+  ✓ Phase 3: Feasibility & Costs
+  ✓ Phase 4: Implementation Planning
+  ✗ Phase 5: Go-to-Market Strategy (skipped)
+  ✓ Phase 6: Plan Review
+
+Quality Checks:
+  ✓ Multi-model validation
+  ✓ Comprehensive diagrams
+
+Output Formats:
+  ✓ Markdown (always)
+  ✓ YAML building blocks (always)
+  ✓ PDF report
+
+======================================================================
+```
+
+This setup replaces all command-line flags. Users discover all features interactively without reading documentation.
 
 ### Step 5: Wait for Dependencies
 
@@ -331,6 +366,42 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
   --context "Market research complete. Key findings: <summary>" \
   --decisions "Target market: <segment>;Key competitors: <list>;Market opportunity: <insight>"
 python "${CLAUDE_PLUGIN_ROOT}/scripts/progress-tracker.py" complete "planning_outputs/<project_name>" 1
+```
+
+**Interactive Approval Gate (if enabled):**
+
+```bash
+# Generate phase summary
+SUMMARY=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/generate-phase-summary.py" \
+  "planning_outputs/<project_name>" 1 "Market Research" --duration 23)
+
+# Display summary
+echo "$SUMMARY"
+
+# Generate approval question
+QUESTION=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/generate-phase-summary.py" \
+  "planning_outputs/<project_name>" 1 "Market Research" --format question)
+
+# Ask user via AskUserQuestion
+# Options: "Continue" | "Revise" | "Pause"
+```
+
+**Handle User Response:**
+
+- **Continue**: Proceed to Phase 2
+- **Revise**: Collect feedback, re-run Phase 1 with adjustments
+- **Pause**: Save state, exit (resume later with `/resume-plan`)
+
+**Revision Workflow (if "Revise" selected):**
+
+```bash
+# Collect revision feedback
+FEEDBACK=$(AskUserQuestion: "What would you like to change about Phase 1?")
+
+# Re-run Phase 1 with feedback
+/refine-plan "planning_outputs/<project_name>" --phase 1 --feedback "$FEEDBACK"
+
+# After revision, show summary again and ask approval
 ```
 
 ### Phase 2: Architecture & Technical Design
