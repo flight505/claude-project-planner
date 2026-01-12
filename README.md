@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.18-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
@@ -39,7 +39,55 @@ Project Planner breaks down complex software projects into Claude Code-buildable
 ### Prerequisites
 - Python 3.10-3.12
 - `ANTHROPIC_API_KEY` (required)
-- `OPENROUTER_API_KEY` (optional, for research-lookup and diagrams)
+- `OPENROUTER_API_KEY` (optional, for research and image generation)
+- `GEMINI_API_KEY` (optional, for Deep Research and Veo 3.1 video generation)
+
+### AI Provider Options
+
+Project Planner supports multiple AI providers with automatic fallback:
+
+| Provider | Features | Requirements | Cost |
+|----------|----------|--------------|------|
+| **Anthropic** | Core planning, text generation | `ANTHROPIC_API_KEY` (required) | Pay-per-use |
+| **OpenRouter** | Research (Perplexity), Image Gen (Flux) | `OPENROUTER_API_KEY` | Pay-per-use |
+| **Google Gemini** | Deep Research, Veo 3.1 videos, Imagen 3 | `GEMINI_API_KEY` + Google AI Pro subscription | $19.99/month + $0.75/sec video |
+
+#### Google Gemini Integration (Optional)
+
+Enable advanced Google AI features:
+
+**Requirements:**
+1. **Google AI Pro subscription** ($19.99/month)
+   - Visit: https://one.google.com/intl/en/about/google-ai-plans/
+   - Provides 5 Deep Research reports/month
+   - Access to Veo 3.1 video generation
+
+2. **Get API Key**
+   - Visit: https://ai.google.dev/
+   - Create project and generate API key
+
+3. **Configure**
+   ```bash
+   export GEMINI_API_KEY='your-key'
+   # OR add to .env file
+   echo "GEMINI_API_KEY=your_key" >> .env
+   ```
+
+**Features Enabled:**
+- ✅ **Deep Research**: Comprehensive multi-step research (up to 60 minutes per query)
+- ✅ **Veo 3.1**: 8-second videos with native audio synchronization
+- ✅ **Imagen 3**: High-quality image generation
+- ✅ **1M Token Context**: Industry-leading context window
+
+**Cost Implications:**
+- Deep Research: Included in subscription (5/month on AI Pro, 200/day on AI Ultra)
+- Video Generation: $0.75/second ($6 per 8-second clip)
+- Image Generation: Included in API usage
+
+**Limitations:**
+- Gmail/Docs/Flow integration NOT available via API (consumer UI only)
+- Deep Research requires active subscription
+- Video limited to 8 seconds per generation (use extension for longer videos)
 
 ### Installation
 
@@ -75,10 +123,24 @@ uv sync
 # .env file (recommended)
 echo "ANTHROPIC_API_KEY=your_key" > .env
 echo "OPENROUTER_API_KEY=your_openrouter_key" >> .env
+echo "GEMINI_API_KEY=your_gemini_key" >> .env  # Optional, for Deep Research + Veo 3.1
 
 # or export in your shell
 export ANTHROPIC_API_KEY='your_key'
+export OPENROUTER_API_KEY='your_openrouter_key'
+export GEMINI_API_KEY='your_gemini_key'  # Optional
+
+# Verify configuration
+/project-planner:setup
 ```
+
+**Provider Auto-Detection:**
+
+The plugin automatically detects available API keys and uses the best provider for each task:
+- **Text Generation**: Gemini 2.0 Flash Thinking (if available) → OpenRouter Claude 3.5
+- **Research**: Gemini Deep Research (if available) → Perplexity via OpenRouter
+- **Video**: Veo 3.1 (requires Gemini)
+- **Images**: OpenRouter Flux (lower cost) → Gemini Imagen 3
 
 ## Usage
 
