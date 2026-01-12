@@ -11,6 +11,8 @@ dependencies = [
     "requests>=2.31.0",
     "pyyaml>=6.0.0",
     "jinja2>=3.1.0",
+    "openai>=1.0.0",           # OpenRouter API client for research
+    "markitdown>=0.1.0",       # Document conversion
 ]
 
 # System Dependencies (must be installed separately):
@@ -27,6 +29,33 @@ dependencies = [
 #   - Windows: MiKTeX (https://miktex.org/) or TeX Live
 
 [project.optional-dependencies]
+# Document processing (PDF, DOCX, PPTX, XLSX)
+documents = [
+    "pillow>=10.0.0",
+    "python-pptx>=0.6.21",
+]
+
+# Google Gemini integration (requires Google AI Pro subscription)
+gemini = [
+    "google-genai>=0.1.0",
+]
+
+# Performance enhancements
+performance = [
+    "aiofiles>=24.1.0",
+    "httpx>=0.27.0",
+]
+
+# All optional dependencies
+all = [
+    "pillow>=10.0.0",
+    "python-pptx>=0.6.21",
+    "google-genai>=0.1.0",
+    "aiofiles>=24.1.0",
+    "httpx>=0.27.0",
+]
+
+# Legacy alias for backward compatibility
 pptx = [
     "pillow>=10.0.0",
     "python-pptx>=0.6.21",
