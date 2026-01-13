@@ -323,6 +323,21 @@ Execute these phases IN ORDER. Each phase uses specific skills.
 ### Phase 1: Research & Market Analysis
 **Skills to use:** `research-lookup`, `competitive-analysis`, `market-research-reports`
 
+**Research Mode Configuration:**
+
+Read the `research_mode` from the configuration file:
+
+```bash
+RESEARCH_MODE=$(jq -r '.research_mode' "$CONFIG_FILE")
+```
+
+**Research mode affects how Phase 1 research is conducted:**
+
+- **`balanced` (Recommended)**: Use Gemini Deep Research for `competitive-analysis` and `market-research-reports`. Use Perplexity for quick `research-lookup` queries.
+- **`perplexity`**: Use Perplexity for all research (fast, 30 seconds/query)
+- **`deep_research`**: Use Gemini Deep Research for all tasks (comprehensive, 60 min/query)
+- **`auto`**: Let ResearchLookup automatically select based on query complexity
+
 **With `--parallel` flag:**
 ```
 Group 1.1 (PARALLEL): research-lookup + competitive-analysis
@@ -331,13 +346,26 @@ Group 1.3 (sequential): project-diagrams
 ```
 
 1. **Market Research + Competitive Analysis** *(can run in parallel)*
+
+   **Quick lookups (research-lookup):**
    - Use `research-lookup` to gather industry data, trends, and benchmarks
+   - Pass research mode context: `--research-mode "$RESEARCH_MODE" --phase 1 --task-type research-lookup`
+   - For balanced/auto modes, this uses Perplexity (fast queries)
+   - Output: `01_market_research/market_data.md`
+
+   **Competitive analysis:**
    - Use `competitive-analysis` skill to analyze competitors
+   - Pass research mode context: `--research-mode "$RESEARCH_MODE" --phase 1 --task-type competitive-analysis`
+   - For balanced/deep_research modes, this uses Gemini Deep Research (60 min comprehensive analysis)
+   - For perplexity mode, uses Perplexity Sonar
+   - Output: `01_market_research/competitive_analysis.md`
+
    - **If `--parallel`**: Launch both skills simultaneously using parallel tool calls
-   - Output: `01_market_research/market_data.md`, `01_market_research/competitive_analysis.md`
 
 2. **Market Research Reports** *(sequential - needs prior context)*
    - Use `market-research-reports` for comprehensive market analysis
+   - Pass research mode context: `--research-mode "$RESEARCH_MODE" --phase 1 --task-type market-research-reports`
+   - For balanced/deep_research modes, this uses Gemini Deep Research for comprehensive market landscape
    - This task uses findings from parallel group above
    - Output: `01_market_research/market_overview.md`
 

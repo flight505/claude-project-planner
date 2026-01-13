@@ -1,28 +1,65 @@
 #!/usr/bin/env python3
 """
 Research Information Lookup Tool
-Uses Perplexity's Sonar Pro Search model through OpenRouter for academic research queries.
+Supports both Perplexity (via OpenRouter) and Gemini Deep Research with intelligent routing.
 """
 
 import os
+import sys
 import json
 import requests
 import time
+import asyncio
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 from urllib.parse import quote
+
+# Add parent directory to path for provider imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../.."))
+
+try:
+    from project_planner.providers import ProviderRouter
+    from project_planner.providers.base import ProviderError, ProviderNotAvailableError
+    HAS_PROVIDERS = True
+except ImportError:
+    HAS_PROVIDERS = False
+    # Create stub classes for when providers are not available
+    class ProviderError(Exception):  # type: ignore
+        pass
+    class ProviderNotAvailableError(Exception):  # type: ignore
+        pass
+    class ProviderRouter:  # type: ignore
+        pass
+    print("Warning: Provider system not available. Falling back to Perplexity-only mode.")
 
 
 class ResearchLookup:
-    """Research information lookup using Perplexity Sonar models via OpenRouter."""
+    """
+    Research information lookup with multi-provider support.
 
-    # Available models
+    Supports three research modes:
+    - perplexity: Fast Perplexity Sonar queries (30s, cost-effective)
+    - deep_research: Gemini Deep Research (60 min, comprehensive)
+    - balanced: Perplexity for quick facts, Deep Research for complex analysis
+    - auto: Smart selection based on query complexity (default)
+    """
+
+    # Available Perplexity models (fallback)
     MODELS = {
-        "pro": "perplexity/sonar-pro",  # Fast lookup, cost-effective
-        "reasoning": "perplexity/sonar-reasoning-pro",  # Deep analysis with reasoning
+        "pro": "perplexity/sonar-pro",
+        "reasoning": "perplexity/sonar-reasoning-pro",
     }
 
-    # Keywords that indicate complex queries requiring reasoning model
+    # Keywords that indicate complex queries requiring deep research
+    DEEP_RESEARCH_KEYWORDS = [
+        "competitive landscape", "market analysis", "competitor analysis",
+        "comprehensive analysis", "deep dive", "in-depth analysis",
+        "strategic analysis", "market landscape", "industry overview",
+        "technology evaluation", "architecture decision", "feasibility study",
+        "meta-analysis", "systematic review", "literature review",
+    ]
+
+    # Keywords for Perplexity reasoning model
     REASONING_KEYWORDS = [
         "compare", "contrast", "analyze", "analysis", "evaluate", "critique",
         "versus", "vs", "vs.", "compared to", "differences between", "similarities",
@@ -33,57 +70,168 @@ class ResearchLookup:
         "pros and cons", "advantages and disadvantages", "trade-off", "tradeoff",
     ]
 
-    def __init__(self, force_model: Optional[str] = None):
+    def __init__(
+        self,
+        research_mode: str = "auto",
+        force_model: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None
+    ):
         """
         Initialize the research lookup tool.
-        
-        Args:
-            force_model: Optional model override ('pro' or 'reasoning'). 
-                        If None, model is auto-selected based on query complexity.
-        """
-        self.api_key = os.getenv("OPENROUTER_API_KEY")
-        if not self.api_key:
-            raise ValueError("OPENROUTER_API_KEY environment variable not set")
 
-        self.base_url = "https://openrouter.ai/api/v1"
+        Args:
+            research_mode: Research mode - "perplexity", "deep_research", "balanced", or "auto"
+            force_model: Optional Perplexity model override ('pro' or 'reasoning')
+            context: Optional context for smart routing (phase, task_type, etc.)
+        """
+        self.research_mode = research_mode
         self.force_model = force_model
-        self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://project-planner.local",
-            "X-Title": "Project Planner Research Tool"
-        }
+        self.context = context or {}
+
+        # Initialize provider router if available
+        self.router = None
+        if HAS_PROVIDERS:
+            try:
+                self.router = ProviderRouter()
+            except Exception as e:
+                print(f"Warning: Failed to initialize ProviderRouter: {e}")
+
+        # Initialize Perplexity fallback (always available)
+        self.api_key = os.getenv("OPENROUTER_API_KEY")
+        if self.api_key:
+            self.base_url = "https://openrouter.ai/api/v1"
+            self.headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://project-planner.local",
+                "X-Title": "Project Planner Research Tool"
+            }
+
+    def _should_use_deep_research(self, query: str) -> bool:
+        """
+        Determine if Deep Research should be used based on query and context.
+
+        Args:
+            query: The research query
+
+        Returns:
+            True if Deep Research should be used, False for Perplexity
+        """
+        # Force mode overrides
+        if self.research_mode == "deep_research":
+            return True
+        elif self.research_mode == "perplexity":
+            return False
+
+        # Check context-based triggers
+        phase = self.context.get("phase")
+        task_type = self.context.get("task_type", "")
+
+        # Phase 1 tasks that benefit from Deep Research
+        if phase == 1:
+            if task_type in ["competitive-analysis", "market-research-reports"]:
+                return True
+
+        # Phase 2: Architecture decisions (complex only)
+        if phase == 2 and task_type == "architecture-research":
+            if any(kw in query.lower() for kw in ["architecture decision", "technology evaluation"]):
+                return True
+
+        # Check for deep research keywords
+        query_lower = query.lower()
+        for keyword in self.DEEP_RESEARCH_KEYWORDS:
+            if keyword in query_lower:
+                return True
+
+        # Check query length and complexity
+        if len(query) > 300:  # Very long queries
+            return True
+
+        # Default to Perplexity for quick lookups
+        return False
 
     def _select_model(self, query: str) -> str:
         """
-        Select the appropriate model based on query complexity.
-        
+        Select the appropriate Perplexity model based on query complexity.
+
         Args:
             query: The research query
-            
+
         Returns:
             Model identifier string
         """
         if self.force_model:
             return self.MODELS.get(self.force_model, self.MODELS["reasoning"])
-        
+
         # Check for reasoning keywords (case-insensitive)
         query_lower = query.lower()
         for keyword in self.REASONING_KEYWORDS:
             if keyword in query_lower:
                 return self.MODELS["reasoning"]
-        
+
         # Check for multiple questions or complex structure
         question_count = query.count("?")
         if question_count >= 2:
             return self.MODELS["reasoning"]
-        
+
         # Check for very long queries (likely complex)
         if len(query) > 200:
             return self.MODELS["reasoning"]
-        
+
         # Default to pro for simple lookups
         return self.MODELS["pro"]
+
+    async def lookup_async(self, query: str) -> Dict[str, Any]:
+        """
+        Perform async research lookup with intelligent provider routing.
+
+        Args:
+            query: The research query
+
+        Returns:
+            Dictionary with research results
+        """
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Determine which provider to use
+        use_deep_research = self._should_use_deep_research(query)
+
+        try:
+            if use_deep_research and self.router and self.router.has_feature("deep_research"):
+                # Use Gemini Deep Research
+                print(f"[Research] Using Gemini Deep Research (60 min) for: {query[:80]}...")
+                provider = self.router.get_provider_for_task("deep_research")
+                result = await provider.deep_research(query, timeout=3600)
+
+                return {
+                    "success": True,
+                    "query": query,
+                    "response": result["report"],
+                    "citations": result["citations"],
+                    "sources": result["citations"],
+                    "timestamp": timestamp,
+                    "provider": "gemini_deep_research",
+                    "metadata": result.get("metadata", {}),
+                }
+
+            else:
+                # Use Perplexity via OpenRouter (fallback or by choice)
+                print(f"[Research] Using Perplexity Sonar for: {query[:80]}...")
+                return self.lookup(query)  # Use existing sync method
+
+        except (ProviderError, ProviderNotAvailableError) as e:
+            # Fallback to Perplexity on provider errors
+            print(f"[Research] Deep Research failed ({e}), falling back to Perplexity...")
+            return self.lookup(query)
+
+        except Exception as e:
+            return {
+                "success": False,
+                "query": query,
+                "error": str(e),
+                "timestamp": timestamp,
+                "provider": "error"
+            }
 
     def _make_request(self, messages: List[Dict[str, str]], model: str, **kwargs) -> Dict[str, Any]:
         """Make a request to the OpenRouter API with academic search mode."""
@@ -358,8 +506,13 @@ def main():
     parser.add_argument("query", nargs="?", help="Research query to look up")
     parser.add_argument("--model-info", action="store_true", help="Show available models")
     parser.add_argument("--batch", nargs="+", help="Run multiple queries")
-    parser.add_argument("--force-model", choices=["pro", "reasoning"], 
-                        help="Force specific model: 'pro' for fast lookup, 'reasoning' for deep analysis")
+    parser.add_argument("--research-mode", choices=["perplexity", "deep_research", "balanced", "auto"],
+                        default="auto",
+                        help="Research mode: perplexity (fast), deep_research (60 min), balanced, or auto (default)")
+    parser.add_argument("--force-model", choices=["pro", "reasoning"],
+                        help="Force specific Perplexity model: 'pro' for fast lookup, 'reasoning' for deep analysis")
+    parser.add_argument("--phase", type=int, help="Planning phase number (for context-based routing)")
+    parser.add_argument("--task-type", help="Task type (e.g., competitive-analysis, market-research-reports)")
     parser.add_argument("-o", "--output", help="Write output to file instead of stdout")
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
 
@@ -377,8 +530,8 @@ def main():
         else:
             print(text)
 
-    # Check for API key
-    if not os.getenv("OPENROUTER_API_KEY"):
+    # Check for API key (if using Perplexity mode)
+    if args.research_mode == "perplexity" and not os.getenv("OPENROUTER_API_KEY"):
         print("Error: OPENROUTER_API_KEY environment variable not set", file=sys.stderr)
         print("Please set it in your .env file or export it:", file=sys.stderr)
         print("  export OPENROUTER_API_KEY='your_openrouter_api_key'", file=sys.stderr)
@@ -386,8 +539,28 @@ def main():
             output_file.close()
         return 1
 
+    # Check for Gemini API key if using deep research
+    if args.research_mode == "deep_research" and not os.getenv("GEMINI_API_KEY"):
+        print("Error: GEMINI_API_KEY environment variable not set", file=sys.stderr)
+        print("Deep Research requires Google Gemini API key.", file=sys.stderr)
+        print("  export GEMINI_API_KEY='your_gemini_api_key'", file=sys.stderr)
+        if output_file:
+            output_file.close()
+        return 1
+
     try:
-        research = ResearchLookup(force_model=args.force_model)
+        # Build context for smart routing
+        context = {}
+        if args.phase:
+            context["phase"] = args.phase
+        if args.task_type:
+            context["task_type"] = args.task_type
+
+        research = ResearchLookup(
+            research_mode=args.research_mode,
+            force_model=args.force_model,
+            context=context
+        )
 
         if args.model_info:
             write_output("Available models from OpenRouter:")
@@ -406,12 +579,25 @@ def main():
                 output_file.close()
             return 1
 
+        # Run queries (async if using providers, sync otherwise)
         if args.batch:
             print(f"Running batch research for {len(args.batch)} queries...", file=sys.stderr)
-            results = research.batch_lookup(args.batch)
+            results = []
+            for query in args.batch:
+                # Use async lookup if providers available
+                if HAS_PROVIDERS and research.router:
+                    result = asyncio.run(research.lookup_async(query))
+                else:
+                    result = research.lookup(query)
+                results.append(result)
         else:
             print(f"Researching: {args.query}", file=sys.stderr)
-            results = [research.lookup(args.query)]
+            # Use async lookup if providers available
+            if HAS_PROVIDERS and research.router:
+                result = asyncio.run(research.lookup_async(args.query))
+            else:
+                result = research.lookup(args.query)
+            results = [result]
 
         # Output as JSON if requested
         if args.json:

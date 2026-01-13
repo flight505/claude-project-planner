@@ -1,6 +1,6 @@
 ---
 name: research-lookup
-description: "Look up current research information using Perplexity's Sonar Pro Search or Sonar Reasoning Pro models through OpenRouter. Automatically selects the best model based on query complexity. Search academic papers, recent studies, technical documentation, and general research information with citations."
+description: "Multi-provider research lookup supporting Gemini Deep Research (60-min comprehensive analysis) and Perplexity Sonar (fast web-grounded research). Intelligently routes between providers based on research mode and query complexity. Supports balanced mode for optimal quality/time tradeoff."
 allowed-tools: [Read, Write, Edit, Bash]
 ---
 
@@ -8,7 +8,38 @@ allowed-tools: [Read, Write, Edit, Bash]
 
 ## Overview
 
-This skill enables real-time research information lookup using Perplexity's Sonar models through OpenRouter. It intelligently selects between **Sonar Pro Search** (fast, efficient lookup) and **Sonar Reasoning Pro** (deep analytical reasoning) based on query complexity. The skill provides access to current academic literature, recent studies, technical documentation, and general research information with proper citations and source attribution.
+This skill provides **multi-provider research lookup** with intelligent routing between:
+
+- **Gemini Deep Research**: 60-minute comprehensive research with extensive citations (requires GEMINI_API_KEY + Google AI Pro subscription)
+- **Perplexity Sonar**: Fast web-grounded research in 30 seconds (requires OPENROUTER_API_KEY)
+
+The skill automatically selects the best provider and model based on:
+- **Research mode** configuration (balanced, perplexity, deep_research, auto)
+- **Query complexity** (keywords, length, structure)
+- **Context** (planning phase, task type)
+
+## Research Modes
+
+### Balanced (Recommended)
+- Use Deep Research for Phase 1 market analysis and competitive landscape
+- Use Perplexity for quick fact lookups and technology verification
+- **Best quality/time tradeoff**: Comprehensive where it matters, fast elsewhere
+- **Total plan time**: ~90 minutes
+
+### Quick (Perplexity Only)
+- Fast 30-second lookups for all research queries
+- **Total plan time**: ~30 minutes
+- Good for well-known tech stacks and familiar domains
+
+### Comprehensive (Deep Research for All)
+- 60-minute deep research for every major decision
+- **Total plan time**: ~4 hours
+- Best for novel technologies, uncertain markets, or high-stakes projects
+
+### Auto (Context-Aware)
+- Automatically selects based on query keywords and planning phase
+- Uses Deep Research for: competitive analysis, market landscape, architecture decisions
+- Uses Perplexity for: quick facts, pricing, version numbers, simple comparisons
 
 ## When to Use This Skill
 
@@ -54,6 +85,77 @@ The AI will automatically:
 - Any complex concept that benefits from visualization
 
 For detailed guidance on creating diagrams, refer to the project-diagrams skill documentation.
+
+---
+
+## Usage
+
+### Command-Line Interface
+
+```bash
+# Basic usage with auto mode (context-aware selection)
+python research_lookup.py "Your research query here"
+
+# Specify research mode explicitly
+python research_lookup.py "Competitive landscape for SaaS market" \
+  --research-mode deep_research
+
+# Provide context for smart routing
+python research_lookup.py "Latest PostgreSQL features" \
+  --research-mode balanced \
+  --phase 2 \
+  --task-type architecture-research
+
+# Force specific Perplexity model
+python research_lookup.py "Quick fact check" \
+  --research-mode perplexity \
+  --force-model pro
+```
+
+### Research Mode Options
+
+| Mode | Provider Selection | Best For |
+|------|-------------------|----------|
+| `balanced` | Deep Research for Phase 1 analysis, Perplexity for others | Most projects (recommended) |
+| `perplexity` | Always use Perplexity | Quick planning, well-known tech |
+| `deep_research` | Always use Gemini Deep Research | Novel domains, high-stakes |
+| `auto` | Automatic based on keywords/context | Let the system decide |
+
+### Context Parameters
+
+**Phase-based routing:**
+- `--phase 1` with `--task-type competitive-analysis` → triggers Deep Research in balanced/auto modes
+- `--phase 2` with keywords like "architecture decision" → may trigger Deep Research
+- Other phases → generally use Perplexity unless query is complex
+
+**Example in planning workflow:**
+
+```bash
+# Phase 1: Competitive analysis (use Deep Research)
+python research_lookup.py "Comprehensive competitive analysis for task management SaaS" \
+  --research-mode balanced \
+  --phase 1 \
+  --task-type competitive-analysis
+
+# Phase 2: Quick tech lookup (use Perplexity)
+python research_lookup.py "Latest React best practices 2026" \
+  --research-mode balanced \
+  --phase 2 \
+  --task-type research-lookup
+```
+
+### API Requirements
+
+**For Perplexity (required for perplexity and balanced modes):**
+```bash
+export OPENROUTER_API_KEY='your_openrouter_key'
+```
+
+**For Gemini Deep Research (required for deep_research and balanced modes):**
+```bash
+export GEMINI_API_KEY='your_gemini_key'
+# Requires Google AI Pro subscription ($19.99/month)
+```
 
 ---
 

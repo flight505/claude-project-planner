@@ -39,7 +39,32 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             ]
         },
 
-        # Question 2: Performance - Parallelization
+        # Question 2: Research Depth (NEW!)
+        {
+            "question": "How comprehensive should research be?",
+            "header": "Research",
+            "multiSelect": False,
+            "options": [
+                {
+                    "label": "Balanced - Smart selection (Recommended)",
+                    "description": "Use Deep Research (60 min) for Phase 1 market analysis. Quick Perplexity for everything else. Best quality/time tradeoff"
+                },
+                {
+                    "label": "Quick - Perplexity only",
+                    "description": "Fast 30-second lookups for all research. Total plan time: ~30 min. Good for well-known tech stacks"
+                },
+                {
+                    "label": "Comprehensive - Deep Research for all",
+                    "description": "60-min deep research for every major decision. Total plan time: ~4 hours. Best for novel/uncertain domains"
+                },
+                {
+                    "label": "Auto - Context-aware selection",
+                    "description": "Automatically choose based on query complexity and phase. Uses Deep Research for competitive analysis and complex architecture decisions"
+                }
+            ]
+        },
+
+        # Question 3: Performance - Parallelization
         {
             "question": "Enable smart parallelization for faster execution?",
             "header": "Performance",
@@ -56,7 +81,7 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             ]
         },
 
-        # Question 3: Interactive Approval Gates (NEW!)
+        # Question 4: Interactive Approval Gates
         {
             "question": "Review and approve each phase before continuing?",
             "header": "Workflow",
@@ -73,7 +98,7 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             ]
         },
 
-        # Question 4: Phase Selection (NEW!)
+        # Question 5: Phase Selection
         {
             "question": "Which phases should be included in this plan?",
             "header": "Scope",
@@ -106,7 +131,7 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             ]
         },
 
-        # Question 5: Quality Assurance (NEW!)
+        # Question 6: Quality Assurance
         {
             "question": "Enable additional quality checks?",
             "header": "Quality",
@@ -131,7 +156,7 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             ]
         },
 
-        # Question 6: Output Format (NEW!)
+        # Question 7: Output Format
         {
             "question": "What output formats do you need?",
             "header": "Outputs",
@@ -170,6 +195,7 @@ def parse_user_selections(answers: Dict[str, str]) -> Dict[str, Any]:
     """
     config = {
         "ai_provider": "auto",
+        "research_mode": "balanced",  # NEW
         "enable_parallelization": False,
         "interactive_mode": False,
         "phases": {
@@ -193,7 +219,7 @@ def parse_user_selections(answers: Dict[str, str]) -> Dict[str, Any]:
         }
     }
 
-    # Parse AI Provider (Question 1)
+    # Parse AI Provider (Question 0)
     provider = answers.get("question_0", "")
     if "Gemini" in provider:
         config["ai_provider"] = "gemini"
@@ -202,29 +228,40 @@ def parse_user_selections(answers: Dict[str, str]) -> Dict[str, Any]:
     else:
         config["ai_provider"] = "auto"
 
+    # Parse Research Mode (Question 1) - NEW
+    research_depth = answers.get("question_1", "")
+    if "Balanced" in research_depth:
+        config["research_mode"] = "balanced"
+    elif "Quick" in research_depth:
+        config["research_mode"] = "perplexity"
+    elif "Comprehensive" in research_depth:
+        config["research_mode"] = "deep_research"
+    else:  # Auto
+        config["research_mode"] = "auto"
+
     # Parse Parallelization (Question 2)
-    parallel = answers.get("question_1", "")
+    parallel = answers.get("question_2", "")
     config["enable_parallelization"] = "Yes" in parallel
 
     # Parse Interactive Mode (Question 3)
-    interactive = answers.get("question_2", "")
+    interactive = answers.get("question_3", "")
     config["interactive_mode"] = "Yes" in interactive
 
     # Parse Phase Selection (Question 4) - multiSelect
-    phases = answers.get("question_3", "")
+    phases = answers.get("question_4", "")
     config["phases"]["marketing"] = "Phase 5" in phases
     config["phases"]["feasibility"] = "Phase 3" in phases
     config["phases"]["review"] = "Phase 6" in phases
     # Phases 1, 2, 4 are always required
 
     # Parse Quality Checks (Question 5) - multiSelect
-    quality = answers.get("question_4", "")
+    quality = answers.get("question_5", "")
     config["quality_checks"]["multi_model_validation"] = "Multi-model" in quality
     config["quality_checks"]["comprehensive_diagrams"] = "comprehensive diagrams" in quality
     config["quality_checks"]["research_verification"] = "Real-time research" in quality
 
     # Parse Output Formats (Question 6) - multiSelect
-    outputs = answers.get("question_5", "")
+    outputs = answers.get("question_6", "")
     config["output_formats"]["pdf"] = "PDF report" in outputs
     config["output_formats"]["pptx"] = "PowerPoint" in outputs
 
@@ -241,12 +278,20 @@ def save_config(config: Dict[str, Any], project_name: str) -> Path:
 
 def display_config_summary(config: Dict[str, Any]) -> str:
     """Generate human-readable configuration summary."""
+    research_mode_display = {
+        "balanced": "BALANCED (Deep Research for Phase 1, Perplexity for others)",
+        "perplexity": "QUICK (Perplexity only)",
+        "deep_research": "COMPREHENSIVE (Deep Research for all)",
+        "auto": "AUTO (Context-aware selection)"
+    }
+
     lines = [
         "=" * 70,
         "Planning Configuration Summary",
         "=" * 70,
         "",
         f"AI Provider: {config['ai_provider'].upper()}",
+        f"Research Mode: {research_mode_display.get(config['research_mode'], config['research_mode'].upper())}",
         f"Parallelization: {'ENABLED' if config['enable_parallelization'] else 'DISABLED'}",
         f"Interactive Mode: {'ENABLED' if config['interactive_mode'] else 'DISABLED'}",
         "",
