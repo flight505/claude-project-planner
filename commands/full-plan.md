@@ -353,6 +353,12 @@ Group 1.3 (sequential): project-diagrams
    - For perplexity mode, uses Perplexity Sonar
    - Output: `01_market_research/competitive_analysis.md`
 
+   **Progress Tracking (v1.4.0+):**
+   - Deep Research operations (60 min) automatically create progress files
+   - Users can monitor from separate terminal: `python scripts/monitor-research-progress.py <project_folder> --follow`
+   - If interrupted, resume from checkpoint: `python scripts/resume-research.py <project_folder> 1 --task competitive-analysis`
+   - See "Research Progress Monitoring" section below for complete dual-terminal workflow
+
    - **If `--parallel`**: Launch both skills simultaneously using parallel tool calls
 
 2. **Market Research Reports** *(sequential - needs prior context)*
@@ -361,6 +367,11 @@ Group 1.3 (sequential): project-diagrams
    - For balanced/deep_research modes, this uses Gemini Deep Research for comprehensive market landscape
    - This task uses findings from parallel group above
    - Output: `01_market_research/market_overview.md`
+
+   **Progress Tracking (v1.4.0+):**
+   - Another 60-min Deep Research operation with automatic progress tracking
+   - Monitor with same commands as competitive-analysis
+   - Both operations can be monitored simultaneously with `--list` option
 
 3. **Generate Diagrams** *(sequential)*
    - Use `project-diagrams` for market positioning charts
@@ -872,6 +883,54 @@ Terminal 1: Main Planning          Terminal 2: Monitoring
 │ [waiting for research]   │      │ [14:52:30] ✅ 100%      │
 └──────────────────────────┘      └──────────────────────────┘
 ```
+
+**Phase 1 Workflow Example (Balanced Mode):**
+
+When running Phase 1 with balanced mode, you'll have two 60-minute Deep Research operations:
+
+```bash
+# Terminal 1: Start /full-plan
+/full-plan my-saas-product
+# ... interactive setup, select "Balanced" mode ...
+# Phase 1 starts:
+#   - Quick research-lookup (Perplexity, 30s) ✅ completes quickly
+#   - Competitive analysis (Deep Research, 60 min) 🔬 starting...
+
+# Terminal 2: Monitor the first operation
+python scripts/monitor-research-progress.py planning_outputs/20260115_my-saas --list
+# ACTIVE RESEARCH OPERATIONS (1)
+# 1. 🔄 dr-competitive-analysis-1736956800
+#    Progress: [████░░░░░░░░] 15%
+#    Phase: gathering_sources
+#    Elapsed: 9m
+
+python scripts/monitor-research-progress.py planning_outputs/20260115_my-saas dr-competitive-analysis-1736956800 --follow
+# [14:15:00] 🔄 [████░░░░░░░░] 15% | gathering: Collecting sources...
+# [14:30:00] 🔄 [████████░░░░] 30% | analyzing: Cross-referencing...
+# [14:45:00] 🔄 [████████████] 50% | synthesizing: Compiling results...
+# [15:00:00] ✅ [████████████████████] 100% | Complete!
+
+# Terminal 1 continues:
+#   - Market research reports (Deep Research, 60 min) 🔬 starting...
+
+# Terminal 2: Switch to monitoring the second operation
+python scripts/monitor-research-progress.py planning_outputs/20260115_my-saas --list
+# ACTIVE RESEARCH OPERATIONS (1)
+# 1. 🔄 dr-market-research-1736960400
+#    Progress: [████░░░░░░░░] 20%
+#    Phase: analyzing_literature
+#    Elapsed: 12m
+
+python scripts/monitor-research-progress.py planning_outputs/20260115_my-saas dr-market-research-1736960400 --follow
+# ... monitoring continues ...
+```
+
+**Total Phase 1 Time (Balanced Mode):**
+- Quick research-lookup: ~30 seconds (Perplexity)
+- Competitive analysis: ~60 minutes (Deep Research)
+- Market research reports: ~60 minutes (Deep Research)
+- Diagrams: ~5 minutes
+- **Total: ~125 minutes** with comprehensive, well-cited research
 
 **See Also:** `docs/WORKFLOWS.md` for complete dual-terminal workflow examples and checkpoint strategies.
 

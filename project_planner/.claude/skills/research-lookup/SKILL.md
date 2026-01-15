@@ -159,6 +159,108 @@ export GEMINI_API_KEY='your_gemini_key'
 
 ---
 
+## Progress Tracking & Monitoring (v1.4.0+)
+
+**For long-running Deep Research operations (60+ minutes)**, the plugin provides comprehensive progress tracking and checkpoint capabilities.
+
+### Real-Time Progress Monitoring
+
+When research operations take longer than 30 seconds, progress tracking is automatically enabled:
+
+**Tier 1: Streaming Progress (Perplexity ~30s)**
+- Real-time event callbacks for instant feedback
+- No external monitoring needed
+
+**Tier 2: Progress Files (Deep Research ~60 min)**
+- JSON progress tracking with checkpoint history
+- External monitoring from separate terminal
+- Resume capability if interrupted
+
+### Monitor Active Research
+
+Monitor long-running research from a separate terminal:
+
+```bash
+# List all active research operations
+python scripts/monitor-research-progress.py <project_folder> --list
+
+# Monitor specific operation with live updates
+python scripts/monitor-research-progress.py <project_folder> <task_id> --follow
+
+# Example output:
+# [14:23:45] 🔄 [████████████░░░░░] 30% | analyzing: Cross-referencing...
+# [14:38:12] 🔄 [████████████████░░] 50% | synthesizing: Results...
+# [14:52:30] ✅ [████████████████████] 100% | Complete!
+```
+
+### Resume Interrupted Research
+
+If Deep Research is interrupted (network issues, timeout), resume from checkpoints:
+
+```bash
+# List resumable tasks with time estimates
+python scripts/resume-research.py <project_folder> 1 --list
+
+# Resume from checkpoint (saves up to 50 minutes)
+python scripts/resume-research.py <project_folder> 1 --task <task_name>
+```
+
+**Checkpoint Strategy:**
+- 15% checkpoint: ~9 minutes saved if interrupted
+- 30% checkpoint: ~18 minutes saved if interrupted
+- 50% checkpoint: ~30 minutes saved if interrupted
+
+### Enhanced Research Integration
+
+For Python API usage with full progress tracking:
+
+```python
+import asyncio
+from pathlib import Path
+from enhanced_research_integration import EnhancedResearchLookup
+
+async def main():
+    # Initialize with progress tracking
+    research = EnhancedResearchLookup(
+        project_folder=Path("planning_outputs/20260115_my-project"),
+        phase_num=1,
+        research_mode="balanced"  # or "quick", "deep_research", "auto"
+    )
+
+    # Execute with automatic progress tracking and checkpoints
+    result = await research.research_with_progress(
+        task_name="competitive-analysis",
+        query="Comprehensive competitive landscape analysis",
+        estimated_duration_sec=3600  # Auto-detected if not provided
+    )
+
+    # Access results and statistics
+    print(f"Success: {result['success']}")
+    print(f"Provider: {result['provider']}")
+    print(f"Sources: {len(result.get('sources', []))}")
+
+    # View execution statistics
+    stats = research.get_stats()
+    print(f"Tasks completed: {stats['tasks_completed']}")
+    print(f"Time saved: {stats['total_time_saved_min']} minutes")
+
+asyncio.run(main())
+```
+
+**Key Features:**
+- Automatic checkpoint creation at 15%, 30%, 50% milestones
+- Graceful degradation (Deep Research → Perplexity fallback)
+- Error recovery with exponential backoff
+- External monitoring support via progress files
+- Statistics tracking across all research operations
+
+**See Also:**
+- `docs/WORKFLOWS.md` - Complete workflow examples with dual-terminal monitoring
+- `scripts/enhanced_research_integration.py` - Integration layer implementation
+- `scripts/resumable_research.py` - Core resumable research executor
+
+---
+
 ## Core Capabilities
 
 ### 1. Academic Research Queries
