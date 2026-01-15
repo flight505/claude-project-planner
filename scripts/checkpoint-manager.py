@@ -64,6 +64,7 @@ def save_checkpoint(
     phase_num: int,
     context_summary: Optional[str] = None,
     key_decisions: Optional[list] = None,
+    research_tasks: Optional[dict] = None,
 ) -> dict:
     """
     Save checkpoint after phase completion.
@@ -73,6 +74,8 @@ def save_checkpoint(
         phase_num: Phase number that was just completed
         context_summary: Summary of important context for continuation
         key_decisions: List of key decisions made in this phase
+        research_tasks: Optional dict of research task statuses
+                       {task_name: "completed"|"failed"|"skipped"}
 
     Returns:
         The checkpoint data that was saved
@@ -117,6 +120,13 @@ def save_checkpoint(
         "key_decisions": key_decisions or [],
     }
     checkpoint.setdefault("phase_history", []).append(phase_record)
+
+    # Track research tasks (NEW in v1.4.0)
+    if research_tasks:
+        checkpoint.setdefault("research_tasks", {})[f"phase_{phase_num}"] = {
+            "tasks": research_tasks,
+            "updated_at": datetime.now().isoformat()
+        }
 
     # Collect completed outputs
     completed_outputs = []
@@ -241,6 +251,63 @@ def get_status(project_folder: Path) -> dict:
     }
 
 
+def get_research_task_status(project_folder: Path, phase_num: Optional[int] = None) -> dict:
+    """
+    Get research task statuses from checkpoint.
+
+    Args:
+        project_folder: Path to project output folder
+        phase_num: Optional phase number (returns all phases if not specified)
+
+    Returns:
+        Dictionary of research tasks by phase
+    """
+    checkpoint = load_checkpoint(project_folder)
+    if not checkpoint:
+        return {}
+
+    research_tasks = checkpoint.get("research_tasks", {})
+
+    if phase_num is not None:
+        return research_tasks.get(f"phase_{phase_num}", {})
+
+    return research_tasks
+
+
+def has_failed_research_tasks(project_folder: Path, phase_num: int) -> bool:
+    """
+    Check if a phase has any failed research tasks.
+
+    Args:
+        project_folder: Path to project output folder
+        phase_num: Phase number to check
+
+    Returns:
+        True if there are failed tasks, False otherwise
+    """
+    phase_tasks = get_research_task_status(project_folder, phase_num)
+    tasks = phase_tasks.get("tasks", {})
+
+    return any(status == "failed" for status in tasks.values())
+
+
+def get_failed_research_tasks(project_folder: Path, phase_num: int) -> list:
+    """
+    Get list of failed research tasks for a phase.
+
+    Args:
+        project_folder: Path to project output folder
+        phase_num: Phase number to check
+
+    Returns:
+        List of task names that failed
+    """
+    phase_tasks = get_research_task_status(project_folder, phase_num)
+    tasks = phase_tasks.get("tasks", {})
+
+    return [name for name, status in tasks.items() if status == "failed"]
+
+
 def generate_resume_context(project_folder: Path) -> str:
     """
     Generate context summary for resuming a plan.
@@ -284,6 +351,23 @@ def generate_resume_context(project_folder: Path) -> str:
                 "",
             ]
         )
+
+    # Add research task status (NEW in v1.4.0)
+    research_tasks = checkpoint.get("research_tasks", {})
+    if research_tasks:
+        context_parts.extend([
+            "## Research Task Status",
+            "",
+        ])
+        for phase_key, phase_data in sorted(research_tasks.items()):
+            phase_num = phase_key.replace("phase_", "")
+            tasks = phase_data.get("tasks", {})
+            if tasks:
+                context_parts.append(f"### Phase {phase_num}")
+                for task_name, status in tasks.items():
+                    status_icon = "✅" if status == "completed" else "❌" if status == "failed" else "⏭️"
+                    context_parts.append(f"- {status_icon} {task_name}: {status}")
+                context_parts.append("")
 
     # List completed outputs
     context_parts.extend(
@@ -344,11 +428,21 @@ def cmd_save(args):
     if args.decisions:
         key_decisions = [d.strip() for d in args.decisions.split(";")]
 
+    research_tasks = None
+    if args.research_tasks:
+        # Parse research tasks in format: task1:status1;task2:status2
+        research_tasks = {}
+        for task_pair in args.research_tasks.split(";"):
+            if ":" in task_pair:
+                task_name, status = task_pair.split(":", 1)
+                research_tasks[task_name.strip()] = status.strip()
+
     save_checkpoint(
         project_folder,
         args.phase_num,
         context_summary=args.context,
         key_decisions=key_decisions,
+        research_tasks=research_tasks,
     )
 
 
@@ -462,6 +556,10 @@ def main():
     )
     save_parser.add_argument(
         "--decisions", type=str, help="Key decisions (semicolon-separated)"
+    )
+    save_parser.add_argument(
+        "--research-tasks", type=str,
+        help="Research task statuses (format: task1:status1;task2:status2)"
     )
 
     # load command
