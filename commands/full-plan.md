@@ -791,6 +791,90 @@ The tracker automatically generates `progress.md` with:
 > Current Activity: Creating sprint plan with user stories...
 ```
 
+### Research Progress Monitoring (v1.4.0+)
+
+**For long-running Deep Research operations**, use the new research-specific monitoring tools:
+
+#### Monitor Active Research Operations
+
+When Deep Research runs (Phase 1 with Balanced/Comprehensive modes), monitor progress in real-time from a separate terminal:
+
+```bash
+# List all active research operations
+python scripts/monitor-research-progress.py "planning_outputs/<project_name>" --list
+
+# Monitor specific research task (one-time check)
+python scripts/monitor-research-progress.py "planning_outputs/<project_name>" <task_id>
+
+# Follow mode (continuous monitoring, updates every 5 seconds)
+python scripts/monitor-research-progress.py "planning_outputs/<project_name>" <task_id> --follow
+```
+
+**Example Output (Follow Mode):**
+
+```
+======================================================================
+MONITORING RESEARCH PROGRESS (Press Ctrl+C to stop)
+======================================================================
+Task ID: dr-competitive-analysis-1736956800
+Update interval: 5.0s
+Progress file: planning_outputs/20260115_my-saas/.research-progress-dr-competitive-analysis-1736956800.json
+======================================================================
+
+[14:23:45] 🔄 [████████████░░░░░░░░░░░░░░░] 30% | analyzing: Cross-referencing sources...
+[14:38:12] 🔄 [████████████████░░░░░░░░░░░] 50% | synthesizing: Compiling results...
+[14:52:30] ✅ [████████████████████████████] 100% | Research complete!
+
+======================================================================
+✅ Research completed successfully!
+Total duration: 58m 45s
+======================================================================
+```
+
+#### Resume Interrupted Research
+
+If research is interrupted (network issues, timeout, user cancellation), resume from checkpoints:
+
+```bash
+# List resumable tasks with time estimates
+python scripts/resume-research.py "planning_outputs/<project_name>" 1 --list
+
+# Example output:
+# RESUMABLE RESEARCH TASKS (Phase 1)
+# 1. ✅ Resumable - competitive-analysis
+#    Progress: 30%
+#    Time invested: ~18 minutes
+#    Time saved by resuming: ~18 minutes
+#    Estimated time remaining: ~42 minutes
+
+# Resume from checkpoint
+python scripts/resume-research.py "planning_outputs/<project_name>" 1 --task competitive-analysis
+```
+
+**Time Savings:**
+
+Resuming from checkpoints can save significant time:
+- 15% checkpoint: ~9 minutes saved
+- 30% checkpoint: ~18 minutes saved
+- 50% checkpoint: ~30 minutes saved
+
+**Dual-Terminal Workflow:**
+
+```
+Terminal 1: Main Planning          Terminal 2: Monitoring
+┌──────────────────────────┐      ┌──────────────────────────┐
+│ /full-plan my-saas      │      │ python scripts/monitor-  │
+│                          │      │ research-progress.py ... │
+│ Phase 1: Market Research │      │ --follow                 │
+│ 🔬 Starting Deep Research│      │                          │
+│ (this will take ~60 min) │      │ [14:23:45] 🔄 30%       │
+│                          │      │ [14:38:12] 🔄 50%       │
+│ [waiting for research]   │      │ [14:52:30] ✅ 100%      │
+└──────────────────────────┘      └──────────────────────────┘
+```
+
+**See Also:** `docs/WORKFLOWS.md` for complete dual-terminal workflow examples and checkpoint strategies.
+
 ### TodoWrite Integration
 
 Also use TodoWrite to track phases for the user's visibility:

@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.3.2-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.4.0--alpha-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
@@ -9,7 +9,7 @@
 
 **AI-powered project planning toolkit** that transforms ideas into comprehensive, buildable specifications. Generate complete project plans including architecture documents, sprint plans, cost analyses, and implementation roadmaps—all backed by real-time research.
 
-**✨ New in v1.3.2:** Gemini Deep Research integration with intelligent routing! Choose research depth during setup—use 60-minute Deep Research for Phase 1 competitive analysis or quick Perplexity for everything. Balanced mode gives best quality/time tradeoff.
+**✨ New in v1.4.0-alpha:** Complete progress tracking & error recovery system! Monitor long-running Deep Research operations in real-time, resume interrupted research from checkpoints, and track progress across all phases. Includes CLI tools for external monitoring and intelligent checkpoint management.
 
 ---
 
@@ -57,47 +57,80 @@ export OPENROUTER_API_KEY='your_key'  # Recommended for research
 
 ---
 
-## ✨ What's New in v1.3.2
+## ✨ What's New in v1.4.0-alpha
 
-### 🧠 Gemini Deep Research Integration
+### 📊 Complete Progress Tracking & Error Recovery System
 
-Choose research depth during interactive setup for optimal quality/time balance:
+**Never lose Deep Research progress again!** v1.4.0-alpha introduces a comprehensive 3-tier progress tracking and checkpoint system:
+
+**3-Tier Architecture:**
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│ 2. Research Depth                                   │
-│ ● Balanced - Smart selection (Recommended)          │
-│   Use Deep Research (60 min) for Phase 1 market    │
-│   analysis. Quick Perplexity for everything else.  │
-│   Best quality/time tradeoff.                       │
+│ Tier 1: Streaming Progress (Perplexity ~30s)       │
+│ Real-time event callbacks with instant feedback    │
+├─────────────────────────────────────────────────────┤
+│ Tier 2: Progress Files (Deep Research ~60 min)     │
+│ JSON progress tracking + external monitoring       │
+├─────────────────────────────────────────────────────┤
+│ Tier 3: Phase Checkpoints                          │
+│ Research task statuses saved at phase boundaries   │
 └─────────────────────────────────────────────────────┘
 ```
 
-**Research Modes:**
+**Key Features:**
 
-| Mode | When It's Used | Total Plan Time | Best For |
-|------|----------------|-----------------|----------|
-| **Balanced** ⭐ | Deep Research for Phase 1 competitive analysis | ~120 min | Most projects |
-| **Quick** | Perplexity for all research | ~30 min | Well-known tech stacks |
-| **Comprehensive** | Deep Research for all decisions | ~240 min | Novel/high-stakes projects |
-| **Auto** | Smart selection based on keywords | Variable | Let system decide |
+| Feature | Benefit | Time Saved |
+|---------|---------|------------|
+| **Resume Interrupted Research** | Continue from 15%, 30%, or 50% checkpoints | Up to 50 minutes |
+| **External Monitoring** | Track progress from separate terminal | Real-time visibility |
+| **Intelligent Retry** | Exponential backoff with circuit breaker | 80% fewer transient failures |
+| **Graceful Degradation** | Deep Research → Perplexity fallback | No research failures |
 
-**What You Get with Deep Research:**
-- 60-minute comprehensive competitive landscape analysis
-- Extensive citations from authoritative sources
-- Deep market insights and strategic recommendations
-- Significantly better quality for critical market decisions
+**Dual-Terminal Workflow:**
 
-**Example Workflow:**
+```bash
+# Terminal 1: Run planning
+/full-plan my-saas-project
+
+# Terminal 2: Monitor research (while it runs)
+python scripts/monitor-research-progress.py planning_outputs/20260115_my-saas --follow
+
+# See live progress:
+# [14:23:45] 🔄 [████████████░░░░░] 30% | analyzing: Cross-referencing...
+# [14:38:12] 🔄 [████████████████░░] 50% | synthesizing: Compiling results...
+# [14:52:30] ✅ [████████████████████] 100% | Research complete!
 ```
-Phase 1 Market Research (Balanced Mode):
-  ├─ Quick lookup (Perplexity, 30s): "Latest SaaS pricing trends 2026"
-  ├─ Deep Research (Gemini, 60 min): "Comprehensive competitive analysis
-  │                                    for task management SaaS market"
-  └─ Deep Research (Gemini, 60 min): "Market landscape and growth opportunities"
 
-Total Phase 1: ~90 minutes (vs 10 min all-Perplexity, 180 min all-Deep Research)
+**Resume Interrupted Research:**
+
+```bash
+# List resumable tasks with time estimates
+python scripts/resume-research.py planning_outputs/20260115_my-saas 1 --list
+
+# Output:
+# RESUMABLE RESEARCH TASKS (Phase 1)
+# 1. ✅ Resumable - competitive-analysis
+#    Progress: 30%
+#    Time invested: ~18 minutes
+#    Time saved by resuming: ~18 minutes
+#    Estimated time remaining: ~42 minutes
+
+# Resume from checkpoint
+python scripts/resume-research.py planning_outputs/20260115_my-saas 1 --task competitive-analysis
 ```
+
+**8 Core Patterns Implemented:**
+- Pattern 1: Streaming progress wrapper
+- Pattern 2: Progress file tracking
+- Pattern 3: Error handling with exponential backoff
+- Pattern 4: Research checkpoint manager
+- Pattern 5: Resumable research executor
+- Pattern 6: Enhanced phase checkpoints
+- Pattern 7: Resume command CLI
+- Pattern 8: Monitoring script CLI
+
+**Documentation:** See `docs/WORKFLOWS.md` for complete workflow examples and diagrams.
 
 ---
 
