@@ -957,20 +957,215 @@ This document provides comprehensive ASCII workflow diagrams for all plugin comm
 
 ---
 
+## Progress Tracking & Recovery Workflow (v1.4.0+)
+
+**New in v1.4.0**: Real-time progress tracking, checkpoint creation, and resume capability for interrupted research operations.
+
+### Progress Tracking During Research
+
+When research executes (especially Deep Research), progress is tracked in real-time:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Research Starts (via /full-plan or /tech-plan)                     │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  TIER 1: Streaming Progress (Perplexity ~30s)                       │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  🚀 Starting research...                                       │  │
+│  │  🛠️  Using: WebSearch                                          │  │
+│  │  💭 AI agent market is experiencing rapid growth...            │  │
+│  │  ✅ Research complete                                          │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  TIER 2: Progress File + Checkpoints (Deep Research ~60 min)        │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  🔬 GEMINI DEEP RESEARCH                                       │  │
+│  │  Task ID: dr-competitive-analysis-1736956800                   │  │
+│  │  Progress file: .research-progress-dr-competitive-...json     │  │
+│  │                                                                │  │
+│  │  [15 min] 💾 Checkpoint: Gathering sources (15%)              │  │
+│  │  [30 min] 💾 Checkpoint: Analyzing literature (30%)           │  │
+│  │  [50 min] 💾 Checkpoint: Cross-referencing (50%)              │  │
+│  │  [60 min] ✅ Research complete                                 │  │
+│  │  💾 Checkpoint cleared                                         │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  TIER 3: Phase Checkpoint (After phase completion)                  │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  ✓ Phase 1 complete                                            │  │
+│  │  ✓ Research task statuses saved                                │  │
+│  │    - market-overview: completed                                │  │
+│  │    - competitive-analysis: completed                           │  │
+│  │    - market-sizing: failed                                     │  │
+│  │  ✓ Checkpoint saved: .checkpoint.json                          │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Monitoring Active Research
+
+**Command**: `python scripts/monitor-research-progress.py <project_folder> <task_id>`
+
+Monitor research progress from a separate terminal:
+
+```
+Terminal 1 (Main):                    Terminal 2 (Monitor):
+┌──────────────────────────┐         ┌───────────────────────────────┐
+│ /full-plan my-project    │         │ List active research:         │
+│                          │         │ $ python scripts/monitor-     │
+│ Phase 1: Market Research │         │   research-progress.py        │
+│ 🔬 Deep Research running │         │   planning_outputs/...        │
+│ (60 min estimated)       │         │   --list                      │
+│                          │         │                               │
+│ [Waiting...]             │         │ ✅ Found: dr-task-123         │
+│                          │         │                               │
+│                          │         │ Monitor specific task:        │
+│                          │         │ $ python scripts/monitor-     │
+│                          │         │   research-progress.py        │
+│                          │         │   planning_outputs/...        │
+│                          │         │   dr-task-123 --follow        │
+│                          │         │                               │
+│                          │         │ [14:30:15] 🔄 [███░░░░░] 30% │
+│                          │         │ Phase: Analyzing literature   │
+│                          │         │                               │
+│                          │         │ [14:45:22] 🔄 [█████░░░] 50% │
+│                          │         │ Phase: Cross-referencing      │
+│                          │         │                               │
+│                          │         │ [15:00:00] ✅ [████████] 100% │
+│                          │         │ ✅ Research completed!        │
+└──────────────────────────┘         └───────────────────────────────┘
+```
+
+### Resume Interrupted Research
+
+**Command**: `python scripts/resume-research.py <project_folder> <phase_num>`
+
+Resume research that was interrupted (connection loss, timeout, rate limit):
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Research Interrupted at 35 minutes (timeout/error)                 │
+│  💾 Checkpoint saved: competitive-analysis (30%)                    │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  User: List resumable tasks                                         │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  $ python scripts/resume-research.py                          │  │
+│  │    planning_outputs/20260115_143022_my-project 1 --list       │  │
+│  │                                                                │  │
+│  │  RESUMABLE RESEARCH TASKS (Phase 1)                           │  │
+│  │  ============================================================  │  │
+│  │                                                                │  │
+│  │  1. ✅ Resumable - competitive-analysis                       │  │
+│  │     Progress: 30%                                              │  │
+│  │     Created: 2026-01-15T14:32:18                              │  │
+│  │     Age: 0.5 hours                                             │  │
+│  │     Time invested: ~30 minutes                                │  │
+│  │     Time saved by resuming: ~30 minutes                       │  │
+│  │     Estimated time remaining: ~30 minutes                     │  │
+│  │     Sources collected: 15                                      │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└────────────────────────┬────────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  User: Resume specific task                                         │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │  $ python scripts/resume-research.py                          │  │
+│  │    planning_outputs/20260115_143022_my-project 1              │  │
+│  │    --task competitive-analysis                                 │  │
+│  │                                                                │  │
+│  │  RESUMING RESEARCH TASK: competitive-analysis                 │  │
+│  │  ============================================================  │  │
+│  │  Original query: Comprehensive competitive landscape...       │  │
+│  │  Progress: 30%                                                 │  │
+│  │  Time invested: ~30 minutes                                   │  │
+│  │  Sources collected: 15                                         │  │
+│  │  Checkpoint age: 0.5 hours                                     │  │
+│  │                                                                │  │
+│  │  Estimated time remaining: ~30 minutes                        │  │
+│  │  Time saved by resuming: ~30 minutes                          │  │
+│  │                                                                │  │
+│  │  🔄 Loading checkpoint and building resume prompt...          │  │
+│  │  ✅ Resume prompt built successfully                          │  │
+│  │                                                                │  │
+│  │  [Research continues from 30%...]                             │  │
+│  │  ✅ Research complete (total: 65 minutes instead of 95)       │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Checkpoint Strategy
+
+Research checkpoints are created at strategic intervals:
+
+| Time | Progress | Phase | Resumable | Rationale |
+|------|----------|-------|-----------|-----------|
+| 15 min | 15% | Gathering sources | ✅ Yes | Early enough to resume efficiently |
+| 30 min | 30% | Analyzing literature | ✅ Yes | Significant work, worth saving |
+| 50 min | 50% | Cross-referencing | ✅ Yes | Halfway point, clear resume path |
+| 60 min | 75% | Synthesizing | ❌ No | Too late - easier to restart than merge |
+| 65 min | 90% | Finalizing | ❌ No | Almost done - no point resuming |
+
+**Resumable Threshold**: Only checkpoints up to 50% can be resumed. After 50%, it's faster to restart than to merge partial results with new research.
+
+### Time Savings
+
+Resume capability saves significant time on interruptions:
+
+| Interruption Point | Time Invested | Time Saved | Remaining Time |
+|-------------------|---------------|------------|----------------|
+| 20 min (15% checkpoint) | 15 min | 15 min | 45 min |
+| 35 min (30% checkpoint) | 30 min | 30 min | 30 min |
+| 55 min (50% checkpoint) | 50 min | 50 min | 10 min |
+
+**Example**: Deep Research interrupted at 35 minutes → Resume from 30% checkpoint → Save 30 minutes of work
+
+---
+
 ## File Locations
 
+### Core Commands
 | File | Purpose |
 |------|---------|
 | `commands/setup.md` | Setup command instructions |
 | `commands/full-plan.md` | Full plan command instructions |
 | `commands/tech-plan.md` | Tech plan command instructions |
+
+### Setup & Configuration
+| File | Purpose |
+|------|---------|
 | `scripts/test-providers.py` | API key validation |
 | `scripts/install-all-dependencies.py` | Dependency installation |
 | `scripts/setup-planning-config.py` | Dynamic UI generation |
 | `scripts/parse-plan-input.py` | Input template parser |
 | `.claude-plugin/hooks/SessionStart.sh` | Session hook (dependency check) |
 
+### Progress Tracking & Recovery (v1.4.0+)
+| File | Purpose |
+|------|---------|
+| `scripts/streaming_research_wrapper.py` | Real-time progress streaming (Pattern 1) |
+| `scripts/research_progress_tracker.py` | Progress file tracking (Pattern 2) |
+| `scripts/research_error_handling.py` | Error recovery with retry (Pattern 3) |
+| `scripts/research_checkpoint_manager.py` | Checkpoint management (Pattern 4) |
+| `scripts/resumable_research.py` | Resumable research executor (Pattern 5) |
+| `scripts/checkpoint-manager.py` | Enhanced phase checkpoints (Pattern 6) |
+| `scripts/resume-research.py` | Resume command CLI (Pattern 7) |
+| `scripts/monitor-research-progress.py` | Progress monitoring CLI (Pattern 8) |
+| `scripts/enhanced_research_integration.py` | Integration with research_lookup.py |
+
 ---
 
-**Document Version**: v1.3.2
+**Document Version**: v1.4.0-alpha
 **Last Updated**: 2026-01-15
