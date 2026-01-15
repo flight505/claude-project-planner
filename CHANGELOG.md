@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.2] - 2026-01-13
+
+### ✨ Added
+
+#### Gemini Deep Research Integration with Intelligent Routing
+
+- **Multi-provider research system** - Smart routing between Gemini Deep Research and Perplexity
+  - Gemini Deep Research: 60-minute comprehensive research with extensive citations
+  - Perplexity Sonar: 30-second fast web-grounded research
+  - Automatic provider selection based on research mode, phase, and query complexity
+
+- **Research mode configuration** - New "Research Depth" question in interactive setup (Question 2)
+  - **Balanced (Recommended)**: Deep Research for Phase 1 market analysis, Perplexity for others (~90 min total)
+  - **Quick**: Perplexity only for all research (~30 min total)
+  - **Comprehensive**: Deep Research for all major decisions (~4 hours total)
+  - **Auto**: Context-aware selection based on keywords and planning phase
+
+- **Smart routing logic** - Intelligent provider selection
+  - Phase 1 + competitive-analysis → Deep Research (balanced/auto modes)
+  - Phase 1 + market-research-reports → Deep Research (balanced/auto modes)
+  - Phase 2 + architecture decisions → Deep Research (conditional)
+  - Keywords like "competitive landscape", "market analysis" → Deep Research
+  - Default → Perplexity for quick lookups
+
+- **Research lookup refactor** - `research_lookup.py` now uses ProviderRouter
+  - Added `research_mode` parameter: perplexity/deep_research/balanced/auto
+  - New async `lookup_async()` method for provider-based research
+  - Context-aware routing with `--phase` and `--task-type` parameters
+  - Graceful fallback: Deep Research errors → Perplexity
+  - Maintains backward compatibility with existing sync `lookup()` method
+
+### 🔧 Changed
+
+- **Phase 1 execution** - Updated to use research mode configuration
+  - Competitive analysis uses Deep Research in balanced/deep_research modes
+  - Market research reports use Deep Research in balanced/deep_research modes
+  - Quick lookups continue to use Perplexity for speed
+
+- **Interactive setup UI** - Added Question 2 for research depth selection
+  - Now presents 7 question groups (up from 6)
+  - Configuration includes `research_mode` field
+
+### 📝 Documentation
+
+- Updated `research-lookup/SKILL.md` with multi-provider documentation
+  - Research mode comparison table with time estimates
+  - CLI usage examples with context parameters
+  - API requirements for each provider
+- Updated `commands/full-plan.md` with Phase 1 research mode instructions
+- Updated `scripts/setup-planning-config.py` parser for research mode
+
+### 🎯 Impact
+
+**Quality Improvement:**
+- Phase 1 market research now includes 60-minute comprehensive competitive analysis
+- Extensive citations and research depth for critical market decisions
+- Best quality/time tradeoff with balanced mode
+
+**Time Tradeoffs:**
+| Mode | Phase 1 Time | Total Plan Time | Quality |
+|------|--------------|-----------------|---------|
+| Quick | ~10 min | ~30 min | Good |
+| **Balanced** | ~90 min | ~120 min | **Excellent** ⭐ |
+| Comprehensive | ~180 min | ~240 min | Maximum |
+
+---
+
 ## [1.0.18] - 2025-01-10
 
 ### ✨ Added

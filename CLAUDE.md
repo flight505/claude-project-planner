@@ -1,6 +1,27 @@
 # Claude Project Planner Instructions
 
+
+
 This project is a Claude Code plugin for software project planning.
+
+
+## Stack 
+Here’s the stack for Claude Project Planner, in short:
+
+•  Language & runtime: Python 3.10–3.12, packaged as a Python project with hatchling and a CLI entrypoint project-planner (via project_planner.cli:cli_main).
+•  Core libraries:  
+◦  claude-agent-sdk for orchestrating AI agents and workflows (btw The Claude Code SDK has been renamed to the Claude Agent SDK)
+◦  requests, pyyaml, jinja2, python-dotenv for HTTP, config, templating, and env management  
+◦  openai client used for OpenRouter-based research
+•  AI providers (external services):  
+◦  Anthropic (Claude) – main planning / text generation (ANTHROPIC_API_KEY)  
+◦  OpenRouter (Perplexity, others) – fast research and some image gen (OPENROUTER_API_KEY)  
+◦  Google Gemini – Deep Research, images, video (GEMINI_API_KEY)
+•  Optional features:  
+◦  Document/slide outputs via pillow, python-pptx  
+◦  Async/performance via aiofiles, httpx
+•  System-level tools (optional): Mermaid CLI for diagram rendering and LaTeX (TeX Live/MacTeX) for rich PDF generation.
+
 
 ## Quick Reference
 
@@ -75,3 +96,42 @@ When using `/full-plan`, the following phases are executed in order:
 - `README.md` - Version badge
 
 This triggers auto-update for users who have the plugin installed.
+
+## Claude Code SDK / Claude Agents SDK documentation.
+
+Here are all the Agent SDK links from the Claude documentation:
+Agent SDK Documentation Links
+Main Overview:
+
+https://platform.claude.com/docs/en/agent-sdk/overview
+
+Getting Started:
+
+https://platform.claude.com/docs/en/agent-sdk/quickstart
+
+Language Implementations:
+
+https://platform.claude.com/docs/en/agent-sdk/typescript
+https://platform.claude.com/docs/en/agent-sdk/typescript-v2-preview
+https://platform.claude.com/docs/en/agent-sdk/python
+
+Guides & Features:
+
+https://platform.claude.com/docs/en/agent-sdk/migration-guide
+https://platform.claude.com/docs/en/agent-sdk/streaming-vs-single-mode
+https://platform.claude.com/docs/en/agent-sdk/permissions
+https://platform.claude.com/docs/en/agent-sdk/user-input
+https://platform.claude.com/docs/en/agent-sdk/hooks
+https://platform.claude.com/docs/en/agent-sdk/sessions
+https://platform.claude.com/docs/en/agent-sdk/file-checkpointing
+https://platform.claude.com/docs/en/agent-sdk/structured-outputs
+https://platform.claude.com/docs/en/agent-sdk/hosting
+
+Related Resources:
+
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/quickstart
+https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
+https://platform.claude.com/docs/en/build-with-claude/skills-guide
+
+That's 18 Agent SDK-specific links plus 4 related agent skills and tools guides. All of these are from the Claude documentation platform.

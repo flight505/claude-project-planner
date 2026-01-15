@@ -9,7 +9,7 @@
 
 **AI-powered project planning toolkit** that transforms ideas into comprehensive, buildable specifications. Generate complete project plans including architecture documents, sprint plans, cost analyses, and implementation roadmaps—all backed by real-time research.
 
-**✨ New in v1.3.1:** Interactive approval gates, iterative refinement with `/refine-plan`, and comprehensive setup UI that eliminates command-line flags.
+**✨ New in v1.3.2:** Gemini Deep Research integration with intelligent routing! Choose research depth during setup—use 60-minute Deep Research for Phase 1 competitive analysis or quick Perplexity for everything. Balanced mode gives best quality/time tradeoff.
 
 ---
 
@@ -43,16 +43,61 @@ export OPENROUTER_API_KEY='your_key'  # Recommended for research
 # Start comprehensive planning with interactive setup
 /full-plan my-project
 
-# You'll see 6 question groups covering ALL features:
+# You'll see 7 question groups covering ALL features:
 # 1. AI Provider (Gemini vs Perplexity)
-# 2. Parallelization (fast vs sequential)
-# 3. Interactive Approval (pause after each phase) ⭐ NEW
-# 4. Phase Selection (choose which phases to run) ⭐ NEW
-# 5. Quality Checks (multi-model validation, diagrams) ⭐ NEW
-# 6. Output Formats (PDF, PowerPoint, Markdown) ⭐ NEW
+# 2. Research Depth (balanced/quick/comprehensive) ⭐ NEW v1.3.2
+# 3. Parallelization (fast vs sequential)
+# 4. Interactive Approval (pause after each phase)
+# 5. Phase Selection (choose which phases to run)
+# 6. Quality Checks (multi-model validation, diagrams)
+# 7. Output Formats (PDF, PowerPoint, Markdown)
 ```
 
 **That's it!** No flags to remember—discover all features through the interactive UI.
+
+---
+
+## ✨ What's New in v1.3.2
+
+### 🧠 Gemini Deep Research Integration
+
+Choose research depth during interactive setup for optimal quality/time balance:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ 2. Research Depth                                   │
+│ ● Balanced - Smart selection (Recommended)          │
+│   Use Deep Research (60 min) for Phase 1 market    │
+│   analysis. Quick Perplexity for everything else.  │
+│   Best quality/time tradeoff.                       │
+└─────────────────────────────────────────────────────┘
+```
+
+**Research Modes:**
+
+| Mode | When It's Used | Total Plan Time | Best For |
+|------|----------------|-----------------|----------|
+| **Balanced** ⭐ | Deep Research for Phase 1 competitive analysis | ~120 min | Most projects |
+| **Quick** | Perplexity for all research | ~30 min | Well-known tech stacks |
+| **Comprehensive** | Deep Research for all decisions | ~240 min | Novel/high-stakes projects |
+| **Auto** | Smart selection based on keywords | Variable | Let system decide |
+
+**What You Get with Deep Research:**
+- 60-minute comprehensive competitive landscape analysis
+- Extensive citations from authoritative sources
+- Deep market insights and strategic recommendations
+- Significantly better quality for critical market decisions
+
+**Example Workflow:**
+```
+Phase 1 Market Research (Balanced Mode):
+  ├─ Quick lookup (Perplexity, 30s): "Latest SaaS pricing trends 2026"
+  ├─ Deep Research (Gemini, 60 min): "Comprehensive competitive analysis
+  │                                    for task management SaaS market"
+  └─ Deep Research (Gemini, 60 min): "Market landscape and growth opportunities"
+
+Total Phase 1: ~90 minutes (vs 10 min all-Perplexity, 180 min all-Deep Research)
+```
 
 ---
 
@@ -141,10 +186,11 @@ Configuration Summary:
 ## 🎯 Key Features
 
 - **📋 Comprehensive Planning** - Market research, architecture, costs, risks, sprints, marketing
+- **🧠 Deep Research** - Gemini 60-min comprehensive or Perplexity 30-sec fast research (v1.3.2)
 - **🏗️ Building Blocks** - Decompose projects into Claude Code-buildable components
 - **💰 Cost Analysis** - AWS/GCP/Azure pricing with ROI projections
 - **📊 AI-Generated Diagrams** - C4 model, sequence, ERD, deployment diagrams
-- **🔍 Research-Backed** - Real-time technology and market research
+- **🔍 Research-Backed** - Real-time technology and market research with intelligent routing
 - **🎯 Interactive Approval** - Review and revise after each phase (v1.3.1)
 - **🔄 Iterative Refinement** - Revise any phase with dependency handling (v1.3.1)
 - **📣 Go-to-Market** - Marketing campaigns, content calendars, influencer strategy

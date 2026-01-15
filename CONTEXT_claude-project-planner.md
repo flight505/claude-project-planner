@@ -1,6 +1,6 @@
 # CONTEXT: Claude Project Planner - Ground Truth Documentation
 
-**Plugin Version:** 1.3.1
+**Plugin Version:** 1.3.2
 **Repository:** https://github.com/flight505/claude-project-planner
 **Origin:** Forked from [claude-scientific-writer](https://github.com/K-Dense-AI/claude-scientific-writer) v2.10.0
 **Last Updated:** 2026-01-13
@@ -9,13 +9,14 @@
 
 ## Executive Summary
 
-Claude Project Planner is a comprehensive AI-powered project planning toolkit for Claude Code. It transforms ideas into buildable specifications through a 6-phase planning system that includes market research, architecture design, cost analysis, sprint planning, and go-to-market strategy. All recommendations are backed by real-time research via Perplexity Sonar and Google Gemini Deep Research.
+Claude Project Planner is a comprehensive AI-powered project planning toolkit for Claude Code. It transforms ideas into buildable specifications through a 6-phase planning system that includes market research, architecture design, cost analysis, sprint planning, and go-to-market strategy. All recommendations are backed by real-time research via intelligent provider routing between Perplexity Sonar (fast) and Google Gemini Deep Research (comprehensive).
 
 **Core Value Proposition:**
 - Research-backed planning (no placeholder recommendations)
 - Building blocks compatible with Claude Code
 - AI-generated diagrams (C4, sequence, ERD, deployment)
 - Interactive approval gates with iterative refinement (v1.3.1)
+- Intelligent multi-provider research routing (v1.3.2)
 - Comprehensive output formats (Markdown, YAML, PDF, DOCX, PowerPoint)
 
 ---
@@ -28,9 +29,9 @@ The plugin orchestrates a comprehensive planning workflow through six sequential
 
 ```
 Phase 1: Market Research
-  ├─ research-lookup (Perplexity/Gemini)
-  ├─ competitive-analysis
-  └─ market-research-reports
+  ├─ research-lookup (Intelligent provider routing - v1.3.2)
+  ├─ competitive-analysis (Deep Research in balanced mode)
+  └─ market-research-reports (Deep Research in balanced mode)
          ↓
 Phase 2: Architecture & Technical Design
   ├─ architecture-research (ADRs, C4 model)
@@ -118,6 +119,47 @@ Re-runs Phase 2 with feedback incorporated
        ↓
 Updates dependent phases if selected
 ```
+
+### Multi-Provider Research System (v1.3.2)
+
+**Intelligent Research Routing:**
+
+The plugin now intelligently routes research queries between Perplexity Sonar (fast, 30 seconds) and Gemini Deep Research (comprehensive, 60 minutes) based on research mode configuration.
+
+**Research Modes:**
+
+| Mode | Phase 1 Time | Total Plan Time | Quality | Use Case |
+|------|--------------|-----------------|---------|----------|
+| **Balanced** ⭐ | ~90 min | ~120 min | Excellent | Recommended - Deep Research for competitive analysis only |
+| Quick | ~10 min | ~30 min | Good | Well-known tech stacks, fast iteration |
+| Comprehensive | ~180 min | ~240 min | Maximum | Novel domains, high-stakes projects |
+| Auto | Varies | Varies | Smart | Context-aware selection based on query complexity |
+
+**Smart Routing Logic:**
+```python
+# Phase-based triggers
+if phase == 1 and task_type in ["competitive-analysis", "market-research-reports"]:
+    use_deep_research()  # Comprehensive market analysis
+
+# Keyword-based triggers
+if query contains ["architecture decision", "technology evaluation"]:
+    use_deep_research()  # Complex technical decisions
+
+# Default for quick lookups
+else:
+    use_perplexity()  # Fast 30-second queries
+```
+
+**Graceful Fallback:**
+- Deep Research errors automatically fall back to Perplexity
+- No research failures - always produces results
+- Provider availability detection
+
+**Implementation:**
+- `research_lookup.py` uses ProviderRouter for multi-provider support
+- Research mode configured in interactive setup UI (Question 2)
+- Context-aware routing based on phase, task_type, and query keywords
+- Async path for Deep Research, sync fallback for Perplexity
 
 ### AI Provider Abstraction
 
@@ -261,7 +303,9 @@ sprints:
 ```
 Technology Decision Required
        ↓
-1. research-lookup (Perplexity/Gemini)
+1. research-lookup (Intelligent routing - v1.3.2)
+   ├─ Deep Research: Comprehensive 60-min analysis (Phase 1, complex decisions)
+   └─ Perplexity: Fast 30-sec lookups (quick queries, Phase 2-6)
    └─ Find official docs, benchmarks, case studies
        ↓
 2. Verify with 2+ sources
@@ -374,7 +418,7 @@ claude-project-planner/
 ├── project_planner/        # Python package
 │   ├── .claude/
 │   │   └── skills/         # 18 specialized skills
-│   │       ├── research-lookup/
+│   │       ├── research-lookup/        # Multi-provider research (v1.3.2)
 │   │       ├── architecture-research/
 │   │       ├── building-blocks/
 │   │       ├── sprint-planning/
@@ -431,13 +475,14 @@ claude-project-planner/
 /full-plan my-project-name
 ```
 
-**Interactive Setup Flow (v1.3.1):**
+**Interactive Setup Flow (v1.3.2):**
 1. **AI Provider** - Gemini vs Perplexity vs Auto-detect
-2. **Parallelization** - Enable for 14% time savings
-3. **Interactive Approval** - Pause after each phase (NEW)
-4. **Phase Selection** - Choose which phases to run (NEW)
-5. **Quality Checks** - Multi-model validation, extra diagrams (NEW)
-6. **Output Formats** - PDF, PowerPoint, Markdown (NEW)
+2. **Research Depth** - Balanced/Quick/Comprehensive/Auto (NEW v1.3.2)
+3. **Parallelization** - Enable for 14% time savings
+4. **Interactive Approval** - Pause after each phase
+5. **Phase Selection** - Choose which phases to run
+6. **Quality Checks** - Multi-model validation, extra diagrams
+7. **Output Formats** - PDF, PowerPoint, Markdown
 
 **Execution Flow:**
 ```
@@ -595,10 +640,20 @@ project_planner/.claude/skills/new-skill/
 
 ### Key Milestones
 
+**v1.3.2 (2026-01-13) - Gemini Deep Research Integration**
+- Multi-provider research system with intelligent routing
+- Research mode configuration (balanced/quick/comprehensive/auto)
+- Smart provider selection based on phase, task type, and query complexity
+- Graceful fallback from Deep Research to Perplexity on errors
+- Updated interactive setup UI with Research Depth question
+- Time tradeoffs: Balanced mode (~120 min) vs Quick (~30 min) vs Comprehensive (~240 min)
+- `research_lookup.py` refactored to use ProviderRouter
+- Phase 1 research mode integration
+
 **v1.3.1 (2026-01-12) - Interactive Approval & Refinement**
 - Added interactive approval gates after each phase
 - `/refine-plan` command for iterative refinement
-- Comprehensive setup UI (6 question groups)
+- Comprehensive setup UI (6 question groups, expanded to 7 in v1.3.2)
 - Revision tracking with dependency handling
 
 **v1.3.0 (2026-01-12) - Post-Plan Analysis**
@@ -810,13 +865,22 @@ asyncio.run(main())
 
 **For Technology Decisions:**
 1. Use `research-lookup` BEFORE recommending any technology
-2. Find official documentation + 2-3 real-world case studies
-3. Document trade-offs with evidence
-4. Verify current pricing for cost analysis
+2. Smart routing selects provider based on research mode:
+   - **Balanced mode** ⭐: Deep Research for Phase 1, Perplexity for others
+   - **Quick mode**: Perplexity for all (fast iteration)
+   - **Comprehensive mode**: Deep Research for all (high-stakes projects)
+   - **Auto mode**: Context-aware selection
+3. Find official documentation + 2-3 real-world case studies
+4. Document trade-offs with evidence
+5. Verify current pricing for cost analysis
 
-**For Market Research:**
-1. Use Gemini Deep Research for comprehensive analysis (if available)
-2. Fallback to Perplexity for fast research
+**For Market Research (Phase 1):**
+1. **Balanced/Comprehensive modes**: Gemini Deep Research (60 min/query)
+   - Comprehensive competitive analysis with extensive citations
+   - Market research reports with deep industry insights
+2. **Quick mode**: Perplexity Sonar (30 sec/query)
+   - Fast market data lookups
+   - Quick competitor analysis
 3. Cross-check competitor claims with multiple sources
 4. Save citations for report generation
 
@@ -861,6 +925,7 @@ asyncio.run(main())
 **1. Research Lookup Fails**
 - **Cause:** Missing `OPENROUTER_API_KEY` or `GEMINI_API_KEY`
 - **Solution:** Run `/project-planner:setup` to configure API keys
+- **Note (v1.3.2):** System automatically falls back to available provider. Deep Research requires `GEMINI_API_KEY` + Google AI Pro subscription ($19.99/mo)
 
 **2. Diagrams Not Generating**
 - **Cause:** mmdc (Mermaid CLI) not installed
@@ -877,6 +942,14 @@ asyncio.run(main())
 **5. Checkpoint Not Saving**
 - **Cause:** Phase completed but checkpoint didn't save
 - **Solution:** Check `.checkpoint.json` permissions, re-run phase
+
+**6. Phase 1 Taking Too Long (v1.3.2)**
+- **Cause:** Using Deep Research mode (60 min per query)
+- **Expected Behavior:** Balanced mode takes ~90 min for Phase 1 (comprehensive research)
+- **Solution:**
+  - For faster results: Use "Quick - Perplexity only" mode (~10 min Phase 1)
+  - Re-run setup with `/project-planner:setup` and select different research depth
+  - Deep Research provides maximum quality with extensive citations
 
 ### Debug Mode
 

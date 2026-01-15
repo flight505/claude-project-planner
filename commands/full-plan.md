@@ -32,16 +32,24 @@ This creates a `.{project_name}-plan-input.md` file and opens it in the user's e
 
 **User Action Required:** User fills out the template with their project details and saves the file.
 
-### Step 2: Background Dependency Installation
+### Step 2: Dependency Check
 
-While the user fills out the template, the **SessionStart hook** automatically starts installing dependencies in the background:
+The **SessionStart hook** checks if dependencies are installed:
 
 ```bash
 # Runs automatically via hooks/SessionStart.sh
-nohup "${CLAUDE_PLUGIN_ROOT}/scripts/ensure-dependencies.sh" full &
+# Checks if google-genai is installed (indicator that setup was run)
+if ! python3 -c "import google.genai" 2>/dev/null; then
+    echo "⚠️  Setup Required"
+    echo "Please run: /project-planner:setup"
+fi
 ```
 
-This ensures all required packages are ready before planning begins.
+**If dependencies are missing**, user must run `/project-planner:setup` first, which:
+- Validates API keys with real API calls
+- Installs ALL dependencies (google-genai, openai, markitdown, etc.)
+- Shows capability matrix based on available providers
+- Configures the environment
 
 ### Step 3: Parse and Validate Input
 
@@ -158,22 +166,7 @@ Output Formats:
 
 This setup replaces all command-line flags. Users discover all features interactively without reading documentation.
 
-### Step 5: Wait for Dependencies
-
-Before starting Phase 1, ensure all dependencies are installed:
-
-```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/wait-for-dependencies.py"
-```
-
-This blocks until background installation completes, showing a progress bar.
-
-**If installation fails:**
-1. Check log: `cat /tmp/claude-planner-deps.log`
-2. Manually install: `pip install -r requirements-full-plan.txt`
-3. Re-run `/full-plan`
-
-### Step 6: Begin Planning Execution
+### Step 5: Begin Planning Execution
 
 With all input gathered and dependencies ready, proceed to Phase 1.
 

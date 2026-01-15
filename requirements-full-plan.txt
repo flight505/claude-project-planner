@@ -20,14 +20,17 @@ markitdown>=0.1.0           # Document conversion (PDF, DOCX, PPTX to Markdown)
 pillow>=10.0.0              # Image processing
 python-pptx>=0.6.21         # PowerPoint file handling
 
-# Google Gemini Integration (Optional - requires Google AI Pro subscription)
+# Google Gemini Integration (Required for Deep Research & NanoBanana Pro)
 # ===========================================================================
-# Uncomment if you have GEMINI_API_KEY and want to use:
-# - Deep Research (comprehensive multi-step research)
-# - Veo 3.1 (video generation with native audio)
+# Enables:
+# - Deep Research (comprehensive 60-min multi-step research)
+# - NanoBanana Pro (4K image generation with text rendering)
+# - Gemini 2.5/3.0 Flash/Pro models (thinking capability)
 # - 1M token context window
 #
-# google-genai>=0.1.0        # Google Generative AI SDK
+# Note: Deep Research requires GEMINI_API_KEY (not available via OpenRouter)
+# Cost: Free tier (20 requests/day) or Google AI Pro ($19.99/month)
+google-genai>=1.55.0        # Google Generative AI SDK (minimum version for Deep Research)
 
 # Progress Tracking & Utilities (Standard Library - no install needed)
 # ======================================================================

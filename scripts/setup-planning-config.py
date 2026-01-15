@@ -4,39 +4,56 @@ Interactive Planning Configuration Setup
 
 Presents comprehensive UI for all planning options, eliminating need to remember flags.
 Users discover all capabilities through guided setup flow.
+
+Dynamically filters options based on available API keys.
 """
 
 import json
+import os
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 
-def generate_setup_questions() -> List[Dict[str, Any]]:
+def check_api_keys() -> Dict[str, bool]:
+    """
+    Check which API keys are available in environment.
+
+    Returns:
+        Dict mapping provider name to availability
+    """
+    return {
+        "gemini": bool(os.getenv("GEMINI_API_KEY")),
+        "openrouter": bool(os.getenv("OPENROUTER_API_KEY")),
+        "perplexity": bool(os.getenv("PERPLEXITY_API_KEY")),
+        "anthropic": bool(os.getenv("ANTHROPIC_API_KEY")),
+        "claude_max": bool(os.getenv("CLAUDE_CODE_OAUTH_TOKEN")),
+    }
+
+
+def generate_setup_questions(filter_unavailable: bool = True) -> List[Dict[str, Any]]:
     """
     Generate comprehensive setup questions for planning configuration.
 
-    This presents ALL available features to users for discovery.
+    Dynamically filters options based on available API keys.
+
+    Args:
+        filter_unavailable: If True, mark unavailable options with warnings
+
+    Returns:
+        List of question configurations for AskUserQuestion
     """
-    return [
+    # Check which providers are available
+    available = check_api_keys()
+    has_research = available["gemini"] or available["openrouter"] or available["perplexity"]
+    has_deep_research = available["gemini"]
+
+    questions = [
         # Question 1: AI Provider Selection
         {
             "question": "Which AI provider should handle research and analysis tasks?",
             "header": "AI Provider",
             "multiSelect": False,
-            "options": [
-                {
-                    "label": "Google Gemini Deep Research (Recommended)",
-                    "description": "Most comprehensive. 60-min deep research, 1M token context. Requires GEMINI_API_KEY + Google AI Pro ($19.99/month)"
-                },
-                {
-                    "label": "Perplexity via OpenRouter",
-                    "description": "Fast web-grounded research. Requires OPENROUTER_API_KEY (pay-per-use, ~$0.01/query)"
-                },
-                {
-                    "label": "Auto-detect from available keys",
-                    "description": "Automatically choose best provider based on configured API keys"
-                }
-            ]
+            "options": _filter_ai_provider_options(available, filter_unavailable)
         },
 
         # Question 2: Research Depth (NEW!)
@@ -44,24 +61,7 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             "question": "How comprehensive should research be?",
             "header": "Research",
             "multiSelect": False,
-            "options": [
-                {
-                    "label": "Balanced - Smart selection (Recommended)",
-                    "description": "Use Deep Research (60 min) for Phase 1 market analysis. Quick Perplexity for everything else. Best quality/time tradeoff"
-                },
-                {
-                    "label": "Quick - Perplexity only",
-                    "description": "Fast 30-second lookups for all research. Total plan time: ~30 min. Good for well-known tech stacks"
-                },
-                {
-                    "label": "Comprehensive - Deep Research for all",
-                    "description": "60-min deep research for every major decision. Total plan time: ~4 hours. Best for novel/uncertain domains"
-                },
-                {
-                    "label": "Auto - Context-aware selection",
-                    "description": "Automatically choose based on query complexity and phase. Uses Deep Research for competitive analysis and complex architecture decisions"
-                }
-            ]
+            "options": _filter_research_depth_options(available, filter_unavailable)
         },
 
         # Question 3: Performance - Parallelization
@@ -181,6 +181,125 @@ def generate_setup_questions() -> List[Dict[str, Any]]:
             ]
         }
     ]
+
+    return questions
+
+
+def _filter_ai_provider_options(available: Dict[str, bool], filter_unavailable: bool) -> List[Dict[str, str]]:
+    """Filter AI provider options based on available keys."""
+    options = []
+
+    # Gemini Deep Research
+    if available["gemini"]:
+        options.append({
+            "label": "Google Gemini Deep Research",
+            "description": "✅ Available. 60-min comprehensive research, 1M token context. Best for Phase 1 competitive analysis"
+        })
+    elif filter_unavailable:
+        options.append({
+            "label": "Google Gemini Deep Research (Unavailable)",
+            "description": "❌ Requires GEMINI_API_KEY. Run /project-planner:setup for setup guidance"
+        })
+
+    # Perplexity via OpenRouter
+    if available["openrouter"]:
+        options.append({
+            "label": "Perplexity via OpenRouter (Recommended)",
+            "description": "✅ Available. Fast 30-sec research. Good for most use cases"
+        })
+    elif filter_unavailable:
+        options.append({
+            "label": "Perplexity via OpenRouter (Unavailable)",
+            "description": "❌ Requires OPENROUTER_API_KEY. Run /project-planner:setup for setup guidance"
+        })
+
+    # Perplexity Direct
+    if available["perplexity"]:
+        options.append({
+            "label": "Perplexity Direct",
+            "description": "✅ Available. Direct Perplexity access (skip OpenRouter 5.5% fee)"
+        })
+
+    # Auto-detect (always available if any research provider exists)
+    if available["gemini"] or available["openrouter"] or available["perplexity"]:
+        options.append({
+            "label": "Auto-detect from available keys",
+            "description": "Automatically use best available provider based on your API keys"
+        })
+    else:
+        options.append({
+            "label": "Auto-detect (No research providers configured)",
+            "description": "❌ No research API keys found. Run /project-planner:setup to configure"
+        })
+
+    return options
+
+
+def _filter_research_depth_options(available: Dict[str, bool], filter_unavailable: bool) -> List[Dict[str, str]]:
+    """Filter research depth options based on available keys."""
+    options = []
+    has_deep_research = available["gemini"]
+    has_fast_research = available["openrouter"] or available["perplexity"]
+
+    # Balanced mode (requires Gemini for Deep Research)
+    if has_deep_research:
+        options.append({
+            "label": "Balanced - Smart selection (Recommended)",
+            "description": "✅ Deep Research for Phase 1 competitive analysis, Perplexity for quick lookups. Best quality/time tradeoff (~120 min total)"
+        })
+    elif filter_unavailable:
+        options.append({
+            "label": "Balanced (Requires Gemini)",
+            "description": "❌ Needs GEMINI_API_KEY for Deep Research capability. Add key and re-run /project-planner:setup"
+        })
+
+    # Quick mode (only needs Perplexity)
+    if has_fast_research:
+        options.append({
+            "label": "Quick - Perplexity only",
+            "description": "✅ Fast 30-sec lookups for all research. Total time: ~30 min. Good for well-known tech stacks"
+        })
+    elif filter_unavailable:
+        options.append({
+            "label": "Quick - Perplexity only (Unavailable)",
+            "description": "❌ Requires OPENROUTER_API_KEY or PERPLEXITY_API_KEY"
+        })
+
+    # Comprehensive mode (requires Gemini)
+    if has_deep_research:
+        options.append({
+            "label": "Comprehensive - Deep Research for all",
+            "description": "✅ 60-min Deep Research for every decision. Total time: ~4 hours. Best for novel/uncertain domains"
+        })
+    elif filter_unavailable:
+        options.append({
+            "label": "Comprehensive (Requires Gemini)",
+            "description": "❌ Needs GEMINI_API_KEY. Add key and re-run /project-planner:setup"
+        })
+
+    # Auto mode (adapts to what's available)
+    if has_deep_research and has_fast_research:
+        options.append({
+            "label": "Auto - Context-aware",
+            "description": "✅ Intelligently choose based on query complexity. Uses Deep Research for competitive analysis"
+        })
+    elif has_fast_research:
+        options.append({
+            "label": "Auto - Context-aware (Perplexity only)",
+            "description": "✅ Will use Perplexity for all research (Gemini not configured)"
+        })
+    elif has_deep_research:
+        options.append({
+            "label": "Auto - Context-aware (Gemini only)",
+            "description": "✅ Will use Gemini Deep Research for all research (Perplexity not configured)"
+        })
+    else:
+        options.append({
+            "label": "Auto (No providers configured)",
+            "description": "❌ No research providers available. Run /project-planner:setup"
+        })
+
+    return options
 
 
 def parse_user_selections(answers: Dict[str, str]) -> Dict[str, Any]:

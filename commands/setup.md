@@ -1,137 +1,248 @@
 ---
-description: Configure Claude Project Planner - detects existing API keys or guides you through setup
+description: Configure Claude Project Planner - validates API keys and installs all dependencies
 ---
 
 # Project Planner Setup
 
-Help the user configure the Claude Project Planner plugin for their environment.
+Help the user configure the Claude Project Planner plugin for optimal performance.
 
 ## Setup Flow
 
-### Step 1: Detect Existing Environment Variables
+### Step 1: Test and Validate API Keys
 
-First, check what API keys are already available in the user's environment:
-
-```bash
-# Check for existing keys (don't print values, just check existence)
-echo "=== Checking Environment Variables ==="
-[ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] && echo "✅ CLAUDE_CODE_OAUTH_TOKEN: Found (Claude Max)" || echo "⬜ CLAUDE_CODE_OAUTH_TOKEN: Not set"
-[ -n "$ANTHROPIC_API_KEY" ] && echo "✅ ANTHROPIC_API_KEY: Found" || echo "⬜ ANTHROPIC_API_KEY: Not set"
-[ -n "$OPENROUTER_API_KEY" ] && echo "✅ OPENROUTER_API_KEY: Found" || echo "⬜ OPENROUTER_API_KEY: Not set"
-[ -n "$PERPLEXITY_API_KEY" ] && echo "✅ PERPLEXITY_API_KEY: Found" || echo "⬜ PERPLEXITY_API_KEY: Not set"
-```
-
-### Step 2: Explain Authentication
-
-**For Claude Code CLI:**
-- `CLAUDE_CODE_OAUTH_TOKEN` is **preferred** (Claude Max subscribers - automatic via browser login)
-- `ANTHROPIC_API_KEY` is the alternative (direct API access)
-- If using Claude Max, no API key configuration needed - just run `claude` and authenticate
-
-**For Plugin Features (research, diagrams, images):**
-- `OPENROUTER_API_KEY` enables research-lookup, project-diagrams, and generate-image skills
-- Get a key at: https://openrouter.ai/keys
-- This provides access to Perplexity Sonar models for research
-
-### Step 3: If Keys Are Found
-
-If `OPENROUTER_API_KEY` is already set in the environment, confirm with the user:
-
-"I detected `OPENROUTER_API_KEY` in your environment. This means the research and AI features are ready to use!
-
-Would you like me to:
-1. **Use existing environment variables** (recommended if you have keys in ~/.zshrc)
-2. **Create a project-local config** (stores in .claude/project-planner.local.md)"
-
-Most developers export keys in their shell profile (~/.zshrc, ~/.bashrc) - this is the recommended approach as it works across all projects.
-
-### Step 4: If Keys Are Missing
-
-If `OPENROUTER_API_KEY` is not found, guide the user:
-
-"The research-lookup skill requires an OpenRouter API key for AI-powered research.
-
-**To set up:**
-
-1. Get your API key at: https://openrouter.ai/keys
-
-2. Add to your shell profile (~/.zshrc or ~/.bashrc):
-   ```bash
-   export OPENROUTER_API_KEY='sk-or-v1-your-key-here'
-   ```
-
-3. Reload your shell:
-   ```bash
-   source ~/.zshrc
-   ```
-
-Or, if you prefer project-local configuration, I can store it in `.claude/project-planner.local.md` (gitignored)."
-
-### Step 5: Offer to Create Local Config (Optional)
-
-If the user wants project-local config, create `.claude/project-planner.local.md`:
-
-```markdown
----
-# Project Planner Configuration
-# This file is gitignored - safe for API keys
-
-# OpenRouter API Key (for research-lookup, project-diagrams, generate-image)
-openrouter_api_key: "USER_PROVIDED_KEY"
-
-# Optional: Force specific research model
-# research_model: "pro"  # or "reasoning"
----
-
-# Project Planner Local Configuration
-
-This file contains project-specific configuration for Claude Project Planner.
-It is automatically gitignored and safe for storing API keys.
-
-## Configured Features
-
-- Research Lookup: Enabled (via OpenRouter → Perplexity Sonar)
-- Project Diagrams: Enabled (via OpenRouter → Nano Banana Pro)
-- Image Generation: Enabled (via OpenRouter → FLUX/Gemini)
-```
-
-### Step 6: Validate Configuration
-
-After setup, test that the keys work:
+First, validate that API keys not only exist, but actually work by making real API calls:
 
 ```bash
-# Quick validation - just check the key format
-if [ -n "$OPENROUTER_API_KEY" ]; then
-    if [[ "$OPENROUTER_API_KEY" == sk-or-* ]]; then
-        echo "✅ OPENROUTER_API_KEY format looks valid"
-    else
-        echo "⚠️ OPENROUTER_API_KEY doesn't match expected format (sk-or-...)"
-    fi
-fi
+python "${CLAUDE_PLUGIN_ROOT}/scripts/test-providers.py"
 ```
 
-### Step 7: Summary
+This will:
+- Test each API key with actual API calls (not just existence checks)
+- Show which capabilities are available
+- Display a capability matrix
+- Provide guidance for missing keys
 
-Provide a summary of the configuration:
+**Expected Output:**
+```
+Testing API keys...
 
-"## Setup Complete!
+  ✅  CLAUDE_CODE_OAUTH_TOKEN     Found (Claude Max)
+  ✅  OPENROUTER_API_KEY          Valid ($50.00 credits)
+  ❌  GEMINI_API_KEY              Not set
+  ⬜  PERPLEXITY_API_KEY          Not set
 
-**Claude Code Authentication:**
-- Using: [CLAUDE_CODE_OAUTH_TOKEN / ANTHROPIC_API_KEY / Browser OAuth]
+Available Capabilities:
+✅  Core Planning (Claude Sonnet)
+✅  Fast Research (Perplexity Sonar, ~30 sec)
+❌  Deep Research (Gemini Agent, 60 min)
+✅  Image Generation (NanoBanana Pro)
+✅  Photo Generation (Flux Pro)
 
-**Plugin Features:**
-- Research Lookup: [✅ Ready / ❌ Needs OPENROUTER_API_KEY]
-- Project Diagrams: [✅ Ready / ❌ Needs OPENROUTER_API_KEY]
-- Image Generation: [✅ Ready / ❌ Needs OPENROUTER_API_KEY]
+Research Modes:
+  ✅  Quick - Perplexity only
+  ❌  Balanced - Deep Research for Phase 1
+  ❌  Comprehensive - Deep Research for all
+  ✅  Auto - Use best available
+```
 
-**Configuration Source:** [Environment variables (~/.zshrc) / Project-local (.claude/project-planner.local.md)]
+### Step 2: Install ALL Dependencies
 
-You're all set! Try `/research-lookup` to test the research feature."
+Install all dependencies from `requirements-full-plan.txt` regardless of which providers are configured. This ensures users can switch providers later without re-running setup:
 
-## Key Points
+```bash
+python "${CLAUDE_PLUGIN_ROOT}/scripts/install-all-dependencies.py"
+```
 
-- **Prefer environment variables** over project-local config (works everywhere)
-- **CLAUDE_CODE_OAUTH_TOKEN preferred** over ANTHROPIC_API_KEY for Claude Max users
-- **Don't store keys in git** - use .local.md files which are gitignored
-- **Validate key format** before saving
-- **Be helpful** - provide direct links and copy-paste commands
+**What gets installed:**
+- Core: `claude-agent-sdk`, `requests`, `pyyaml`, `jinja2`, `python-dotenv`
+- Research: `openai` (for OpenRouter)
+- Documents: `markitdown`, `pillow`, `python-pptx`
+- **Gemini: `google-genai>=1.55.0`** ⭐ Now included (required for Deep Research)
+
+**Rationale:** Install everything upfront so users can:
+- Switch between Perplexity and Deep Research without reinstalling
+- Change image providers (NanoBanana vs Flux) seamlessly
+- Try different research modes without dependency issues
+
+**Progress Display:**
+```
+[1/10] ✓ claude-agent-sdk       (already installed)
+[2/10] ✓ python-dotenv          (already installed)
+[3/10] ⏳ google-genai           ✅ installed
+...
+✨ All dependencies installed successfully!
+```
+
+### Step 3: Provider Availability Summary
+
+After validation and installation, show what's available:
+
+```bash
+echo ""
+echo "======================================================================"
+echo "  Setup Complete!"
+echo "======================================================================"
+echo ""
+```
+
+Display summary based on test results:
+
+**If GEMINI_API_KEY is available:**
+```
+✅ Core Planning: Claude Sonnet (via Claude Max)
+✅ Research: Perplexity Sonar + Gemini Deep Research
+✅ Images: NanoBanana Pro (recommended for diagrams & realistic)
+✅ Photos: Flux Pro (ultra-realistic, different prompting)
+
+You can use all research modes:
+  • Quick (Perplexity, ~30 sec/query)
+  • Balanced (Deep Research Phase 1, Perplexity for others)
+  • Comprehensive (Deep Research for all)
+  • Auto (context-aware selection)
+```
+
+**If only OPENROUTER_API_KEY:**
+```
+✅ Core Planning: Claude Sonnet (via Claude Max)
+✅ Research: Perplexity Sonar (fast, ~30 sec)
+⚠️  Deep Research: Unavailable (add GEMINI_API_KEY)
+✅ Images: NanoBanana Pro (via OpenRouter)
+✅ Photos: Flux Pro (via OpenRouter)
+
+Available research modes:
+  • Quick (Perplexity only)
+  • Auto (will use Perplexity)
+```
+
+### Step 4: Guidance for Missing Capabilities
+
+If GEMINI_API_KEY is missing, provide clear guidance:
+
+```bash
+echo "💡 To enable Gemini Deep Research:"
+echo ""
+echo "1. Get your API key:"
+echo "   https://aistudio.google.com/apikey"
+echo ""
+echo "2. Add to your shell profile (~/.zshrc or ~/.bashrc):"
+echo "   export GEMINI_API_KEY='your-key-here'"
+echo ""
+echo "3. Reload and re-run setup:"
+echo "   source ~/.zshrc"
+echo "   /project-planner:setup"
+echo ""
+echo "Cost Options:"
+echo "  • Free tier: 20 requests/day"
+echo "  • Google AI Pro: $19.99/month (unlimited Deep Research)"
+echo ""
+```
+
+### Step 5: Next Steps
+
+Guide the user on what to do next:
+
+```
+Ready to use:
+  • /full-plan <project-name>   - Complete 6-phase planning
+  • /tech-plan <project-name>   - Technical planning only (skip marketing)
+  • /research-lookup <query>    - Test research capabilities
+  • /generate-report            - Create PDF/DOCX reports
+
+Try it out:
+  /research-lookup "Latest trends in AI agents 2025"
+```
+
+## Provider Access Matrix
+
+Show users what each key unlocks:
+
+```
+┌────────────────────┬─────────────────┬──────────────────────────────┐
+│ Capability         │ Access Method   │ Notes                        │
+├────────────────────┼─────────────────┼──────────────────────────────┤
+│ Deep Research      │ GEMINI_API_KEY  │ ONLY via direct Google API   │
+│ (60 min agent)     │                 │ NOT available via OpenRouter │
+├────────────────────┼─────────────────┼──────────────────────────────┤
+│ Fast Research      │ OPENROUTER_API  │ Perplexity Sonar (~30 sec)   │
+│ (Perplexity)       │    OR           │ $5/1M + 5.5% OR fee          │
+│                    │ PERPLEXITY_KEY  │ OR $5/1M direct              │
+├────────────────────┼─────────────────┼──────────────────────────────┤
+│ NanoBanana Pro     │ GEMINI_API_KEY  │ Best for diagrams + realistic│
+│ (Images 4K)        │    OR           │ Via Gemini: $2-12/1M tokens  │
+│                    │ OPENROUTER_API  │ Via OR: pricing + 5.5% fee   │
+├────────────────────┼─────────────────┼──────────────────────────────┤
+│ Flux Pro           │ OPENROUTER_API  │ Ultra-realistic photos only  │
+│ (Photos)           │                 │ Different prompting style    │
+└────────────────────┴─────────────────┴──────────────────────────────┘
+```
+
+## Important Notes
+
+### Authentication Priority
+
+The plugin checks for authentication in this order:
+1. **CLAUDE_CODE_OAUTH_TOKEN** (preferred) - Claude Max subscribers
+2. **ANTHROPIC_API_KEY** - Direct API access
+
+### Deep Research Requirements
+
+**Critical:** Deep Research is ONLY available via direct `GEMINI_API_KEY`:
+- ❌ NOT available through OpenRouter
+- ✅ Requires Google AI Studio API key
+- ✅ Works with free tier (20 requests/day) or AI Pro subscription
+
+### Image Generation Defaults
+
+**Default:** NanoBanana Pro
+- ✅ Excellent for diagrams, slides, text rendering
+- ✅ Also good for realistic images (competitive with Imagen 4)
+- ✅ 4K resolution support
+- ✅ Thinking capability for complex compositions
+
+**Alternative:** Flux Pro
+- Use only for ultra-realistic photos (report covers, presentations)
+- Note: Different prompting style than NanoBanana
+- Requires OpenRouter API key
+
+### Cost Transparency
+
+Always show users the costs:
+- OpenRouter: Provider pricing + 5.5% fee
+- Gemini Direct: Provider pricing (no markup)
+- Perplexity Direct: $5/1M tokens (no markup)
+
+## Troubleshooting
+
+### "google-genai not installed" Error
+
+If users get this error after running old `/full-plan` before setup:
+1. They ran `/full-plan` BEFORE running `/project-planner:setup`
+2. Solution: Run `/project-planner:setup` first to install all dependencies
+
+### Invalid API Key
+
+If `test-providers.py` shows "Invalid key":
+- Check for typos in environment variable
+- Verify key is active (not revoked)
+- For Gemini: Ensure you're using AI Studio API key, not consumer app key
+- For OpenRouter: Check credits balance
+
+### Connection Failed
+
+If tests show "Connection failed":
+- Check internet connection
+- Verify firewall/proxy settings
+- Try again in a few minutes (temporary API outage)
+
+## Re-running Setup
+
+Users can re-run setup anytime to:
+- Add new API keys
+- Verify current configuration
+- Update dependencies
+
+```bash
+/project-planner:setup
+```
+
+Dependencies that are already installed will be skipped (fast re-run).
