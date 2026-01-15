@@ -1,8 +1,22 @@
 # Claude Project Planner API
 
-**Claude Project Planner is a deep research and project planning tool** that combines AI-driven deep research with well-formatted written outputs. This API lets you programmatically generate publication-ready documents backed by real-time literature search and verified citations.
+**Version:** 1.4.0-alpha
 
-Complete reference for the Claude Project Planner v2.0 programmatic API. For a quick start, see the README. This page contains full details, examples, and best practices.
+Complete reference for the Claude Project Planner programmatic API. This API enables you to generate comprehensive software project plans including architecture documents, sprint plans, cost analyses, and implementation roadmaps—all backed by real-time research.
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Core API](#core-api)
+- [Progress Tracking API](#progress-tracking-api-v140-alpha)
+- [Research Integration](#research-integration)
+- [Data Models](#data-models)
+- [Best Practices](#best-practices)
+
+---
 
 ## Installation
 
@@ -12,663 +26,544 @@ uv sync
 
 # Or install in your current environment
 uv pip install -e .
+
+# Install optional dependencies
+uv pip install -e ".[all]"  # All features
+uv pip install -e ".[gemini]"  # Gemini Deep Research
+uv pip install -e ".[documents]"  # PDF/DOCX support
 ```
+
+---
 
 ## Quick Start
 
+### Basic Usage
+
 ```python
 import asyncio
-from project_planner import generate_project
+from pathlib import Path
+
+# Import the main planning function
+# (Note: Programmatic API is under development for v1.4.0)
+# Current usage is primarily via CLI commands
+
+# CLI Usage (recommended):
+# /full-plan my-project
+# /tech-plan my-project
+```
+
+### Using CLI Tools
+
+```python
+import subprocess
+
+# Run full planning via CLI
+result = subprocess.run(
+    ["claude", "run", "/full-plan", "my-saas-project"],
+    capture_output=True,
+    text=True
+)
+
+# Monitor research progress
+result = subprocess.run(
+    ["python", "scripts/monitor-research-progress.py",
+     "planning_outputs/20260115_my-project", "--list"],
+    capture_output=True,
+    text=True
+)
+print(result.stdout)
+```
+
+---
+
+## Progress Tracking API (v1.4.0-alpha)
+
+The progress tracking system provides comprehensive monitoring and checkpoint capabilities for long-running research operations.
+
+### EnhancedResearchLookup
+
+Integrates progress tracking with the research lookup system.
+
+```python
+import asyncio
+from pathlib import Path
+from scripts.enhanced_research_integration import EnhancedResearchLookup
 
 async def main():
-    async for update in generate_project("Create a Nature paper on CRISPR"):
-        if update["type"] == "progress":
-            print(f"[{update['stage']}] {update['message']}")
-        else:
-            print(f"PDF: {update['files']['pdf_final']}")
+    # Initialize with progress tracking
+    research = EnhancedResearchLookup(
+        project_folder=Path("planning_outputs/20260115_my-project"),
+        phase_num=1,
+        research_mode="balanced"  # or "quick", "deep_research", "auto"
+    )
+
+    # Execute research with automatic progress tracking
+    result = await research.research_with_progress(
+        task_name="competitive-analysis",
+        query="Comprehensive competitive landscape analysis for SaaS market",
+        estimated_duration_sec=3600  # Optional, auto-detected if not provided
+    )
+
+    # Access results
+    print(f"Success: {result['success']}")
+    print(f"Provider: {result['provider']}")
+    print(f"Sources: {len(result.get('sources', []))}")
+
+    # View execution statistics
+    stats = research.get_stats()
+    print(f"Tasks completed: {stats['tasks_completed']}")
+    print(f"Tasks resumed: {stats['tasks_resumed']}")
+    print(f"Time saved: {stats['total_time_saved_min']} minutes")
 
 asyncio.run(main())
 ```
 
-## API Functions
+**Key Features:**
+- Automatic checkpoint creation at 15%, 30%, 50% milestones
+- Graceful degradation (Deep Research → Perplexity fallback)
+- Error recovery with exponential backoff
+- External monitoring support via progress files
+- Statistics tracking across all research operations
 
-### `generate_project()`
+### ResumableResearchExecutor
 
-Asynchronous generator that creates a scientific paper and yields progress updates.
+Core executor for resumable research operations with full checkpoint support.
 
-**Signature:**
-```python
-from typing import AsyncGenerator, Dict, Any, Optional, List
-
-async def generate_project(
-    query: str,
-    output_dir: Optional[str] = None,
-    api_key: Optional[str] = None,
-    model: str = "claude-sonnet-4-20250514",
-    data_files: Optional[List[str]] = None,
-    cwd: Optional[str] = None,
-    track_token_usage: bool = False,
-) -> AsyncGenerator[Dict[str, Any], None]
-```
-
-**Parameters:**
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `query` | `str` | Yes | - | The paper generation request (e.g., "Create a Nature paper on CRISPR") |
-| `output_dir` | `str` | No | `None` | Custom output directory. Defaults to `cwd/writing_outputs` |
-| `api_key` | `str` | No | `None` | Anthropic API key. Defaults to `ANTHROPIC_API_KEY` env var |
-| `model` | `str` | No | `"claude-sonnet-4-20250514"` | Claude model to use |
-| `data_files` | `List[str]` | No | `None` | List of file paths to include in the paper |
-| `cwd` | `str` | No | `None` | Working directory. Defaults to package parent directory |
-| `track_token_usage` | `bool` | No | `False` | If True, track and return token usage in the final result |
-
-**Returns:**
-
-An async generator that yields:
-1. Progress updates (type="progress") during execution
-2. Final result (type="result") with comprehensive paper information
-
-**Example:**
 ```python
 import asyncio
-from project_planner import generate_project
+from pathlib import Path
+from scripts.resumable_research import ResumableResearchExecutor
 
-async def example():
-    async for update in generate_project(
-        query="Create a NeurIPS paper on transformers",
-        output_dir="./my_papers",
-        data_files=["results.csv", "figure.png"],
-    ):
-        if update["type"] == "progress":
-            print(f"[{update['stage']}] {update['message']}")
-        else:
-            print(f"Done! PDF: {update['files']['pdf_final']}")
+async def main():
+    # Initialize executor
+    executor = ResumableResearchExecutor(
+        project_folder=Path("planning_outputs/20260115_my-project"),
+        phase_num=1,
+        auto_resume=True  # Automatically resume from checkpoints if available
+    )
 
-asyncio.run(example())
+    # Define research function
+    async def my_research_func():
+        # Your research logic here
+        return {"findings": "...", "sources": [...]}
+
+    # Execute with full progress tracking
+    result = await executor.execute(
+        task_name="market-research",
+        query="Market size and growth projections",
+        provider="perplexity_sonar",  # or "gemini_deep_research"
+        estimated_duration_sec=30,
+        research_func=my_research_func,
+        fallback_func=None  # Optional fallback function
+    )
+
+    # Check execution results
+    if result["success"]:
+        print(f"Research completed: {result['result']}")
+        print(f"Time saved: {result['metadata']['time_saved_min']} minutes")
+    else:
+        print(f"Research failed: {result['error']}")
+
+    # Get statistics
+    stats = executor.get_stats()
+    print(f"Total tasks: {stats['tasks_executed']}")
+    print(f"Resumed: {stats['tasks_resumed']}")
+    print(f"Failed: {stats['tasks_failed']}")
+
+asyncio.run(main())
 ```
+
+### ResearchProgressTracker
+
+Low-level progress tracking for custom integrations.
+
+```python
+import asyncio
+from pathlib import Path
+from scripts.research_progress_tracker import ResearchProgressTracker
+
+async def main():
+    # Initialize tracker
+    tracker = ResearchProgressTracker(
+        project_folder=Path("planning_outputs/20260115_my-project"),
+        task_id="custom-research-001"
+    )
+
+    # Start tracking
+    await tracker.start(
+        query="Custom research query",
+        provider="custom_provider",
+        estimated_duration_sec=600
+    )
+
+    # Update progress
+    await tracker.update(
+        phase="analyzing",
+        current_action="Processing data...",
+        progress_pct=30.0
+    )
+
+    # Add checkpoint
+    await tracker.checkpoint(
+        phase="analyzing",
+        progress_pct=30.0,
+        partial_results={"findings": ["Finding 1", "Finding 2"]}
+    )
+
+    # Complete or fail
+    await tracker.complete(results={"final": "results"})
+    # OR
+    # await tracker.fail(error="Error message", error_type="rate_limit")
+
+    # Read progress (from another process)
+    progress = tracker.read_progress()
+    print(f"Status: {progress['status']}")
+    print(f"Progress: {progress['progress_pct']}%")
+
+asyncio.run(main())
+```
+
+### ResearchCheckpointManager
+
+Manage research checkpoints for resume capability.
+
+```python
+from pathlib import Path
+from scripts.research_checkpoint_manager import ResearchCheckpointManager
+
+# Initialize manager
+manager = ResearchCheckpointManager(
+    project_folder=Path("planning_outputs/20260115_my-project"),
+    phase_num=1
+)
+
+# Save checkpoint
+manager.save_research_checkpoint(
+    task_name="competitive-analysis",
+    query="Original query",
+    partial_results={"findings": [...]},
+    sources_collected=[...],
+    progress_pct=30.0,
+    resumable=True
+)
+
+# Load checkpoint
+checkpoint = manager.load_research_checkpoint("competitive-analysis")
+if checkpoint:
+    print(f"Progress: {checkpoint['progress_pct']}%")
+    print(f"Resumable: {checkpoint['resumable']}")
+
+# Build resume prompt
+resume_prompt = manager.build_resume_prompt("competitive-analysis", checkpoint)
+print(resume_prompt)  # Prompt for AI to continue research
+
+# Get time estimates
+estimate = manager.get_resume_estimate(checkpoint)
+print(f"Time saved: {estimate['time_saved_min']} minutes")
+print(f"Time remaining: {estimate['time_remaining_min']} minutes")
+
+# Delete checkpoint after successful completion
+manager.delete_checkpoint("competitive-analysis")
+```
+
+---
+
+## Research Integration
+
+### Using Research Lookup with Progress Tracking
+
+```python
+import sys
+from pathlib import Path
+
+# Add scripts to path
+sys.path.insert(0, str(Path(__file__).parent / "scripts"))
+
+from research_lookup import ResearchLookup
+
+# Basic usage (without progress tracking)
+lookup = ResearchLookup(
+    research_mode="balanced",
+    force_model=None,
+    context={"phase": 1, "task_type": "competitive-analysis"}
+)
+
+# Sync research
+result = lookup.lookup("Market trends for SaaS in 2026")
+
+# Async research (for Deep Research)
+result = await lookup.lookup_async("Comprehensive competitive landscape")
+
+print(f"Provider: {result['provider']}")
+print(f"Content: {result['content']}")
+print(f"Sources: {result.get('sources', [])}")
+```
+
+---
 
 ## Data Models
 
-### `ProgressUpdate`
+### Progress Update
 
-Progress information yielded during paper generation.
-
-**Fields:**
 ```python
 {
-    "type": "progress",
-    "timestamp": str,      # ISO 8601 timestamp
-    "message": str,        # Progress message
-    "stage": str,          # Current stage (see stages below)
-    "details": dict | None # Optional additional context (tool name, files, etc.)
+    "task_id": str,
+    "status": str,  # "running", "completed", "failed"
+    "progress_pct": float,  # 0.0 to 100.0
+    "phase": str,
+    "current_action": str,
+    "started_at": str,  # ISO timestamp
+    "updated_at": str,  # ISO timestamp
+    "estimated_completion_at": str,  # ISO timestamp
+    "checkpoints": List[Dict],
+    "metadata": Dict[str, Any]
 }
 ```
 
-**Stages:**
-- `initialization` - Setting up paper generation
-- `research` - Conducting literature research
-- `writing` - Writing paper sections
-- `compilation` - Compiling LaTeX to PDF
-- `complete` - Finalizing and scanning results
+### Research Checkpoint
 
-### `PaperResult`
-
-Comprehensive final result with all paper information.
-
-**Fields:**
 ```python
 {
-    "type": "result",
-    "status": str,                    # "success" | "partial" | "failed"
-    "paper_directory": str,           # Full path to paper directory
-    "paper_name": str,                # Paper directory name
-    "metadata": PaperMetadata,        # Paper metadata
-    "files": PaperFiles,              # All generated files
-    "citations": dict,                # Citation information
-    "figures_count": int,             # Number of figures
-    "compilation_success": bool,      # Whether PDF was generated
-    "errors": List[str],              # Any error messages
-    "token_usage": TokenUsage | None  # Token usage (when track_token_usage=True)
+    "task_name": str,
+    "query": str,
+    "created_at": str,  # ISO timestamp
+    "progress_pct": float,
+    "resumable": bool,
+    "partial_results": Dict[str, Any],
+    "sources_collected": List[Dict],
+    "metadata": {
+        "phase": str,
+        "estimated_total_duration_sec": int,
+        "time_elapsed_sec": float,
+        "source_count": int
+    }
 }
 ```
 
-**Status Values:**
-- `success` - Paper fully generated with PDF
-- `partial` - TeX created but PDF compilation failed
-- `failed` - Generation failed (see `errors` field)
+### Research Result
 
-### `PaperMetadata`
-
-Metadata about the generated paper.
-
-**Fields:**
 ```python
 {
-    "title": Optional[str],      # Extracted paper title
-    "created_at": str,           # ISO 8601 timestamp
-    "topic": str,                # Topic extracted from directory name
-    "word_count": Optional[int]  # Estimated word count
+    "success": bool,
+    "provider": str,  # "perplexity_sonar", "gemini_deep_research"
+    "content": str,
+    "sources": List[Dict],
+    "result": Any,  # Full result data
+    "error": Optional[str],
+    "metadata": {
+        "resumed": bool,
+        "checkpoint_used": Optional[str],
+        "time_saved_min": float,
+        "retries": int
+    }
 }
 ```
 
-### `PaperFiles`
+### Executor Statistics
 
-Paths to all generated paper files.
-
-**Fields:**
 ```python
 {
-    "pdf_final": Optional[str],      # Final PDF path
-    "tex_final": Optional[str],      # Final TeX source path
-    "pdf_drafts": List[str],         # List of draft PDF paths
-    "tex_drafts": List[str],         # List of draft TeX paths
-    "bibliography": Optional[str],   # BibTeX file path
-    "figures": List[str],            # List of figure file paths
-    "data": List[str],               # List of data file paths
-    "progress_log": Optional[str],   # progress.md path
-    "summary": Optional[str]         # SUMMARY.md path
+    "tasks_executed": int,
+    "tasks_completed": int,
+    "tasks_failed": int,
+    "tasks_resumed": int,
+    "total_time_saved_min": float
 }
 ```
 
-### `TokenUsage`
-
-Token usage statistics. Only present when `track_token_usage=True`.
-
-**Fields:**
-```python
-{
-    "input_tokens": int,                  # Total input tokens consumed
-    "output_tokens": int,                 # Total output tokens generated
-    "total_tokens": int,                  # Sum of input + output tokens
-    "cache_creation_input_tokens": int,   # Tokens used for cache creation
-    "cache_read_input_tokens": int        # Tokens read from cache
-}
-```
-
-**Example:**
-```python
-async for update in generate_project("Create a paper", track_token_usage=True):
-    if update["type"] == "result":
-        if "token_usage" in update:
-            usage = update["token_usage"]
-            print(f"Input: {usage['input_tokens']:,} tokens")
-            print(f"Output: {usage['output_tokens']:,} tokens")
-            print(f"Total: {usage['total_tokens']:,} tokens")
-```
-
-## Usage Patterns
-
-### Basic Paper Generation
-
-```python
-import asyncio
-from project_planner import generate_project
-
-async def create_paper():
-    query = "Create a Nature paper on quantum computing"
-    
-    async for update in generate_project(query):
-        if update["type"] == "progress":
-            print(f"Progress: {update['message']}")
-        else:
-            if update["status"] == "success":
-                print(f"Success! PDF: {update['files']['pdf_final']}")
-            else:
-                print(f"Failed: {update['errors']}")
-
-asyncio.run(create_paper())
-```
-
-### Progress Tracking with Stages
-
-```python
-async def track_progress():
-    async for update in generate_project("Create a paper on ML"):
-        if update["type"] == "progress":
-            # Show stage-based progress
-            stage_icons = {
-                "initialization": "🔧",
-                "research": "🔍",
-                "writing": "✍️",
-                "compilation": "📦",
-                "complete": "✅"
-            }
-            icon = stage_icons.get(update["stage"], "⏳")
-            print(f"{icon} [{update['stage']:12}] {update['message']}")
-        else:
-            print(f"\n✅ Complete! PDF: {update['files']['pdf_final']}")
-```
-
-### Custom Output Directory
-
-```python
-async def custom_directory():
-    async for update in generate_project(
-        "Create a conference paper",
-        output_dir="./my_research/papers"
-    ):
-        if update["type"] == "result":
-            print(f"Paper saved to: {update['paper_directory']}")
-```
-
-### Including Data Files
-
-```python
-async def with_data_files():
-    data_files = [
-        "./experiment_results.csv",
-        "./figures/performance_graph.png",
-        "./appendix_data.json"
-    ]
-    
-    async for update in generate_project(
-        "Create a paper analyzing the experimental results",
-        data_files=data_files
-    ):
-        if update["type"] == "result":
-            print(f"Included {len(data_files)} data files")
-            print(f"Result has {update['figures_count']} figures")
-```
-
-### Save Complete Result to JSON
-
-```python
-import json
-
-async def save_to_json():
-    result = None
-    
-    async for update in generate_project("Create a paper"):
-        if update["type"] == "result":
-            result = update
-    
-    if result:
-        with open("paper_result.json", "w") as f:
-            json.dump(result, f, indent=2)
-        print("Result saved to paper_result.json")
-```
-
-### Error Handling
-
-```python
-async def with_error_handling():
-    try:
-        async for update in generate_project("Create a paper"):
-            if update["type"] == "progress":
-                print(f"[{update['stage']}] {update['message']}")
-            else:
-                if update["status"] == "failed":
-                    print("Generation failed!")
-                    for error in update["errors"]:
-                        print(f"  Error: {error}")
-                elif update["status"] == "partial":
-                    print("Partial success")
-                    print(f"  TeX file: {update['files']['tex_final']}")
-                    print("  PDF compilation failed")
-                else:
-                    print("Success!")
-    except ValueError as e:
-        print(f"Configuration error: {e}")
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-```
-
-### Custom API Key
-
-```python
-async def with_custom_api_key():
-    # Override ANTHROPIC_API_KEY environment variable
-    async for update in generate_project(
-        "Create a paper",
-        api_key="sk-ant-your-api-key-here"
-    ):
-        # Process updates...
-        pass
-```
-
-### Accessing All Generated Files
-
-```python
-async def list_all_files():
-    async for update in generate_project("Create a paper"):
-        if update["type"] == "result":
-            files = update["files"]
-            
-            print("Generated files:")
-            print(f"  PDF: {files['pdf_final']}")
-            print(f"  TeX: {files['tex_final']}")
-            print(f"  Bibliography: {files['bibliography']}")
-            
-            print(f"\nDrafts ({len(files['pdf_drafts'])} versions):")
-            for draft in files['pdf_drafts']:
-                print(f"  - {draft}")
-            
-            print(f"\nFigures ({len(files['figures'])} files):")
-            for fig in files['figures']:
-                print(f"  - {fig}")
-            
-            print(f"\nData files ({len(files['data'])} files):")
-            for data in files['data']:
-                print(f"  - {data}")
-```
-
-## Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | Yes* | Your Anthropic API key for Project-Planner |
-| `OPENROUTER_API_KEY` | No | For real-time research lookup via Perplexity Sonar Pro Search |
-
-\* Can be overridden by passing `api_key` parameter to `generate_project()`
-
-### Research Lookup
-
-When `OPENROUTER_API_KEY` is set, the system gains access to real-time research capabilities:
-
-- **Live internet search** during paper generation
-- **Recent publications** from 2024-2025
-- **Fact verification** with current data
-- **Citation discovery** for latest research
-
-The research lookup is automatically invoked when needed - you don't need to explicitly request it.
-
-### Native Web Search
-
-In addition to research lookup, the system includes Claude's native **WebSearch** tool for:
-
-- **Current events** and general information
-- **Non-academic sources** (news, blogs, documentation)
-- **Real-time information** that may not be in academic databases
-- **Fact-checking** and verification from diverse sources
-
-Both tools work together: use research-lookup for scholarly/academic content, and WebSearch for broader web information.
-
-**Setup:**
-```bash
-# Add to your .env file
-echo "OPENROUTER_API_KEY=your_key_here" >> .env
-```
-
-**Example usage:**
-```python
-# Will automatically use research lookup to find recent papers
-async for update in generate_project(
-    "Create a paper on recent advances in quantum computing (2024)"
-):
-    pass
-```
-
-## Error Handling
-
-The API handles errors gracefully:
-
-1. Configuration errors (missing API key): yields a result with `status="failed"`
-2. Generation errors: captured in the `errors` field of the result
-3. Partial failures: TeX created but PDF failed -> `status="partial"`
+---
 
 ## Best Practices
 
-1. Always check update type:
-   ```python
-   if update["type"] == "progress":
-       # Handle progress
-   else:  # type == "result"
-       # Handle final result
-   ```
+### 1. Use Enhanced Research Integration
 
-2. Check status before accessing files:
-   ```python
-   if update["status"] == "success":
-       pdf_path = update["files"]["pdf_final"]
-   ```
-
-3. Handle both success and failure:
-   ```python
-   if update["status"] == "failed":
-       print(f"Errors: {update['errors']}")
-   elif update["status"] == "partial":
-       print("TeX created but PDF failed")
-   else:
-       print("Success!")
-   ```
-
-4. Use async context properly:
-   ```python
-   import asyncio
-   asyncio.run(main())  # For scripts
-   ```
-
-5. Save important results:
-   ```python
-   import json
-   with open("result.json", "w") as f:
-       json.dump(update, f, indent=2)
-   ```
-
-## Advanced Features
-
-### Data File Processing
-
-The API automatically processes data files and organizes them appropriately:
+For new code, always use `EnhancedResearchLookup` instead of direct `ResearchLookup`:
 
 ```python
-async for update in generate_project(
-    query="Analyze experimental results",
-    data_files=[
-        "./results.csv",           # → copied to data/
-        "./performance_plot.png",  # → copied to figures/
-        "./supplementary.json"     # → copied to data/
-    ]
-):
-    if update["type"] == "result":
-        # Files are available in the paper directory
-        data_files = update["files"]["data"]
-        figures = update["files"]["figures"]
+# ✅ Good - includes progress tracking and checkpoints
+from scripts.enhanced_research_integration import EnhancedResearchLookup
+research = EnhancedResearchLookup(...)
+
+# ❌ Avoid - no progress tracking
+from scripts.research_lookup import ResearchLookup
+lookup = ResearchLookup(...)
 ```
 
-**Note:** When using the API, original files are preserved (not deleted). In CLI mode, they are deleted after copying.
+### 2. Handle Async Properly
 
-### Intelligent Paper Detection (CLI Only)
+Research operations are async, always use proper async context:
 
-The CLI automatically detects references to existing papers:
+```python
+# ✅ Good
+async def my_function():
+    result = await research.research_with_progress(...)
+
+asyncio.run(my_function())
+
+# ❌ Bad - blocking async call
+result = research.research_with_progress(...)  # Won't work
+```
+
+### 3. Monitor Long-Running Operations
+
+For operations > 2 minutes, use external monitoring:
+
+```python
+# Start research in main process
+result = await research.research_with_progress(task_name="analysis", ...)
+
+# Monitor from separate terminal:
+# python scripts/monitor-research-progress.py <project_folder> --list
+```
+
+### 4. Clean Up Checkpoints
+
+Always clean up checkpoints after successful completion:
+
+```python
+# After successful research
+if result["success"]:
+    manager.delete_checkpoint(task_name)
+```
+
+### 5. Use Appropriate Research Modes
+
+Choose research mode based on your needs:
+
+```python
+# Balanced mode (recommended) - Deep Research for Phase 1, Perplexity for others
+research = EnhancedResearchLookup(research_mode="balanced", ...)
+
+# Quick mode - Perplexity only, fast iteration
+research = EnhancedResearchLookup(research_mode="perplexity", ...)
+
+# Comprehensive mode - Deep Research for everything, high quality
+research = EnhancedResearchLookup(research_mode="deep_research", ...)
+
+# Auto mode - Smart selection based on keywords
+research = EnhancedResearchLookup(research_mode="auto", ...)
+```
+
+### 6. Handle Errors Gracefully
+
+Always implement error handling:
+
+```python
+try:
+    result = await research.research_with_progress(...)
+    if not result["success"]:
+        print(f"Research failed: {result['error']}")
+        # Implement fallback or retry logic
+except Exception as e:
+    print(f"Exception: {e}")
+    # Handle unexpected errors
+```
+
+---
+
+## CLI Tools
+
+### Monitor Research Progress
 
 ```bash
-# CLI automatically tracks context
-> Create a Nature paper on CRISPR
-# Creates new paper
+# List all active operations
+python scripts/monitor-research-progress.py <project_folder> --list
 
-> Add a methods section
-# Continues editing the CRISPR paper
+# Monitor specific operation
+python scripts/monitor-research-progress.py <project_folder> <task_id>
 
-> Find the acoustics paper
-# Switches to the acoustics paper
-
-> new paper on quantum computing
-# Explicitly starts a new paper
+# Follow mode (continuous updates)
+python scripts/monitor-research-progress.py <project_folder> <task_id> --follow
 ```
 
-This feature is CLI-specific because the API is stateless. Each `generate_project()` call creates a new paper.
+### Resume Interrupted Research
 
-### Custom Output Organization
+```bash
+# List resumable tasks
+python scripts/resume-research.py <project_folder> <phase_num> --list
 
-Control where papers are saved:
+# Resume specific task
+python scripts/resume-research.py <project_folder> <phase_num> --task <task_name>
 
-```python
-# Custom output directory
-async for update in generate_project(
-    query="Create a paper",
-    output_dir="~/my_research/papers"
-):
-    pass
-
-# Custom working directory
-async for update in generate_project(
-    query="Create a paper",
-    cwd="/path/to/project",
-    output_dir="./outputs"
-):
-    pass
+# Force resume (ignore age warnings)
+python scripts/resume-research.py <project_folder> <phase_num> --task <task_name> --force
 ```
 
-### Model Selection
+---
 
-Choose different Claude models (though Sonnet 4.5 is recommended):
+## Environment Variables
 
-```python
-async for update in generate_project(
-    query="Create a paper",
-    model="claude-sonnet-4-20250514"  # Latest Sonnet 4.5
-):
-    pass
+### Required
+
+```bash
+export ANTHROPIC_API_KEY='your_key'  # Core planning and text generation
 ```
 
-### Token Usage Tracking
+### Optional
 
-Track token consumption for cost monitoring and usage analysis:
-
-```python
-async for update in generate_project(
-    query="Create a paper on quantum computing",
-    track_token_usage=True
-):
-    if update["type"] == "result":
-        if "token_usage" in update:
-            usage = update["token_usage"]
-            print(f"Token Usage Summary:")
-            print(f"  Input tokens:  {usage['input_tokens']:,}")
-            print(f"  Output tokens: {usage['output_tokens']:,}")
-            print(f"  Total tokens:  {usage['total_tokens']:,}")
-            
-            # Cache statistics (if applicable)
-            if usage.get('cache_read_input_tokens', 0) > 0:
-                print(f"  Cache reads:   {usage['cache_read_input_tokens']:,}")
+```bash
+export OPENROUTER_API_KEY='your_key'  # Perplexity research, image generation
+export GEMINI_API_KEY='your_key'      # Google Gemini Deep Research (requires AI Pro subscription)
 ```
 
-**Notes:**
-- Token usage is returned silently (not printed to terminal)
-- Available in the final result as a dictionary
-- Also included in error results when tracking is enabled
-- Useful for cost estimation and monitoring API usage
+---
 
-### Metadata Extraction
+## Examples
 
-The API automatically extracts metadata from generated papers:
-
-```python
-async for update in generate_project(query):
-    if update["type"] == "result":
-        # Extracted metadata
-        title = update["metadata"]["title"]        # From \title{} in LaTeX
-        word_count = update["metadata"]["word_count"]  # Estimated from TeX
-        created_at = update["metadata"]["created_at"]  # ISO 8601 timestamp
-        topic = update["metadata"]["topic"]        # From directory name
-        
-        # Citation information
-        citation_count = update["citations"]["count"]  # From .bib file
-        citation_style = update["citations"]["style"]  # BibTeX style
-        bib_file = update["citations"]["file"]     # Path to .bib
-```
-
-### Progress Monitoring Patterns
-
-#### Simple Stage Display
-
-```python
-def format_stage(stage: str) -> str:
-    """Format stage name with icon."""
-    icons = {
-        "initialization": "🔧",
-        "research": "🔍", 
-        "writing": "✍️",
-        "compilation": "📦",
-        "complete": "✅"
-    }
-    return f"{icons.get(stage, '⏳')} {stage}"
-
-async for update in generate_project(query):
-    if update["type"] == "progress":
-        print(f"\r{format_stage(update['stage'])}: {update['message']}", end="")
-
-#### Stage-Based Updates
-
-```python
-stage_emojis = {
-    "initialization": "🔧",
-    "research": "🔍",
-    "writing": "✍️",
-    "compilation": "📦",
-    "complete": "✅"
-}
-
-async for update in generate_project(query):
-    if update["type"] == "progress":
-        emoji = stage_emojis.get(update["stage"], "⏳")
-        print(f"{emoji} [{update['stage']}] {update['message']}")
-```
-
-#### Logging to File
-
-```python
-import json
-from datetime import datetime
-
-log_file = "paper_generation.log"
-
-async for update in generate_project(query):
-    # Log all updates
-    with open(log_file, "a") as f:
-        f.write(json.dumps(update) + "\n")
-    
-    if update["type"] == "progress":
-        print(f"[{update['stage']}] {update['message']}")
-```
-
-### Multiple Papers
-
-Generate multiple papers in sequence or parallel:
+### Complete Phase 1 Research with Progress Tracking
 
 ```python
 import asyncio
+from pathlib import Path
+from scripts.enhanced_research_integration import EnhancedResearchLookup
 
-# Sequential generation
-async def generate_multiple_sequential():
-    papers = [
-        "Create a paper on quantum computing",
-        "Create a paper on machine learning",
-        "Create a paper on climate change"
-    ]
-    
-    results = []
-    for query in papers:
-        async for update in generate_project(query):
-            if update["type"] == "result":
-                results.append(update)
-    
-    return results
+async def phase1_research():
+    project_folder = Path("planning_outputs/20260115_my-saas")
 
-# Parallel generation (advanced)
-async def generate_multiple_parallel():
-    async def generate_one(query):
-        async for update in generate_project(query):
-            if update["type"] == "result":
-                return update
-    
-    papers = [
-        "Create a paper on quantum computing",
-        "Create a paper on machine learning",
-        "Create a paper on climate change"
-    ]
-    
-    results = await asyncio.gather(*[generate_one(q) for q in papers])
-    return results
+    research = EnhancedResearchLookup(
+        project_folder=project_folder,
+        phase_num=1,
+        research_mode="balanced"
+    )
+
+    # Task 1: Quick market lookup (Perplexity, 30s)
+    result1 = await research.research_with_progress(
+        task_name="market-data",
+        query="Latest SaaS pricing trends 2026"
+    )
+
+    # Task 2: Competitive analysis (Deep Research, 60 min)
+    result2 = await research.research_with_progress(
+        task_name="competitive-analysis",
+        query="Comprehensive competitive landscape for task management SaaS"
+    )
+
+    # Task 3: Market research (Deep Research, 60 min)
+    result3 = await research.research_with_progress(
+        task_name="market-research",
+        query="Market size and growth opportunities for SaaS"
+    )
+
+    # View statistics
+    stats = research.get_stats()
+    print(f"\nPhase 1 Complete:")
+    print(f"  Tasks: {stats['tasks_completed']}/{stats['tasks_executed']}")
+    print(f"  Resumed: {stats['tasks_resumed']}")
+    print(f"  Time saved: {stats['total_time_saved_min']} minutes")
+
+asyncio.run(phase1_research())
 ```
+
+---
 
 ## See Also
 
-- [README.md](../README.md) - Overview and quick start
-- [FEATURES.md](FEATURES.md) - Complete features guide
-- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Troubleshooting issues
-- [example_api_usage.py](../example_api_usage.py) - Complete code examples
+- [WORKFLOWS.md](WORKFLOWS.md) - Complete workflow examples
+- [CHANGELOG.md](../CHANGELOG.md) - Version history and features
+- [README.md](../README.md) - User-facing documentation
+- [CONTEXT_claude-project-planner.md](../CONTEXT_claude-project-planner.md) - Architecture deep dive
 
+---
 
+**Last Updated:** 2026-01-15
+**Version:** 1.4.0-alpha

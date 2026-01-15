@@ -88,6 +88,61 @@ When using `/full-plan`, the following phases are executed in order:
 4. **Generate diagrams extensively** - Use `project-diagrams` for all architectures
 5. **Complete tasks fully** - Never stop mid-task to ask permission
 
+## Progress Tracking & Error Recovery (v1.4.0-alpha)
+
+**New in v1.4.0-alpha:** Complete progress tracking and checkpoint system for long-running operations.
+
+### Key Features
+
+| Feature | Description | CLI Tool |
+|---------|-------------|----------|
+| **Resume Interrupted Research** | Continue from 15%, 30%, or 50% checkpoints | `scripts/resume-research.py` |
+| **External Monitoring** | Track progress from separate terminal | `scripts/monitor-research-progress.py` |
+| **Intelligent Retry** | Exponential backoff with circuit breaker | Automatic |
+| **Graceful Degradation** | Deep Research → Perplexity fallback | Automatic |
+
+### CLI Tools
+
+**Monitor active research:**
+```bash
+# List all active operations
+python scripts/monitor-research-progress.py <project_folder> --list
+
+# Monitor specific operation with live updates
+python scripts/monitor-research-progress.py <project_folder> <task_id> --follow
+```
+
+**Resume interrupted research:**
+```bash
+# List resumable tasks with time estimates
+python scripts/resume-research.py <project_folder> <phase_num> --list
+
+# Resume from checkpoint (saves up to 50 minutes)
+python scripts/resume-research.py <project_folder> <phase_num> --task <task_name>
+```
+
+### Architecture
+
+**3-Tier System:**
+1. **Streaming Progress** (Perplexity ~30s) - Real-time callbacks
+2. **Progress Files** (Deep Research ~60 min) - JSON tracking + external monitoring
+3. **Phase Checkpoints** - Research task statuses at phase boundaries
+
+**8 Core Patterns:**
+- Pattern 1: Streaming progress wrapper (`streaming_research_wrapper.py`)
+- Pattern 2: Progress file tracking (`research_progress_tracker.py`)
+- Pattern 3: Error handling with retry (`research_error_handling.py`)
+- Pattern 4: Research checkpoint manager (`research_checkpoint_manager.py`)
+- Pattern 5: Resumable research executor (`resumable_research.py`)
+- Pattern 6: Enhanced phase checkpoints (`checkpoint-manager.py`)
+- Pattern 7: Resume command CLI (`resume-research.py`)
+- Pattern 8: Monitoring script CLI (`monitor-research-progress.py`)
+
+**See Also:**
+- `docs/WORKFLOWS.md` - Complete workflow examples
+- `scripts/enhanced_research_integration.py` - Python API integration
+- `CHANGELOG.md` - Full v1.4.0-alpha details
+
 ## Development
 
 **Before committing changes**, bump the version number in these files:
