@@ -147,6 +147,10 @@ def scan_project_directory(project_dir: Path) -> Dict[str, Any]:
         'sprint_plan': None,
         'timeline': None,
         'building_blocks': None,
+        'component_breakdown': None,  # Alias for building_blocks (api.py compatibility)
+
+        # Components
+        'components': [],  # List of component directories
 
         # Diagrams
         'diagrams': [],
@@ -229,13 +233,23 @@ def scan_project_directory(project_dir: Path) -> Dict[str, Any]:
     # Scan components/ directory
     components_dir = project_dir / "components"
     if components_dir.exists():
+        # Look for building_blocks file
         blocks_file = components_dir / "building_blocks.yaml"
         if blocks_file.exists():
             result['building_blocks'] = str(blocks_file)
+            result['component_breakdown'] = str(blocks_file)  # Alias for api.py compatibility
         else:
             blocks_file = components_dir / "building_blocks.md"
             if blocks_file.exists():
                 result['building_blocks'] = str(blocks_file)
+                result['component_breakdown'] = str(blocks_file)  # Alias for api.py compatibility
+
+        # Scan for component subdirectories and component_breakdown file
+        for item in components_dir.iterdir():
+            if item.is_dir():
+                result['components'].append(str(item))
+            elif item.is_file() and 'component_breakdown' in item.name.lower():
+                result['component_breakdown'] = str(item)
 
     # Scan diagrams/ directory
     diagrams_dir = project_dir / "diagrams"
@@ -333,7 +347,8 @@ def count_building_blocks(blocks_file: Optional[str]) -> int:
             # For Markdown files, count ## Component or ### Block headers
             matches = re.findall(r'^#{2,3}\s+(Component|Block|Building Block):', content, re.MULTILINE | re.IGNORECASE)
             return len(matches)
-    except Exception:
+    except (FileNotFoundError, OSError, UnicodeDecodeError, ValueError):
+        # File not found, permission denied, encoding error, or parsing error
         return 0
 
 
@@ -362,7 +377,8 @@ def count_sprints(sprint_file: Optional[str]) -> int:
             # For Markdown files, count ## Sprint headers
             matches = re.findall(r'^#{2,3}\s*Sprint\s*\d+', content, re.MULTILINE | re.IGNORECASE)
             return len(matches)
-    except Exception:
+    except (FileNotFoundError, OSError, UnicodeDecodeError, ValueError):
+        # File not found, permission denied, encoding error, or parsing error
         return 0
 
 
@@ -392,7 +408,8 @@ def extract_project_name(project_dir: Path) -> Optional[str]:
                 match = re.search(r'^#\s*(.+)$', content, re.MULTILINE)
                 if match:
                     return match.group(1).strip()
-        except Exception:
+        except (FileNotFoundError, OSError, UnicodeDecodeError):
+            # File not found, permission denied, or encoding error
             pass
 
     return None
@@ -423,7 +440,8 @@ def count_citations_in_bib(bib_file: Optional[str]) -> int:
             # Count @article, @book, @inproceedings, etc.
             matches = re.findall(r'@\w+\s*{', content)
             return len(matches)
-    except Exception:
+    except (FileNotFoundError, OSError, UnicodeDecodeError, ValueError):
+        # File not found, permission denied, encoding error, or parsing error
         return 0
 
 
@@ -467,7 +485,8 @@ def count_words_in_tex(tex_file: Optional[str]) -> Optional[int]:
             # Count words
             words = content.split()
             return len(words)
-    except Exception:
+    except (FileNotFoundError, OSError, UnicodeDecodeError):
+        # File not found, permission denied, or encoding error
         return None
 
 
@@ -495,7 +514,8 @@ def extract_title_from_tex(tex_file: Optional[str]) -> Optional[str]:
                 # Clean up LaTeX commands in title
                 title = re.sub(r'\\[a-zA-Z]+(\[.*?\])?(\{.*?\})?', '', title)
                 return title.strip()
-    except Exception:
+    except (FileNotFoundError, OSError, UnicodeDecodeError):
+        # File not found, permission denied, or encoding error
         pass
 
     return None

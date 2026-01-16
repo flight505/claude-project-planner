@@ -439,7 +439,8 @@ User request: {user_input}"""
                         if time_since_modification < 10:
                             current_project_path = str(most_recent)
                             print(f"\n📂 Working on: {most_recent.name}")
-                except Exception:
+                except (OSError, ValueError):
+                    # Directory access error or no directories to compare
                     pass
 
         except KeyboardInterrupt:

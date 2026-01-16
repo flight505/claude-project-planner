@@ -21,6 +21,7 @@ from .core import (
     setup_claude_skills,
 )
 from .models import ProgressUpdate, TextUpdate, ProjectResult, ProjectMetadata, ProjectFiles, TokenUsage
+from .utils import scan_project_directory
 
 
 # Model mapping for effort levels
@@ -534,116 +535,13 @@ def _find_most_recent_output(output_folder: Path, start_time: float) -> Optional
             recent_dirs = output_dirs
 
         return max(recent_dirs, key=lambda d: d.stat().st_mtime)
-    except Exception:
+    except (FileNotFoundError, PermissionError, OSError, ValueError):
+        # Directory not found, permission denied, or no directories to compare
         return None
 
 
-def scan_project_directory(project_dir: Path) -> Dict[str, Any]:
-    """
-    Scan a project directory for all generated files.
-
-    Args:
-        project_dir: Path to project directory
-
-    Returns:
-        Dictionary with file information
-    """
-    result = {
-        # Specifications
-        'project_spec': None,
-        'technical_spec': None,
-        'api_spec': None,
-        'data_model': None,
-
-        # Research
-        'market_research': None,
-        'competitive_analysis': None,
-        'technology_research': None,
-
-        # Analysis
-        'feasibility_analysis': None,
-        'cost_analysis': None,
-        'risk_assessment': None,
-        'roi_projections': None,
-
-        # Planning
-        'sprint_plan': None,
-        'timeline': None,
-        'component_breakdown': None,
-
-        # Diagrams
-        'diagrams': [],
-
-        # Meta
-        'progress_log': None,
-        'summary': None,
-        'plan_review': None,
-
-        # Components (list of component directories)
-        'components': [],
-    }
-
-    if not project_dir.exists():
-        return result
-
-    # Scan subdirectories
-    for subdir in ['specifications', 'research', 'analysis', 'planning', 'diagrams', 'components']:
-        subdir_path = project_dir / subdir
-        if subdir_path.exists():
-            for file in subdir_path.iterdir():
-                if file.is_file():
-                    filename = file.name.lower()
-                    filepath = str(file)
-
-                    # Map files to result keys
-                    if 'project_spec' in filename:
-                        result['project_spec'] = filepath
-                    elif 'technical_spec' in filename:
-                        result['technical_spec'] = filepath
-                    elif 'api_spec' in filename:
-                        result['api_spec'] = filepath
-                    elif 'data_model' in filename:
-                        result['data_model'] = filepath
-                    elif 'market_research' in filename:
-                        result['market_research'] = filepath
-                    elif 'competitive' in filename:
-                        result['competitive_analysis'] = filepath
-                    elif 'technology_research' in filename:
-                        result['technology_research'] = filepath
-                    elif 'feasibility' in filename:
-                        result['feasibility_analysis'] = filepath
-                    elif 'cost_analysis' in filename:
-                        result['cost_analysis'] = filepath
-                    elif 'risk' in filename:
-                        result['risk_assessment'] = filepath
-                    elif 'roi' in filename:
-                        result['roi_projections'] = filepath
-                    elif 'sprint' in filename:
-                        result['sprint_plan'] = filepath
-                    elif 'timeline' in filename:
-                        result['timeline'] = filepath
-                    elif 'component_breakdown' in filename:
-                        result['component_breakdown'] = filepath
-                    elif file.suffix in ['.png', '.jpg', '.svg', '.pdf']:
-                        result['diagrams'].append(filepath)
-
-                elif file.is_dir() and subdir == 'components':
-                    result['components'].append(str(file))
-
-    # Check root level files
-    for file in project_dir.iterdir():
-        if file.is_file():
-            filename = file.name.lower()
-            filepath = str(file)
-
-            if filename == 'progress.md':
-                result['progress_log'] = filepath
-            elif filename == 'summary.md':
-                result['summary'] = filepath
-            elif 'plan_review' in filename:
-                result['plan_review'] = filepath
-
-    return result
+# scan_project_directory is now imported from utils.py (see line 23)
+# Removed duplicate implementation - using consolidated version from utils.py
 
 
 def _build_project_result(project_dir: Path, file_info: Dict[str, Any]) -> ProjectResult:

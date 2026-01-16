@@ -268,8 +268,3 @@ class ProjectResult:
 
         return result
 
-
-# Backwards compatibility aliases (deprecated, will be removed in v2.0)
-PaperMetadata = ProjectMetadata
-PaperFiles = ProjectFiles
-PaperResult = ProjectResult
