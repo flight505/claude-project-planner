@@ -29,6 +29,7 @@ from datetime import datetime
 from research_checkpoint_manager import ResearchCheckpointManager, ResearchResumeHelper
 from research_progress_tracker import ResearchProgressTracker
 from research_error_handling import ResearchErrorHandler, ErrorRecoveryStrategy
+from research_config import ResearchConfig, DEFAULT_CONFIG
 
 
 class ResumableResearchExecutor:
@@ -43,27 +44,41 @@ class ResumableResearchExecutor:
         self,
         project_folder: Path,
         phase_num: int,
+        config: Optional[ResearchConfig] = None,
         auto_resume: bool = True,
-        max_checkpoint_age_hours: int = 24
+        max_checkpoint_age_hours: Optional[int] = None
     ):
         """
-        Initialize resumable research executor.
+        Initialize resumable research executor with configurable settings.
 
         Args:
             project_folder: Root folder for project outputs
             phase_num: Current phase number
+            config: Research configuration (uses DEFAULT_CONFIG if not provided)
             auto_resume: Automatically resume from checkpoints (default: True)
-            max_checkpoint_age_hours: Max age for auto-resume (default: 24)
+            max_checkpoint_age_hours: Max age for auto-resume (uses config if not provided)
         """
         self.project_folder = Path(project_folder)
         self.phase_num = phase_num
+        self.config = config or DEFAULT_CONFIG
         self.auto_resume = auto_resume
-        self.max_checkpoint_age_hours = max_checkpoint_age_hours
+        self.max_checkpoint_age_hours = (
+            max_checkpoint_age_hours
+            if max_checkpoint_age_hours is not None
+            else self.config.checkpoint_max_age_hours
+        )
 
-        # Initialize managers
-        self.checkpoint_mgr = ResearchCheckpointManager(project_folder, phase_num)
+        # Initialize managers with config
+        self.checkpoint_mgr = ResearchCheckpointManager(project_folder, phase_num, config=self.config)
         self.resume_helper = ResearchResumeHelper(self.checkpoint_mgr)
-        self.error_handler = ResearchErrorHandler(max_retries=3, base_delay=2.0)
+        self.error_handler = ResearchErrorHandler(
+            max_retries=self.config.max_retries,
+            base_delay=self.config.base_retry_delay_sec,
+            max_delay=self.config.max_retry_delay_sec,
+            circuit_breaker_failure_threshold=self.config.circuit_breaker_failure_threshold,
+            circuit_breaker_timeout_sec=self.config.circuit_breaker_timeout_sec,
+            circuit_breaker_half_open_attempts=self.config.circuit_breaker_half_open_max_calls
+        )
 
         # Statistics
         self.stats = {
@@ -192,13 +207,8 @@ class ResumableResearchExecutor:
         """
         start_time = datetime.now()
 
-        # Checkpoint schedule
-        checkpoint_schedule = [
-            (900, 15, "Gathering sources", True),           # 15 min
-            (1800, 30, "Analyzing literature", True),       # 30 min
-            (3000, 50, "Cross-referencing", True),          # 50 min
-            (3600, 75, "Synthesizing report", False),       # 60 min (not resumable)
-        ]
+        # Get checkpoint schedule from config
+        checkpoint_schedule = self.config.get_checkpoint_schedule_tuples()
 
         last_checkpoint_time = 0
 
@@ -207,7 +217,8 @@ class ResumableResearchExecutor:
             nonlocal last_checkpoint_time
 
             while True:
-                await asyncio.sleep(60)  # Check every minute
+                # Use configured check interval
+                await asyncio.sleep(self.config.checkpoint_check_interval_sec)
 
                 elapsed = (datetime.now() - start_time).total_seconds()
 

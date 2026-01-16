@@ -23,6 +23,9 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
 
+# Import configuration system
+from research_config import ResearchConfig, DEFAULT_CONFIG
+
 
 class ResearchCheckpointManager:
     """
@@ -32,16 +35,18 @@ class ResearchCheckpointManager:
     resume capability if research is interrupted.
     """
 
-    def __init__(self, project_folder: Path, phase_num: int):
+    def __init__(self, project_folder: Path, phase_num: int, config: Optional[ResearchConfig] = None):
         """
-        Initialize checkpoint manager.
+        Initialize checkpoint manager with configurable settings.
 
         Args:
             project_folder: Root folder for project outputs
             phase_num: Current phase number (for organizing checkpoints)
+            config: Research configuration (uses DEFAULT_CONFIG if not provided)
         """
         self.project_folder = Path(project_folder)
         self.phase_num = phase_num
+        self.config = config or DEFAULT_CONFIG
 
         # Checkpoint directory structure
         self.state_dir = self.project_folder / ".state"
@@ -266,13 +271,8 @@ Please CONTINUE the research by building on these partial results. Focus on comp
         """
         progress_pct = (elapsed_sec / estimated_duration_sec) * 100
 
-        # Checkpoint schedule
-        checkpoints = [
-            (900, 15, "Gathering sources", True),           # 15 min
-            (1800, 30, "Analyzing literature", True),       # 30 min
-            (3000, 50, "Cross-referencing", True),          # 50 min
-            (3600, 75, "Synthesizing report", False),       # 60 min (not resumable)
-        ]
+        # Get checkpoint schedule from config
+        checkpoints = self.config.get_checkpoint_schedule_tuples()
 
         # Find the appropriate checkpoint
         for target_time, pct, phase, resumable in checkpoints:
@@ -316,13 +316,15 @@ Please CONTINUE the research by building on these partial results. Focus on comp
             "checkpoint_age_hours": (datetime.now() - created_at).total_seconds() / 3600
         }
 
-    def cleanup_old_checkpoints(self, max_age_hours: int = 168):
+    def cleanup_old_checkpoints(self, max_age_hours: Optional[int] = None):
         """
-        Clean up old checkpoints (default: 7 days).
+        Clean up old checkpoints.
 
         Args:
-            max_age_hours: Maximum age in hours before deletion
+            max_age_hours: Maximum age in hours before deletion (uses config if not provided)
         """
+        if max_age_hours is None:
+            max_age_hours = self.config.checkpoint_cleanup_interval_hours
         cutoff = datetime.now() - timedelta(hours=max_age_hours)
 
         for checkpoint_file in self.checkpoint_dir.glob("*.json"):

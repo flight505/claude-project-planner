@@ -138,23 +138,33 @@ class ResearchErrorHandler:
         max_retries: int = 3,
         base_delay: float = 2.0,
         max_delay: float = 60.0,
-        enable_circuit_breaker: bool = True
+        enable_circuit_breaker: bool = True,
+        circuit_breaker_failure_threshold: int = 3,
+        circuit_breaker_timeout_sec: int = 60,
+        circuit_breaker_half_open_attempts: int = 1
     ):
         """
-        Initialize error handler.
+        Initialize error handler with configurable settings.
 
         Args:
             max_retries: Maximum number of retry attempts (default: 3)
             base_delay: Base delay for exponential backoff in seconds (default: 2.0)
             max_delay: Maximum delay between retries in seconds (default: 60.0)
             enable_circuit_breaker: Enable circuit breaker for rate limiting (default: True)
+            circuit_breaker_failure_threshold: Failures before opening circuit (default: 3)
+            circuit_breaker_timeout_sec: Timeout before half-open (default: 60)
+            circuit_breaker_half_open_attempts: Attempts in half-open state (default: 1)
         """
         self.max_retries = max_retries
         self.base_delay = base_delay
         self.max_delay = max_delay
         self.enable_circuit_breaker = enable_circuit_breaker
 
-        self.circuit_breaker = CircuitBreaker(failure_threshold=3, timeout_sec=60)
+        self.circuit_breaker = CircuitBreaker(
+            failure_threshold=circuit_breaker_failure_threshold,
+            timeout_sec=circuit_breaker_timeout_sec,
+            half_open_attempts=circuit_breaker_half_open_attempts
+        )
         self.retry_stats = {
             "total_attempts": 0,
             "successful": 0,
