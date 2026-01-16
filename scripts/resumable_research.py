@@ -225,8 +225,8 @@ class ResumableResearchExecutor:
                             save_checkpoint=True
                         )
 
-                        # Save research checkpoint
-                        self.checkpoint_mgr.save_research_checkpoint(
+                        # Save research checkpoint (now async with atomic writes)
+                        await self.checkpoint_mgr.save_research_checkpoint(
                             task_name=task_name,
                             query=query,
                             partial_results={"phase": phase, "progress_pct": progress_pct},

@@ -26,12 +26,49 @@ import sys
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
+from concurrent.futures import ThreadPoolExecutor
 
 # Add scripts directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from research_checkpoint_manager import ResearchCheckpointManager, ResearchResumeHelper
 from resumable_research import ResumableResearchExecutor
+
+
+async def prompt_with_timeout(message: str, timeout_sec: int = 30) -> bool:
+    """
+    Prompt user with timeout fallback for CI/CD compatibility.
+
+    Args:
+        message: Prompt message
+        timeout_sec: Timeout in seconds (default: 30)
+
+    Returns:
+        True if user confirms ('y'), False otherwise
+
+    Note:
+        - Returns False immediately if stdin is not a TTY (non-interactive)
+        - Returns False if timeout expires
+        - Safe for use in CI/CD pipelines and automated environments
+    """
+    # Check if stdin is a TTY
+    if not sys.stdin.isatty():
+        print(f"⚠️  Non-interactive session detected, assuming 'no'")
+        return False
+
+    try:
+        # Run input() in thread pool to avoid blocking event loop
+        with ThreadPoolExecutor() as pool:
+            response = await asyncio.wait_for(
+                asyncio.get_event_loop().run_in_executor(
+                    pool, input, message
+                ),
+                timeout=timeout_sec
+            )
+            return response.lower() == 'y'
+    except asyncio.TimeoutError:
+        print(f"\n⏱  Timeout after {timeout_sec}s, assuming 'no'")
+        return False
 
 
 def list_resumable_tasks(project_folder: Path, phase_num: int):
@@ -128,8 +165,11 @@ async def resume_research_task(
     if age_hours > 168:  # 7 days
         print(f"\n⚠️  Warning: Checkpoint is {age_hours/24:.1f} days old")
         print(f"   Consider starting fresh instead of resuming.")
-        response = input("\nContinue with resume? (y/N): ")
-        if response.lower() != 'y':
+        should_continue = await prompt_with_timeout(
+            "\nContinue with resume? (y/N): ",
+            timeout_sec=30
+        )
+        if not should_continue:
             print("Resume cancelled.")
             return 1
 

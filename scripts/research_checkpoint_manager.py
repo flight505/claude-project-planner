@@ -17,6 +17,7 @@ Features:
 - Checkpoint cleanup after successful completion
 """
 
+import asyncio
 import json
 from pathlib import Path
 from typing import Optional, Dict, Any, List
@@ -51,11 +52,14 @@ class ResearchCheckpointManager:
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         self.backup_dir.mkdir(parents=True, exist_ok=True)
 
+        # Locks for preventing concurrent writes to same task
+        self._locks: Dict[str, asyncio.Lock] = {}
+
     def get_checkpoint_file(self, task_name: str) -> Path:
         """Get checkpoint file path for a task."""
         return self.checkpoint_dir / f"phase{self.phase_num}_{task_name}.json"
 
-    def save_research_checkpoint(
+    async def save_research_checkpoint(
         self,
         task_name: str,
         query: str,
@@ -66,7 +70,7 @@ class ResearchCheckpointManager:
         metadata: Optional[Dict[str, Any]] = None
     ):
         """
-        Save intermediate research state.
+        Save intermediate research state with atomic writes and concurrency protection.
 
         Args:
             task_name: Unique name for this research task
@@ -78,35 +82,48 @@ class ResearchCheckpointManager:
             metadata: Optional additional metadata
 
         Creates a checkpoint file with all necessary state to resume research.
+        Uses asyncio locks to prevent concurrent writes and atomic file operations
+        to prevent corruption.
         """
-        checkpoint = {
-            "version": "1.0",
-            "task_name": task_name,
-            "phase_num": self.phase_num,
-            "query": query,
-            "created_at": datetime.now().isoformat(),
-            "progress_pct": progress_pct,
-            "resumable": resumable,
-            "partial_results": partial_results,
-            "sources_collected": sources_collected,
-            "metadata": {
-                "source_count": len(sources_collected),
-                "partial_content_length": len(str(partial_results)),
-                "checkpoint_reason": self._get_checkpoint_reason(progress_pct)
+        # Get or create lock for this task
+        if task_name not in self._locks:
+            self._locks[task_name] = asyncio.Lock()
+
+        async with self._locks[task_name]:
+            checkpoint = {
+                "version": "1.0",
+                "task_name": task_name,
+                "phase_num": self.phase_num,
+                "query": query,
+                "created_at": datetime.now().isoformat(),
+                "progress_pct": progress_pct,
+                "resumable": resumable,
+                "partial_results": partial_results,
+                "sources_collected": sources_collected,
+                "metadata": {
+                    "source_count": len(sources_collected),
+                    "partial_content_length": len(str(partial_results)),
+                    "checkpoint_reason": self._get_checkpoint_reason(progress_pct)
+                }
             }
-        }
 
-        # Add custom metadata
-        if metadata:
-            checkpoint["metadata"].update(metadata)
+            # Add custom metadata
+            if metadata:
+                checkpoint["metadata"].update(metadata)
 
-        # Write checkpoint
-        checkpoint_file = self.get_checkpoint_file(task_name)
-        checkpoint_file.write_text(json.dumps(checkpoint, indent=2))
+            checkpoint_json = json.dumps(checkpoint, indent=2)
 
-        # Also backup to timestamped file
-        backup_file = self.backup_dir / f"phase{self.phase_num}_{task_name}_{int(datetime.now().timestamp())}.json"
-        backup_file.write_text(json.dumps(checkpoint, indent=2))
+            # Atomic write to checkpoint file (write to temp, then rename)
+            checkpoint_file = self.get_checkpoint_file(task_name)
+            temp_checkpoint = checkpoint_file.with_suffix('.tmp')
+            temp_checkpoint.write_text(checkpoint_json)
+            temp_checkpoint.replace(checkpoint_file)  # Atomic on POSIX systems
+
+            # Also backup to timestamped file (atomic write)
+            backup_file = self.backup_dir / f"phase{self.phase_num}_{task_name}_{int(datetime.now().timestamp())}.json"
+            temp_backup = backup_file.with_suffix('.tmp')
+            temp_backup.write_text(checkpoint_json)
+            temp_backup.replace(backup_file)  # Atomic on POSIX systems
 
     def load_research_checkpoint(self, task_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -454,7 +471,7 @@ class ResearchResumeHelper:
 
 
 # Example usage
-def example_usage():
+async def example_usage():
     """Example of how to use ResearchCheckpointManager."""
     import tempfile
 
@@ -465,8 +482,8 @@ def example_usage():
         # Create manager
         manager = ResearchCheckpointManager(project_folder, phase_num)
 
-        # Save a checkpoint
-        manager.save_research_checkpoint(
+        # Save a checkpoint (now async with atomic writes and locking)
+        await manager.save_research_checkpoint(
             task_name="competitive-analysis",
             query="Analyze competitive landscape for AI agents",
             partial_results={
@@ -499,4 +516,4 @@ def example_usage():
 
 
 if __name__ == "__main__":
-    example_usage()
+    asyncio.run(example_usage())

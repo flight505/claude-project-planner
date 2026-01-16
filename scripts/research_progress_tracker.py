@@ -22,6 +22,9 @@ from pathlib import Path
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
 
+# Import state machine for transition validation
+from research_state_machine import ResearchTaskStateMachine, ResearchTaskState
+
 
 class ResearchProgressTracker:
     """
@@ -33,7 +36,7 @@ class ResearchProgressTracker:
 
     def __init__(self, project_folder: Path, task_id: str):
         """
-        Initialize progress tracker.
+        Initialize progress tracker with state machine validation.
 
         Args:
             project_folder: Root folder for project outputs
@@ -43,6 +46,9 @@ class ResearchProgressTracker:
         self.task_id = task_id
         self.progress_file = self.project_folder / f".research-progress-{task_id}.json"
         self.start_time: Optional[datetime] = None
+
+        # Initialize state machine for transition validation
+        self.state_machine = ResearchTaskStateMachine()
 
     def _get_initial_state(
         self,
@@ -92,6 +98,9 @@ class ResearchProgressTracker:
 
         Creates a progress file with initial state.
         """
+        # Validate state transition
+        self.state_machine.transition(ResearchTaskState.RUNNING, "start")
+
         self.start_time = datetime.now()
 
         # Ensure project folder exists
@@ -182,6 +191,9 @@ class ResearchProgressTracker:
 
         Updates status to "completed" and records completion time.
         """
+        # Validate state transition
+        self.state_machine.transition(ResearchTaskState.COMPLETED, "complete")
+
         if not self.progress_file.exists():
             return  # Already cleaned up or never started
 
@@ -219,6 +231,9 @@ class ResearchProgressTracker:
 
         Updates status to "failed" and records error details.
         """
+        # Validate state transition
+        self.state_machine.transition(ResearchTaskState.FAILED, "fail")
+
         if not self.progress_file.exists():
             return  # Already cleaned up or never started
 
