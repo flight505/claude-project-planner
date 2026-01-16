@@ -21,6 +21,9 @@ from typing import List, Tuple, Set, Optional
 from dataclasses import dataclass
 from datetime import datetime
 
+# Import structured error system
+from research_errors import raise_research_error, ErrorCode
+
 
 class ResearchTaskState(Enum):
     """States a research task can be in."""
@@ -109,15 +112,26 @@ class ResearchTaskStateMachine:
             event: Event triggering the transition
 
         Raises:
-            ValueError: If transition is invalid
+            ResearchError: If transition is invalid
 
         Example:
             state_machine.transition(ResearchTaskState.RUNNING, "start")
         """
         if not self.can_transition(to_state, event):
-            # Build helpful error message
-            error_msg = self._build_transition_error(to_state, event)
-            raise ValueError(error_msg)
+            # Get valid events for recovery suggestions
+            valid_events = self.get_valid_events()
+
+            # Build structured error
+            raise_research_error(
+                ErrorCode.INVALID_STATE,
+                f"Cannot transition from {self.current_state.value} to {to_state.value}",
+                current_state=self.current_state.value,
+                attempted_state=to_state.value,
+                event=event,
+                is_terminal=self.is_terminal(),
+                valid_events=valid_events,
+                transition_count=len(self.history)
+            )
 
         # Record transition
         record = StateTransitionRecord(

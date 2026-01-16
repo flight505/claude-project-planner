@@ -26,6 +26,9 @@ from datetime import datetime, timedelta
 # Import configuration system
 from research_config import ResearchConfig, DEFAULT_CONFIG
 
+# Import structured error system
+from research_errors import raise_research_error, wrap_error, ErrorCode, ResearchError
+
 
 class ResearchCheckpointManager:
     """
@@ -314,6 +317,69 @@ Please CONTINUE the research by building on these partial results. Focus on comp
             "time_remaining_min": time_remaining_min,
             "time_saved_min": time_invested_min,
             "checkpoint_age_hours": (datetime.now() - created_at).total_seconds() / 3600
+        }
+
+    def verify_resume_continuation(
+        self,
+        task_name: str,
+        new_result: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Verify that new result continued from checkpoint (not restarted).
+
+        Args:
+            task_name: Task name
+            new_result: New research result
+
+        Returns:
+            Verification report with overlap analysis
+        """
+        checkpoint = self.load_research_checkpoint(task_name)
+        if not checkpoint:
+            return {
+                'verified': False,
+                'reason': 'No checkpoint found',
+            }
+
+        # Check for duplicate sources (indicates restart)
+        checkpoint_sources = set(
+            s.get('url', s.get('title', ''))
+            for s in checkpoint.get('sources_collected', [])
+            if s.get('url') or s.get('title')
+        )
+        new_sources = set(
+            s.get('url', s.get('title', ''))
+            for s in new_result.get('sources', [])
+            if s.get('url') or s.get('title')
+        )
+
+        overlap = checkpoint_sources & new_sources
+        overlap_pct = len(overlap) / max(len(checkpoint_sources), 1) * 100 if checkpoint_sources else 0
+
+        # If >50% overlap, likely restarted
+        if overlap_pct > 50:
+            return {
+                'verified': False,
+                'reason': 'High source overlap suggests restart',
+                'overlap_pct': overlap_pct,
+                'checkpoint_sources': len(checkpoint_sources),
+                'new_sources': len(new_sources),
+                'overlap_count': len(overlap),
+            }
+
+        # Check timestamp progression
+        checkpoint_time = datetime.fromisoformat(checkpoint['created_at'])
+        result_time = datetime.now()
+        elapsed = (result_time - checkpoint_time).total_seconds()
+
+        return {
+            'verified': True,
+            'overlap_pct': overlap_pct,
+            'checkpoint_sources': len(checkpoint_sources),
+            'new_sources': len(new_sources),
+            'unique_new_sources': len(new_sources - overlap),
+            'elapsed_min': elapsed / 60,
+            'resumed_successfully': True
         }
 
     def cleanup_old_checkpoints(self, max_age_hours: Optional[int] = None):

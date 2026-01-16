@@ -24,6 +24,9 @@ from typing import Callable, Optional, Any, Dict
 from datetime import datetime, timedelta
 from enum import Enum
 
+# Import structured error system
+from research_errors import ResearchError, ErrorCode, raise_research_error, wrap_error
+
 
 class ErrorType(Enum):
     """Classification of error types."""
@@ -255,9 +258,13 @@ class ResearchErrorHandler:
         for attempt in range(self.max_retries):
             # Check circuit breaker
             if self.enable_circuit_breaker and not self.circuit_breaker.can_attempt():
-                raise Exception(
-                    f"Circuit breaker is {self.circuit_breaker.state.value}. "
-                    f"Too many rate limit failures. Try again later."
+                raise_research_error(
+                    ErrorCode.CIRCUIT_OPEN,
+                    f"Circuit breaker is {self.circuit_breaker.state.value}",
+                    state=self.circuit_breaker.state.value,
+                    failure_count=self.circuit_breaker.failure_count,
+                    timeout_sec=self.circuit_breaker.timeout_sec,
+                    last_failure=self.circuit_breaker.last_failure_time.isoformat() if self.circuit_breaker.last_failure_time else None
                 )
 
             try:
@@ -271,22 +278,50 @@ class ResearchErrorHandler:
                 return result
 
             except Exception as e:
+                # Don't re-wrap ResearchError
+                if isinstance(e, ResearchError):
+                    raise
+
                 # Classify error
                 error_type = self.classify_error(e)
 
-                # Fatal errors don't get retried
+                # Map ErrorType to ErrorCode
+                error_code_map = {
+                    ErrorType.RATE_LIMIT: ErrorCode.RATE_LIMIT,
+                    ErrorType.TRANSIENT: ErrorCode.NETWORK,
+                    ErrorType.FATAL: ErrorCode.PROVIDER_ERROR,
+                    ErrorType.UNKNOWN: ErrorCode.UNKNOWN,
+                }
+                error_code = error_code_map.get(error_type, ErrorCode.UNKNOWN)
+
+                # Fatal errors don't get retried - wrap and raise
                 if error_type == ErrorType.FATAL:
                     self.retry_stats["failed"] += 1
-                    raise
+                    wrapped = wrap_error(
+                        e,
+                        error_code,
+                        f"Fatal error: {str(e)[:100]}",
+                        error_type=error_type.value,
+                        attempts=attempt + 1
+                    )
+                    raise wrapped from e
 
                 # Rate limit errors update circuit breaker
                 if error_type == ErrorType.RATE_LIMIT and self.enable_circuit_breaker:
                     self.circuit_breaker.record_failure()
 
-                # Last attempt - don't retry
+                # Last attempt - don't retry, wrap and raise
                 if attempt == self.max_retries - 1:
                     self.retry_stats["failed"] += 1
-                    raise
+                    wrapped = wrap_error(
+                        e,
+                        error_code,
+                        f"Max retries ({self.max_retries}) exceeded",
+                        error_type=error_type.value,
+                        attempts=attempt + 1,
+                        total_retries=self.max_retries
+                    )
+                    raise wrapped from e
 
                 # Calculate delay
                 delay = self.calculate_delay(attempt)
@@ -307,8 +342,13 @@ class ResearchErrorHandler:
                 # Wait before retry
                 await asyncio.sleep(delay)
 
-        # Should never reach here
-        raise Exception("Max retries exceeded")
+        # Should never reach here, but handle gracefully
+        raise_research_error(
+            ErrorCode.UNKNOWN,
+            "Unexpected code path: exited retry loop without success or exception",
+            max_retries=self.max_retries,
+            total_attempts=self.retry_stats["total_attempts"]
+        )
 
     def get_stats(self) -> Dict[str, Any]:
         """
