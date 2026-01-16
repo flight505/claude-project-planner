@@ -19,7 +19,6 @@
     "sprints",
     "cost-analysis"
   ],
-  "category": "productivity",
   "commands": "./commands",
   "agents": [
     "./agents/architecture-validator.md"
@@ -45,27 +44,5 @@
     "./project_planner/.claude/skills/marketing-campaign",
     "./project_planner/.claude/skills/report-generation"
   ],
-  "hooks": {
-    "SessionStart": "./.claude-plugin/hooks/SessionStart.sh"
-  },
-  "requirements": {
-    "python": ">=3.10"
-  },
-  "optional_dependencies": {
-    "openrouter": {
-      "env_var": "OPENROUTER_API_KEY",
-      "purpose": "Real-time technology research via OpenRouter API",
-      "required": false
-    },
-    "gemini": {
-      "env_var": "GEMINI_API_KEY",
-      "purpose": "Deep Research and image generation via Google Gemini",
-      "required": false
-    }
-  },
-  "claude_api": {
-    "uses_claude": true,
-    "preferred_env": "CLAUDE_CODE_OAUTH_TOKEN",
-    "fallback_env": "ANTHROPIC_API_KEY"
-  }
+  "hooks": "./.claude-plugin/hooks.json"
 }
