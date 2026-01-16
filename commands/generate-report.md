@@ -316,7 +316,7 @@ Before generating the final report, convert any Mermaid markdown files to PNG im
 
 ```bash
 # Batch render all Mermaid diagrams in the planning folder
-python "${CLAUDE_PLUGIN_ROOT}/../project-diagrams/scripts/render_mermaid.py" \
+python "${CLAUDE_PLUGIN_ROOT}/project_planner/.claude/skills/project-diagrams/scripts/render_mermaid.py" \
   "<planning_folder>/diagrams/" --batch --json
 ```
 
@@ -371,7 +371,7 @@ Incorporate project domain elements:
 
 Execute image generation:
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+python "${CLAUDE_PLUGIN_ROOT}/project_planner/.claude/skills/generate-image/scripts/generate_image.py" \
   "<cover_prompt>" \
   --output "<planning_folder>/diagrams/cover_image.png" \
   --model "google/gemini-3-pro-image-preview"
@@ -383,7 +383,7 @@ For each requested diagram type, construct an appropriate prompt:
 
 **Architecture Overview:**
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+python "${CLAUDE_PLUGIN_ROOT}/project_planner/.claude/skills/generate-image/scripts/generate_image.py" \
   "System architecture diagram for <project_name>, showing <key_components>,
    clean technical illustration style, labeled boxes and arrows,
    professional documentation diagram" \
@@ -392,7 +392,7 @@ python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
 
 **Component Diagram:**
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+python "${CLAUDE_PLUGIN_ROOT}/project_planner/.claude/skills/generate-image/scripts/generate_image.py" \
   "Software component diagram showing building blocks: <list_components>,
    with connections and dependencies, UML-style boxes, clean technical style" \
   --output "<planning_folder>/diagrams/component_diagram.png"
@@ -400,7 +400,7 @@ python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
 
 **Data Flow Diagram:**
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/../generate-image/scripts/generate_image.py" \
+python "${CLAUDE_PLUGIN_ROOT}/project_planner/.claude/skills/generate-image/scripts/generate_image.py" \
   "Data flow diagram for <project_name>, showing how data moves from
    <source> through <processing> to <destination>, arrows indicating flow direction,
    clean technical documentation style" \
