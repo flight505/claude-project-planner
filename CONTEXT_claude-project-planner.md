@@ -1,9 +1,9 @@
 # CONTEXT: Claude Project Planner - Ground Truth Documentation
 
-**Plugin Version:** 1.4.0-alpha
+**Plugin Version:** 1.4.0
 **Repository:** https://github.com/flight505/claude-project-planner
 **Origin:** Forked from [claude-scientific-writer](https://github.com/K-Dense-AI/claude-scientific-writer) v2.10.0
-**Last Updated:** 2026-01-15
+**Last Updated:** 2026-01-16
 
 ---
 
@@ -161,11 +161,11 @@ else:
 - Context-aware routing based on phase, task_type, and query keywords
 - Async path for Deep Research, sync fallback for Perplexity
 
-### Progress Tracking & Error Recovery System (v1.4.0-alpha)
+### Progress Tracking & Error Recovery System (v1.4.0)
 
-**Complete 3-tier architecture for long-running operations:**
+**Production-ready 3-tier architecture for long-running operations:**
 
-The plugin now includes a comprehensive progress tracking and error recovery system designed specifically for long-running Deep Research operations (60+ minutes).
+The plugin includes a comprehensive progress tracking and error recovery system designed for long-running Deep Research operations (60+ minutes), now production-ready with critical bug fixes, structured error handling, and automatic cleanup.
 
 **3-Tier Architecture:**
 
@@ -253,6 +253,288 @@ python scripts/resume-research.py <project_folder> <phase_num> --task <task_name
 - Dual-terminal monitoring examples
 - Resume workflow with user journeys
 - Checkpoint strategy and time savings tables
+
+### v1.4.0 Production Release Enhancements
+
+**Status:** ✅ Production-Ready (2026-01-16)
+
+The v1.4.0 release completes the progress tracking system with critical correctness fixes, structured error handling, activity-based progress, and automatic cleanup.
+
+#### Priority 1: Critical Correctness Fixes
+
+**1.1 Race Condition Prevention**
+- **Problem:** Concurrent checkpoint writes could corrupt data
+- **Solution:** Per-task `asyncio.Lock` for atomic checkpoint saves
+- **Implementation:** `research_checkpoint_manager.py` lines 61-126
+- **Impact:** Eliminates data corruption under concurrent access
+
+**1.2 CI/CD Compatibility**
+- **Problem:** Resume command blocked indefinitely on user input in automated environments
+- **Solution:** `prompt_with_timeout()` with 30s timeout and TTY detection
+- **Implementation:** `resume-research.py` lines 38-71
+- **Features:**
+  - Non-interactive session detection (checks `sys.stdin.isatty()`)
+  - ThreadPoolExecutor + `asyncio.wait_for` for non-blocking input
+  - Automatic fallback to 'no' on timeout or non-TTY
+- **Impact:** Resume now works in CI/CD pipelines
+
+**1.3 State Machine Validation**
+- **Component:** `scripts/research_state_machine.py` (276 lines)
+- **Purpose:** Prevent invalid state transitions
+- **States:** PENDING → RUNNING → CHECKPOINTED/COMPLETED/FAILED
+- **Transitions:** Explicit allowed transitions with event validation
+- **Error Handling:** Structured errors with valid event suggestions
+- **Impact:** Enforces valid state progression, prevents silent bugs
+
+#### Priority 2: Centralized Configuration System
+
+**Component:** `scripts/research_config.py` (362 lines)
+
+**Purpose:** Eliminate hardcoded values, enable runtime configuration
+
+**Key Features:**
+```python
+@dataclass
+class ResearchConfig:
+    # Checkpoint schedule
+    checkpoint_schedule: List[CheckpointScheduleEntry]
+    checkpoint_check_interval_sec: int = 60
+    checkpoint_max_age_hours: int = 24
+
+    # Error handling
+    max_retries: int = 3
+    base_retry_delay_sec: float = 2.0
+    max_retry_delay_sec: float = 60.0
+
+    # Circuit breaker
+    circuit_breaker_failure_threshold: int = 3
+    circuit_breaker_timeout_sec: int = 60
+
+    # Timeouts
+    user_prompt_timeout_sec: int = 30
+    research_default_timeout_sec: int = 3600
+```
+
+**Benefits:**
+- Single source of truth for all configuration
+- JSON serialization for runtime configuration
+- Eliminated 20+ hardcoded values across 5 modules
+- Easy customization without code changes
+
+**Integration:**
+- `ResumableResearchExecutor` accepts optional `config` parameter
+- `ResearchErrorHandler` uses config for retry/circuit breaker settings
+- `ResearchCheckpointManager` uses config for checkpoint schedules
+
+#### Priority 3: Complete Resume Functionality
+
+**3.1 End-to-End Resume Execution**
+- **Implementation:** `resume-research.py` lines 210-291
+- **Features:**
+  - Real research execution (not simulation)
+  - Imports `ResearchLookup` for actual research providers
+  - Fallback to simulation if provider unavailable
+  - Source merging from checkpoint + new research
+  - Comprehensive completion summary
+- **Impact:** Fully functional resume feature
+
+**3.2 Resume Verification**
+- **Component:** `research_checkpoint_manager.py::verify_resume_continuation()`
+- **Method:** Source overlap detection
+  - >50% overlap = likely restart (warning)
+  - <50% overlap = confirmed continuation
+- **Metrics:**
+  - Unique new sources count
+  - Overlap percentage
+  - Time saved calculation
+- **Impact:** Confirms resume actually saved time, not restart
+
+#### Priority 4: Error Handling & UX
+
+**4.1 Structured Error System**
+
+**Component:** `scripts/research_errors.py` (270 lines)
+
+**Error Codes:**
+```python
+class ErrorCode(Enum):
+    RATE_LIMIT = "RATE_LIMIT"
+    NETWORK = "NETWORK"
+    TIMEOUT = "TIMEOUT"
+    VALIDATION = "VALIDATION"
+    CHECKPOINT_CORRUPT = "CHECKPOINT_CORRUPT"
+    CIRCUIT_OPEN = "CIRCUIT_OPEN"
+    INVALID_STATE = "INVALID_STATE"
+    PROVIDER_ERROR = "PROVIDER_ERROR"
+    FILE_IO = "FILE_IO"
+    UNKNOWN = "UNKNOWN"
+```
+
+**Features:**
+- Contextual information about what failed
+- Recovery strategy mapping for each error type
+- Actionable recovery suggestions
+- JSON serialization for logging
+
+**Example Error Output:**
+```
+❌ Research Error: RATE_LIMIT
+   Rate limit exceeded for Gemini Deep Research
+
+Context:
+  • provider: gemini_deep_research
+  • attempts: 3
+  • quota_limit: 10
+  • next_retry_in_sec: 60
+
+Recovery Suggestions:
+  1. Wait 60 seconds and retry
+  2. Check API quota limits in provider dashboard
+  3. Use fallback provider (Perplexity instead of Deep Research)
+  4. Reduce request frequency in configuration
+```
+
+**Integration:**
+- All modules now use `ResearchError` instead of generic exceptions
+- `research_error_handling.py` wraps errors with context
+- `research_state_machine.py` uses structured errors for invalid transitions
+- `resume-research.py` displays structured errors with formatting
+
+**4.2 Activity-Based Progress Tracking**
+
+**Component:** `research_progress_tracker.py` additions (197 lines)
+
+**Purpose:** Granular progress instead of 0% → 15% → 30% jumps
+
+**Architecture:**
+```python
+@dataclass
+class Activity:
+    name: str
+    weight: float  # 0.0 to 1.0
+    progress_pct: float = 0.0
+    started: bool = False
+    completed: bool = False
+
+class ActivityBasedProgressTracker:
+    activities = [
+        Activity("Searching sources", weight=0.25),
+        Activity("Analyzing sources", weight=0.35),
+        Activity("Synthesizing findings", weight=0.30),
+        Activity("Generating report", weight=0.10),
+    ]
+```
+
+**Progress Calculation:**
+- Overall progress = Σ(activity.weight × activity.progress_pct)
+- Example: "Searching sources" at 50% = 12.5% overall (25% × 50%)
+- Smooth progress updates vs. coarse jumps
+
+**Usage:**
+```python
+# Activity-based update
+await tracker.update(
+    activity_name="Searching sources",
+    activity_progress_pct=50.0
+)
+# Results in overall progress of 12.5% with detailed status
+```
+
+**Features:**
+- Current/next activity tracking
+- Activity status summary in progress files
+- Backward compatible with direct progress updates
+- Weight validation (must sum to 1.0)
+
+#### Priority 5: Automatic Cleanup & Maintenance
+
+**5.1 Context Manager Support**
+
+**Implementation:** `research_progress_tracker.py` lines 471-511
+
+```python
+async def __aenter__(self):
+    return self
+
+async def __aexit__(self, exc_type, exc_val, exc_tb):
+    if exc_type is None:
+        # Success: clean up progress file
+        self.cleanup()
+    else:
+        # Failure: keep progress file for debugging
+        print(f"⚠️  Keeping progress file for debugging: {self.progress_file}")
+    return False  # Don't suppress exceptions
+```
+
+**Usage:**
+```python
+async with ResearchProgressTracker(folder, task_id) as tracker:
+    await tracker.start(...)
+    await tracker.complete(results)
+    # Progress file deleted automatically on success
+```
+
+**Benefits:**
+- Prevents progress file accumulation
+- Automatic cleanup on success
+- Failed operations preserve debugging info
+
+**5.2 Background Cleanup Script**
+
+**Component:** `scripts/cleanup_research_files.py` (218 lines, executable)
+
+**Features:**
+- Clean up old progress files and checkpoints
+- `--max-age-days` parameter (default: 7)
+- `--dry-run` for preview without deletion
+- Cleans checkpoints across all phases (1-6)
+- Comprehensive cleanup summary
+
+**Usage:**
+```bash
+# Clean up files older than 7 days
+python scripts/cleanup_research_files.py <project_folder>
+
+# Preview what would be deleted
+python scripts/cleanup_research_files.py <project_folder> --dry-run
+
+# Custom age threshold
+python scripts/cleanup_research_files.py <project_folder> --max-age-days 14
+```
+
+**Output Example:**
+```
+======================================================================
+CLEANUP COMPLETE
+======================================================================
+Progress files deleted: 5
+Checkpoints deleted: 12
+Total files deleted: 17
+======================================================================
+```
+
+#### Technical Improvements Summary
+
+**Files Created:**
+- `scripts/research_errors.py` (270 lines) - Structured error system
+- `scripts/research_state_machine.py` (276 lines) - State validation
+- `scripts/research_config.py` (362 lines) - Centralized configuration
+- `scripts/cleanup_research_files.py` (218 lines) - Maintenance script
+
+**Files Enhanced:**
+- `research_checkpoint_manager.py` - Atomic writes, verification
+- `resumable_research.py` - Config injection, context manager
+- `resume-research.py` - Timeout handling, structured errors
+- `research_progress_tracker.py` - Activity tracking, context manager
+- `research_error_handling.py` - Structured error integration
+
+**Overall Impact:**
+- ✅ **Robustness:** No data corruption, hangs, or invalid states
+- ✅ **Maintainability:** Centralized configuration, single source of truth
+- ✅ **User Experience:** Clear error messages with recovery guidance
+- ✅ **Progress Detail:** Granular sub-activity tracking
+- ✅ **Cleanliness:** Automatic cleanup prevents file accumulation
+- ✅ **Production Ready:** All critical issues resolved
 
 ### AI Provider Abstraction
 
