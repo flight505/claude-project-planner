@@ -21,9 +21,156 @@ import asyncio
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
+from dataclasses import dataclass, field
 
 # Import state machine for transition validation
 from research_state_machine import ResearchTaskStateMachine, ResearchTaskState
+
+
+@dataclass
+class Activity:
+    """
+    Single research activity with weight.
+
+    Represents a distinct phase of research with a relative weight
+    that contributes to overall progress calculation.
+    """
+    name: str
+    weight: float  # 0.0 to 1.0 (must sum to 1.0 across all activities)
+    progress_pct: float = 0.0  # Current progress within this activity (0-100)
+    started: bool = False
+    completed: bool = False
+
+
+class ActivityBasedProgressTracker:
+    """
+    Track progress across multiple weighted activities.
+
+    Instead of jumping from 0% → 15% → 30%, this provides granular
+    progress by breaking research into weighted activities.
+
+    Example:
+        - "Searching sources" (25% weight) at 50% complete = 12.5% overall
+        - "Analyzing sources" (35% weight) at 100% complete = 35% overall
+        - Total = 47.5% overall progress with sub-activity detail
+    """
+
+    def __init__(self, activities: Optional[List[Activity]] = None):
+        """
+        Initialize activity tracker with default or custom activities.
+
+        Args:
+            activities: List of Activity instances (defaults to standard research activities)
+        """
+        if activities is None:
+            # Default activities for research operations
+            self.activities = [
+                Activity("Searching sources", weight=0.25),
+                Activity("Analyzing sources", weight=0.35),
+                Activity("Synthesizing findings", weight=0.30),
+                Activity("Generating report", weight=0.10),
+            ]
+        else:
+            self.activities = activities
+
+        # Validate weights sum to 1.0
+        total_weight = sum(a.weight for a in self.activities)
+        if abs(total_weight - 1.0) > 0.01:  # Allow small floating point error
+            raise ValueError(
+                f"Activity weights must sum to 1.0, got {total_weight}. "
+                f"Weights: {[a.weight for a in self.activities]}"
+            )
+
+    def get_overall_progress(self) -> float:
+        """
+        Calculate overall progress from weighted activities.
+
+        Returns:
+            Progress percentage (0-100) based on weighted activity completion
+        """
+        total = 0.0
+        for activity in self.activities:
+            if activity.completed:
+                # Activity is fully complete - contribute full weight
+                total += activity.weight * 100
+            elif activity.started:
+                # Activity is in progress - contribute partial weight
+                total += activity.weight * activity.progress_pct
+        return total
+
+    def update_activity(self, activity_name: str, progress_pct: float):
+        """
+        Update progress for a specific activity.
+
+        Args:
+            activity_name: Name of activity to update
+            progress_pct: Progress percentage within this activity (0-100)
+
+        Raises:
+            ValueError: If activity_name not found
+        """
+        for activity in self.activities:
+            if activity.name == activity_name:
+                activity.started = True
+                activity.progress_pct = min(100.0, max(0.0, progress_pct))  # Clamp 0-100
+
+                if activity.progress_pct >= 100:
+                    activity.completed = True
+
+                return
+
+        # Activity not found
+        raise ValueError(
+            f"Activity '{activity_name}' not found. "
+            f"Available: {[a.name for a in self.activities]}"
+        )
+
+    def get_current_activity(self) -> Optional[Activity]:
+        """
+        Get currently active activity (started but not completed).
+
+        Returns:
+            Current Activity or None if all complete/none started
+        """
+        for activity in self.activities:
+            if activity.started and not activity.completed:
+                return activity
+        return None
+
+    def get_next_activity(self) -> Optional[Activity]:
+        """
+        Get next activity that hasn't started yet.
+
+        Returns:
+            Next Activity or None if all started
+        """
+        for activity in self.activities:
+            if not activity.started:
+                return activity
+        return None
+
+    def get_status_summary(self) -> Dict[str, Any]:
+        """
+        Get summary of all activities and overall progress.
+
+        Returns:
+            Dictionary with activity details and overall progress
+        """
+        return {
+            "overall_progress_pct": self.get_overall_progress(),
+            "current_activity": self.get_current_activity().name if self.get_current_activity() else None,
+            "next_activity": self.get_next_activity().name if self.get_next_activity() else None,
+            "activities": [
+                {
+                    "name": a.name,
+                    "weight": a.weight,
+                    "progress_pct": a.progress_pct,
+                    "started": a.started,
+                    "completed": a.completed,
+                }
+                for a in self.activities
+            ]
+        }
 
 
 class ResearchProgressTracker:
@@ -34,13 +181,14 @@ class ResearchProgressTracker:
     Useful for operations like Gemini Deep Research (60 minutes).
     """
 
-    def __init__(self, project_folder: Path, task_id: str):
+    def __init__(self, project_folder: Path, task_id: str, activities: Optional[List[Activity]] = None):
         """
-        Initialize progress tracker with state machine validation.
+        Initialize progress tracker with state machine validation and activity tracking.
 
         Args:
             project_folder: Root folder for project outputs
             task_id: Unique identifier for this research task
+            activities: Optional custom activities (uses defaults if not provided)
         """
         self.project_folder = Path(project_folder)
         self.task_id = task_id
@@ -49,6 +197,9 @@ class ResearchProgressTracker:
 
         # Initialize state machine for transition validation
         self.state_machine = ResearchTaskStateMachine()
+
+        # Initialize activity-based progress tracking
+        self.activity_tracker = ActivityBasedProgressTracker(activities)
 
     def _get_initial_state(
         self,
@@ -118,14 +269,20 @@ class ResearchProgressTracker:
 
     async def update(
         self,
-        phase: str,
-        action: str,
-        progress_pct: float,
+        phase: Optional[str] = None,
+        action: Optional[str] = None,
+        progress_pct: Optional[float] = None,
         metadata: Optional[Dict[str, Any]] = None,
-        save_checkpoint: bool = False
+        save_checkpoint: bool = False,
+        activity_name: Optional[str] = None,
+        activity_progress_pct: Optional[float] = None
     ):
         """
         Update progress state with current phase and action.
+
+        Supports two modes:
+        1. Direct progress: Pass phase, action, progress_pct directly
+        2. Activity-based: Pass activity_name and activity_progress_pct for granular tracking
 
         Args:
             phase: Current phase name (e.g., "Gathering sources", "Analyzing literature")
@@ -133,13 +290,43 @@ class ResearchProgressTracker:
             progress_pct: Progress percentage (0-100)
             metadata: Optional metadata to include
             save_checkpoint: If True, save this update as a checkpoint in history
+            activity_name: Optional activity name for activity-based tracking
+            activity_progress_pct: Optional progress within specific activity (0-100)
 
         Updates the progress file atomically.
+
+        Example (activity-based):
+            await tracker.update(
+                activity_name="Searching sources",
+                activity_progress_pct=50.0
+            )
+            # Results in overall progress of 12.5% (25% weight * 50%)
         """
         if not self.progress_file.exists():
             raise FileNotFoundError(
                 f"Progress file not found: {self.progress_file}. "
                 "Call start() first."
+            )
+
+        # Activity-based progress calculation
+        if activity_name is not None and activity_progress_pct is not None:
+            # Update activity tracker
+            self.activity_tracker.update_activity(activity_name, activity_progress_pct)
+
+            # Calculate overall progress from activities
+            progress_pct = self.activity_tracker.get_overall_progress()
+
+            # Get current activity for phase/action
+            current_activity = self.activity_tracker.get_current_activity()
+            if current_activity:
+                phase = current_activity.name
+                action = f"{current_activity.name}: {activity_progress_pct:.0f}%"
+
+        # Validate that we have the required fields
+        if phase is None or action is None or progress_pct is None:
+            raise ValueError(
+                "Must provide either (phase, action, progress_pct) or "
+                "(activity_name, activity_progress_pct)"
             )
 
         # Read current state
@@ -154,6 +341,10 @@ class ResearchProgressTracker:
             "progress_pct": progress_pct,
             "updated_at": now.isoformat(),
         })
+
+        # Add activity tracking status if using activity-based tracking
+        if activity_name is not None:
+            progress["activity_status"] = self.activity_tracker.get_status_summary()
 
         # Update estimated completion based on progress
         if self.start_time and progress_pct > 0:
