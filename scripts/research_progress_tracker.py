@@ -468,6 +468,48 @@ class ResearchProgressTracker:
         if self.progress_file.exists():
             self.progress_file.unlink()
 
+    async def __aenter__(self):
+        """
+        Context manager entry - allows using tracker with 'async with'.
+
+        Returns:
+            self for use in the with block
+
+        Example:
+            async with ResearchProgressTracker(folder, task_id) as tracker:
+                await tracker.start(...)
+                # ... research work ...
+                await tracker.complete(results)
+                # Auto-cleanup on success
+        """
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """
+        Context manager exit - handles auto-cleanup on success.
+
+        Args:
+            exc_type: Exception type if an error occurred
+            exc_val: Exception value if an error occurred
+            exc_tb: Exception traceback if an error occurred
+
+        Returns:
+            False to propagate exceptions (don't suppress)
+
+        Behavior:
+            - Success (exc_type is None): Delete progress file
+            - Failure (exc_type is not None): Keep progress file for debugging
+        """
+        if exc_type is None:
+            # Success: clean up progress file
+            self.cleanup()
+        else:
+            # Failure: keep progress file for debugging
+            print(f"⚠️  Keeping progress file for debugging: {self.progress_file}")
+
+        # Don't suppress exceptions - let them propagate
+        return False
+
     @classmethod
     def list_active_research(cls, project_folder: Path) -> List[Dict[str, Any]]:
         """
@@ -498,7 +540,7 @@ class ResearchProgressTracker:
         return active
 
     @classmethod
-    def cleanup_old_progress_files(cls, project_folder: Path, max_age_days: int = 7):
+    def cleanup_old_progress_files(cls, project_folder: Path, max_age_days: int = 7) -> int:
         """
         Clean up old progress files.
 
@@ -506,10 +548,14 @@ class ResearchProgressTracker:
             project_folder: Root folder for project outputs
             max_age_days: Maximum age in days (default: 7)
 
+        Returns:
+            Number of files deleted
+
         Removes progress files older than max_age_days.
         """
         project_folder = Path(project_folder)
         cutoff = datetime.now() - timedelta(days=max_age_days)
+        deleted_count = 0
 
         for progress_file in project_folder.glob(".research-progress-*.json"):
             try:
@@ -517,9 +563,12 @@ class ResearchProgressTracker:
                 mtime = datetime.fromtimestamp(progress_file.stat().st_mtime)
                 if mtime < cutoff:
                     progress_file.unlink()
+                    deleted_count += 1
             except OSError:
                 # Skip files we can't access
                 continue
+
+        return deleted_count
 
 
 class ProgressMonitor:
