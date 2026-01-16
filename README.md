@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.4.0--alpha-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
@@ -9,7 +9,7 @@
 
 **AI-powered project planning toolkit** that transforms ideas into comprehensive, buildable specifications. Generate complete project plans including architecture documents, sprint plans, cost analyses, and implementation roadmaps—all backed by real-time research.
 
-**✨ New in v1.4.0-alpha:** Complete progress tracking & error recovery system! Monitor long-running Deep Research operations in real-time, resume interrupted research from checkpoints, and track progress across all phases. Includes CLI tools for external monitoring and intelligent checkpoint management.
+**✨ New in v1.4.0:** Production-ready progress tracking & error recovery system! Monitor long-running Deep Research operations in real-time, resume interrupted research from checkpoints, and track progress with granular activity-based updates. Includes structured error handling with recovery suggestions, automatic cleanup, state machine validation, and comprehensive CLI tools.
 
 ---
 
