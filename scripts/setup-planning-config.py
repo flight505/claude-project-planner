@@ -98,27 +98,36 @@ def generate_setup_questions(filter_unavailable: bool = True) -> List[Dict[str, 
             ]
         },
 
-        # Question 5: Phase Selection
+        # Question 5: Core Phases (Always Included)
         {
-            "question": "Which phases should be included in this plan?",
-            "header": "Scope",
-            "multiSelect": True,  # Allow selecting multiple phases
+            "question": "Which core phases should be included?",
+            "header": "Core Phases",
+            "multiSelect": True,
             "options": [
                 {
-                    "label": "Phase 1: Market Research (Required)",
-                    "description": "Competitive analysis, market sizing, target audience research. Always recommended"
+                    "label": "Phase 1: Market Research (Recommended)",
+                    "description": "Competitive analysis, market sizing, target audience research. Foundation for all decisions"
                 },
                 {
-                    "label": "Phase 2: Architecture & Design (Required)",
+                    "label": "Phase 2: Architecture (Required)",
                     "description": "Technical architecture, building blocks, system design. Cannot be skipped"
                 },
                 {
+                    "label": "Phase 4: Implementation (Required)",
+                    "description": "Sprint planning, user stories, development roadmap. Cannot be skipped"
+                }
+            ]
+        },
+
+        # Question 6: Optional Analysis Phases
+        {
+            "question": "Include optional analysis and strategy phases?",
+            "header": "Optional",
+            "multiSelect": True,
+            "options": [
+                {
                     "label": "Phase 3: Feasibility & Costs (Recommended)",
                     "description": "Risk assessment, cost analysis, technical feasibility. Helps avoid expensive mistakes"
-                },
-                {
-                    "label": "Phase 4: Implementation Planning (Required)",
-                    "description": "Sprint planning, user stories, development roadmap. Cannot be skipped"
                 },
                 {
                     "label": "Phase 5: Go-to-Market Strategy",
@@ -126,12 +135,12 @@ def generate_setup_questions(filter_unavailable: bool = True) -> List[Dict[str, 
                 },
                 {
                     "label": "Phase 6: Plan Review (Recommended)",
-                    "description": "Final validation, gap analysis, recommendations. Always recommended"
+                    "description": "Final validation, gap analysis, recommendations. Quality assurance for complete plan"
                 }
             ]
         },
 
-        # Question 6: Quality Assurance
+        # Question 7: Quality Assurance
         {
             "question": "Enable additional quality checks?",
             "header": "Quality",
@@ -148,24 +157,16 @@ def generate_setup_questions(filter_unavailable: bool = True) -> List[Dict[str, 
                 {
                     "label": "Real-time research verification",
                     "description": "Cross-reference all technology recommendations with latest docs. Ensures current best practices"
-                },
-                {
-                    "label": "None - Standard quality only",
-                    "description": "Skip additional checks. Faster execution, still produces high-quality plans"
                 }
             ]
         },
 
-        # Question 7: Output Format
+        # Question 8: Optional Output Formats
         {
-            "question": "What output formats do you need?",
+            "question": "Generate additional output formats? (Markdown and YAML always included)",
             "header": "Outputs",
             "multiSelect": True,
             "options": [
-                {
-                    "label": "Markdown files (Always included)",
-                    "description": "All outputs in .md format. Always generated, works with Claude Code"
-                },
                 {
                     "label": "Generate final PDF report",
                     "description": "Compile all phases into professional PDF with table of contents, IEEE citations, cover page"
@@ -173,10 +174,6 @@ def generate_setup_questions(filter_unavailable: bool = True) -> List[Dict[str, 
                 {
                     "label": "Generate PowerPoint presentation",
                     "description": "Executive summary slides for stakeholder presentation"
-                },
-                {
-                    "label": "YAML building blocks",
-                    "description": "Structured component specifications for automated code generation (Always included)"
                 }
             ]
         }
@@ -366,21 +363,26 @@ def parse_user_selections(answers: Dict[str, str]) -> Dict[str, Any]:
     interactive = answers.get("question_3", "")
     config["interactive_mode"] = "Yes" in interactive
 
-    # Parse Phase Selection (Question 4) - multiSelect
-    phases = answers.get("question_4", "")
-    config["phases"]["marketing"] = "Phase 5" in phases
-    config["phases"]["feasibility"] = "Phase 3" in phases
-    config["phases"]["review"] = "Phase 6" in phases
-    # Phases 1, 2, 4 are always required
+    # Parse Core Phases (Question 4) - multiSelect
+    core_phases = answers.get("question_4", "")
+    config["phases"]["market_research"] = "Phase 1" in core_phases
+    config["phases"]["architecture"] = "Phase 2" in core_phases  # Always required
+    config["phases"]["implementation"] = "Phase 4" in core_phases  # Always required
 
-    # Parse Quality Checks (Question 5) - multiSelect
-    quality = answers.get("question_5", "")
+    # Parse Optional Phases (Question 5) - multiSelect
+    optional_phases = answers.get("question_5", "")
+    config["phases"]["feasibility"] = "Phase 3" in optional_phases
+    config["phases"]["marketing"] = "Phase 5" in optional_phases
+    config["phases"]["review"] = "Phase 6" in optional_phases
+
+    # Parse Quality Checks (Question 6 - was Question 5) - multiSelect
+    quality = answers.get("question_6", "")
     config["quality_checks"]["multi_model_validation"] = "Multi-model" in quality
     config["quality_checks"]["comprehensive_diagrams"] = "comprehensive diagrams" in quality
     config["quality_checks"]["research_verification"] = "Real-time research" in quality
 
-    # Parse Output Formats (Question 6) - multiSelect
-    outputs = answers.get("question_6", "")
+    # Parse Output Formats (Question 7 - was Question 6) - multiSelect
+    outputs = answers.get("question_7", "")
     config["output_formats"]["pdf"] = "PDF report" in outputs
     config["output_formats"]["pptx"] = "PowerPoint" in outputs
 
