@@ -80,7 +80,7 @@ Present **all planning capabilities** in one guided setup flow, eliminating need
 SETUP_QUESTIONS=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/setup-planning-config.py")
 
 # Present to user via AskUserQuestion
-# (This displays 6 question groups covering all features)
+# (This displays 8 question groups covering all features)
 ```
 
 **Setup Questions Presented:**

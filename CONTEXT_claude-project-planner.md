@@ -1041,7 +1041,7 @@ project_planner/.claude/skills/new-skill/
 **v1.3.1 (2026-01-12) - Interactive Approval & Refinement**
 - Added interactive approval gates after each phase
 - `/refine-plan` command for iterative refinement
-- Comprehensive setup UI (6 question groups, expanded to 7 in v1.3.2)
+- Comprehensive setup UI (8 question groups as of v1.4.2)
 - Revision tracking with dependency handling
 
 **v1.3.0 (2026-01-12) - Post-Plan Analysis**

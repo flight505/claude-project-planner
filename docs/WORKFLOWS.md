@@ -192,7 +192,7 @@ This document provides comprehensive ASCII workflow diagrams for all plugin comm
 │  ┌───────────────────────────────────────────────────────────────┐  │
 │  │  python scripts/setup-planning-config.py                      │  │
 │  │                                                                │  │
-│  │  Presents 7 question groups via AskUserQuestion:              │  │
+│  │  Presents 8 question groups via AskUserQuestion:              │  │
 │  │                                                                │  │
 │  │  Q1: AI Provider                                               │  │
 │  │      Options dynamically filtered based on available keys:    │  │

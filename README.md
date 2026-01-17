@@ -43,14 +43,15 @@ export OPENROUTER_API_KEY='your_key'  # Recommended for research
 # Start comprehensive planning with interactive setup
 /full-plan my-project
 
-# You'll see 7 question groups covering ALL features:
+# You'll see 8 question groups covering ALL features:
 # 1. AI Provider (Gemini vs Perplexity)
-# 2. Research Depth (balanced/quick/comprehensive) ⭐ NEW v1.3.2
+# 2. Research Depth (balanced/quick/comprehensive)
 # 3. Parallelization (fast vs sequential)
 # 4. Interactive Approval (pause after each phase)
-# 5. Phase Selection (choose which phases to run)
-# 6. Quality Checks (multi-model validation, diagrams)
-# 7. Output Formats (PDF, PowerPoint, Markdown)
+# 5. Core Phases (Market Research, Architecture, Implementation)
+# 6. Optional Phases (Feasibility, Go-to-Market, Review)
+# 7. Quality Checks (multi-model validation, diagrams)
+# 8. Output Formats (PDF, PowerPoint)
 ```
 
 **That's it!** No flags to remember—discover all features through the interactive UI.

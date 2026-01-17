@@ -277,13 +277,13 @@ class TestResearchDepthOptionsFiltering:
 class TestGenerateSetupQuestions:
     """Test the full question generation with filtering."""
 
-    def test_generates_7_questions(self):
-        """Should always generate 7 question groups."""
+    def test_generates_8_questions(self):
+        """Should always generate 8 question groups."""
         with patch.dict(os.environ, {
             "OPENROUTER_API_KEY": "test-key",
         }, clear=True):
             questions = generate_setup_questions()
-            assert len(questions) == 7
+            assert len(questions) == 8
 
     def test_question_structure(self):
         """Each question should have required fields."""

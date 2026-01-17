@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.2] - 2026-01-17
+
+### 🔧 Patch Release - AskUserQuestion Schema Compliance
+
+This patch release fixes critical AskUserQuestion tool compliance issues identified through comprehensive review using the `askuserquestion` skill.
+
+### 🔴 Critical Fixes
+
+#### AskUserQuestion Schema Violations
+- **Fixed**: Question 5 (Phase Selection) had 6 options, exceeding the 4-option maximum
+- **Solution**: Split into two questions following Option A pattern:
+  - **Question 5: Core Phases** (3 options) - Market Research, Architecture, Implementation
+  - **Question 6: Optional** (3 options) - Feasibility & Costs, Go-to-Market, Review
+- **Updated**: Parsing logic in `parse_user_selections()` to handle new question indices
+- **Result**: 100% schema compliant ✅
+
+### 🟢 Minor Improvements
+
+#### Removed Redundant Options
+- **Removed**: "None - Standard quality only" option from Quality checks (redundant in multiSelect)
+- **Removed**: "Always included" options from Outputs (Markdown, YAML)
+- **Updated**: Output question text to clarify: "Generate additional output formats? (Markdown and YAML always included)"
+- **Impact**: Cleaner UI, reduced confusion
+
+### ✅ Validation Results
+
+All 8 questions now comply with AskUserQuestion schema:
+- 2-4 options per question ✅
+- Headers ≤12 characters ✅
+- Proper multiSelect usage ✅
+- Clear, actionable question phrasing ✅
+
+### 📝 Documentation
+
+- Updated README.md: 7 → 8 question groups
+- Updated tests/test_setup_config.py: Expects 8 questions
+- Updated commands/full-plan.md: 6 → 8 question groups
+- Updated CONTEXT_claude-project-planner.md: Version reference
+- Updated docs/WORKFLOWS.md: 7 → 8 question groups
+
+### 🔗 References
+
+- Commit: 2534235 - "fix: AskUserQuestion compliance - split 6-option question and remove redundant options"
+- Review: Used `askuserquestion` skill for comprehensive compliance check
+
+---
+
 ## [1.4.1] - 2026-01-16
 
 ### 🔧 Patch Release - Code Quality & Portability Improvements
