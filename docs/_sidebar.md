@@ -1,11 +1,10 @@
 - [📖 Home](/)
-- [🚀 Quick Start](../README.md)
+- [🚀 Getting Started](#getting-started)
+- [🏗️ Architecture](#technical-architecture)
 
 ---
 
 **User Guides**
-
-- [✨ How It Works](../README.md#-how-it-works)
 - [🎯 Features Overview](FEATURES.md)
 - [🛠️ Skills Reference](SKILLS.md)
 - [📊 Workflows](WORKFLOWS.md)
@@ -27,6 +26,6 @@
 **Resources**
 
 - [📚 Documentation Index](DOCUMENTATION_INDEX.md)
-- [📝 Changelog](../CHANGELOG.md)
+- [📝 Changelog](CHANGELOG.md)
 - [🐙 GitHub Repository](https://github.com/flight505/claude-project-planner)
-- [📦 PyPI Package](https://pypi.org/project/project-planner/)
+- [❓ Troubleshooting](TROUBLESHOOTING.md)

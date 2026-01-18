@@ -19,11 +19,13 @@ claude plugin install flight505/claude-project-planner
 
 ### 2. Understand How It Works
 
-Read **[How It Works](../README.md#-how-it-works)** to understand the 4-step workflow:
-- **Fill Template** - Describe your project
-- **Validate Setup** - Check dependencies
-- **Configure Options** - Answer 8 questions
-- **Generate Plan** - AI creates comprehensive plan
+**The 4-step workflow:**
+1. **📝 Fill Template** - Describe your project in an interactive form
+2. **✓ Validate Setup** - System checks dependencies and API keys
+3. **⚙️ Configure Options** - Answer 8 questions about AI provider, research depth, phases, quality checks
+4. **✨ Generate Plan** - AI creates comprehensive plan (30 min - 2 hours)
+
+**Result:** 50+ documents including market research, architecture diagrams, cost breakdowns, sprint plans, and implementation roadmaps.
 
 ### 3. First Planning Session
 
@@ -38,6 +40,48 @@ Read **[How It Works](../README.md#-how-it-works)** to understand the 4-step wor
 ### 4. Explore Capabilities
 
 Browse **[Skills Reference](SKILLS.md)** to see all 19+ planning capabilities.
+
+---
+
+## 🏗️ Technical Architecture
+
+**Complete Pipeline Flow:**
+
+<p align="center">
+  <img src="../assets/complete-architecture.png" alt="Claude Project Planner Complete Architecture" width="100%">
+</p>
+
+### System Overview
+
+Claude Project Planner uses a **3-layer architecture** that orchestrates multiple AI providers, checkpoint systems, and data processors:
+
+**Layer 1 - User Interface:**
+- Interactive question system (8 groups)
+- Template editor (opens in `$EDITOR`)
+- Progress monitoring dashboard
+- Approval gates for phase review
+
+**Layer 2 - AI Research Engine:**
+- **Gemini Deep Research**: 60 min/query, comprehensive multi-step reasoning, 3-tier progress tracking
+- **Perplexity Sonar**: 30 sec/query, fast web search with citations
+- **Graceful degradation**: Automatic fallback if Gemini unavailable
+
+**Layer 3 - Data Processing:**
+- Building blocks generator → YAML specs
+- Cost analyzer → Cloud pricing breakdowns
+- Sprint planner → User stories with INVEST criteria
+- Diagram generator → C4, sequence, ERD diagrams
+- Risk assessor → Risk registers and mitigation
+- Report compiler → PDF with IEEE citations
+
+### Checkpoint & Resume System
+
+- **15% checkpoint**: Initial research complete
+- **30% checkpoint**: Cross-referencing done
+- **50% checkpoint**: Synthesis started
+- **100% completion**: Ready for processing
+
+Resume interrupted research and save up to 50 minutes!
 
 ---
 
@@ -61,7 +105,7 @@ Browse **[Skills Reference](SKILLS.md)** to see all 19+ planning capabilities.
 |-------|-------------|----------|
 | **[Development Guide](DEVELOPMENT.md)** | Architecture, plugin development, contributing | Contributors, maintainers |
 | **[Dependencies](DEPENDENCIES.md)** | System requirements and optional dependencies | Installation help |
-| **[Releasing](RELEASING.md)** | Version management, PyPI publishing | Maintainers |
+| **[Releasing](RELEASING.md)** | Version management and plugin releases | Maintainers |
 
 ---
 
@@ -132,9 +176,9 @@ After running `/full-plan`, you get:
 ## 🔍 Quick Links
 
 - **[GitHub Repository](https://github.com/flight505/claude-project-planner)** - Source code and issues
-- **[PyPI Package](https://pypi.org/project/project-planner/)** - Python package
-- **[Changelog](../CHANGELOG.md)** - Version history
+- **[Changelog](CHANGELOG.md)** - Version history and release notes
 - **[Documentation Index](DOCUMENTATION_INDEX.md)** - Complete documentation map
+- **[Troubleshooting](TROUBLESHOOTING.md)** - Common issues and solutions
 
 ---
 
