@@ -1,6 +1,6 @@
 # Complete Documentation Index
 
-**Claude Project Planner v2.7.0** - Comprehensive documentation navigation guide.
+**Claude Project Planner v1.4.3** - Comprehensive documentation navigation guide.
 
 ---
 
@@ -10,9 +10,10 @@
 
 | Document | Purpose | Audience | Last Updated |
 |----------|---------|----------|--------------|
-| [README.md](../README.md) | Main entry point, quick start, features overview | Everyone | v2.7.0 |
-| [docs/README.md](README.md) | Documentation hub with navigation guide | Everyone | v2.7.0 |
-| [CHANGELOG.md](../CHANGELOG.md) | Version history and release notes | Everyone | v2.7.0 |
+| [README.md](../README.md) | Main entry point, quick start, features overview | Everyone | v1.4.3 |
+| [PROJECT_STATUS.md](../PROJECT_STATUS.md) | Current status, completed tasks, quality metrics | Everyone | v1.4.3 |
+| [CHANGELOG.md](../CHANGELOG.md) | Version history and release notes | Everyone | v1.4.3 |
+| [CONTEXT_claude-project-planner.md](../CONTEXT_claude-project-planner.md) | Architecture and consolidated context | Developers | v1.4.3 |
 
 ### User Guides
 
@@ -22,6 +23,10 @@
 | [SKILLS.md](SKILLS.md) | All 19+ skills with examples | To learn available capabilities |
 | [API.md](API.md) | Programmatic API reference with code examples | When using Python API |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions | When you encounter problems |
+| [WORKFLOWS.md](WORKFLOWS.md) | End-to-end workflows with progress tracking, resume | Advanced usage patterns |
+| [PARALLELIZATION_GUIDE.md](PARALLELIZATION_GUIDE.md) | Parallel research execution for speed | Performance optimization |
+| [USER_FLOW.md](USER_FLOW.md) | User interaction patterns and flows | UX understanding |
+| [DEPENDENCIES.md](DEPENDENCIES.md) | System requirements and optional dependencies | Installation help |
 
 ### Developer Resources
 
