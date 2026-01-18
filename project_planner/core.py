@@ -6,6 +6,7 @@ import zipfile
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from dotenv import load_dotenv
+from claude_agent_sdk.types import StopHookInput, HookContext
 
 # Load environment variables from .env file if it exists
 load_dotenv()
@@ -387,6 +388,35 @@ def create_data_context_message(processed_info: Optional[Dict[str, Any]]) -> str
         context_parts.append("\nNote: These can be referenced as existing diagrams or mockups.")
     
     context_parts.append("[END DATA FILES]\n")
-    
+
     return "\n".join(context_parts)
+
+
+def create_completion_check_stop_hook(auto_continue: bool = True):
+    """
+    Create a stop hook that optionally forces continuation.
+
+    Args:
+        auto_continue: If True, always continue (never stop on agent's own).
+                      If False, allow normal stopping behavior.
+    """
+    async def completion_check_stop_hook(
+        hook_input: StopHookInput,
+        matcher: str | None,
+        context: HookContext,
+    ) -> dict:
+        """
+        Stop hook that checks if the task is complete before allowing stop.
+
+        When auto_continue is True, this returns continue_=True to force
+        the agent to continue working instead of stopping.
+        """
+        if auto_continue:
+            # Force continuation - the agent should not stop on its own
+            return {"continue_": True}
+
+        # Allow the stop
+        return {"continue_": False}
+
+    return completion_check_stop_hook
 

@@ -241,7 +241,7 @@ class ResumableResearchExecutor:
                             task_name=task_name,
                             query=query,
                             partial_results={"phase": phase, "progress_pct": progress_pct},
-                            sources_collected=[],  # TODO: Extract from results if available
+                            sources_collected=[],  # NOTE: Sources unavailable during execution - only known at completion
                             progress_pct=progress_pct,
                             resumable=resumable,
                             metadata={"elapsed_sec": elapsed}

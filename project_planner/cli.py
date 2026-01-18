@@ -13,7 +13,7 @@ from typing import Optional
 from dotenv import load_dotenv
 
 from claude_agent_sdk import query, ClaudeAgentOptions
-from claude_agent_sdk.types import HookMatcher, StopHookInput, HookContext
+from claude_agent_sdk.types import HookMatcher
 
 from .core import (
     get_api_key,
@@ -23,38 +23,10 @@ from .core import (
     process_data_files,
     create_data_context_message,
     setup_claude_skills,
+    create_completion_check_stop_hook,
 )
 from .utils import find_existing_projects, detect_project_reference, scan_project_directory
 from .models import TokenUsage
-
-
-def create_completion_check_stop_hook(auto_continue: bool = True):
-    """
-    Create a stop hook that optionally forces continuation.
-
-    Args:
-        auto_continue: If True, always continue (never stop on agent's own).
-                      If False, allow normal stopping behavior.
-    """
-    async def completion_check_stop_hook(
-        hook_input: StopHookInput,
-        matcher: str | None,
-        context: HookContext,
-    ) -> dict:
-        """
-        Stop hook that checks if the task is complete before allowing stop.
-
-        When auto_continue is True, this returns continue_=True to force
-        the agent to continue working instead of stopping.
-        """
-        if auto_continue:
-            # Force continuation - the agent should not stop on its own
-            return {"continue_": True}
-
-        # Allow the stop
-        return {"continue_": False}
-
-    return completion_check_stop_hook
 
 
 async def main(track_token_usage: bool = False) -> Optional[TokenUsage]:
