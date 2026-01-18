@@ -6,10 +6,17 @@
 python3 -c "import requests" 2>/dev/null
 if [ $? -ne 0 ]; then
     echo "⚠️  Python 'requests' module not installed."
-    echo "   Research-lookup skill requires: pip install requests"
     echo ""
     echo "   To install all plugin dependencies:"
-    echo "   pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+    # Check if uv is available (preferred)
+    if command -v uv &> /dev/null; then
+        echo "   uv pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+    else
+        echo "   pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+    fi
+    echo ""
+    echo "   Or run the setup command:"
+    echo "   /project-planner:setup"
 fi
 
 # Check for OPENROUTER_API_KEY (required for research-lookup and AI diagrams)

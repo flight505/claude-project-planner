@@ -11,6 +11,7 @@ Usage:
 
 import subprocess
 import sys
+import shutil
 from pathlib import Path
 from typing import List, Tuple
 
@@ -44,6 +45,11 @@ def parse_requirements() -> List[str]:
     return packages
 
 
+def has_uv() -> bool:
+    """Check if uv is available on the system."""
+    return shutil.which("uv") is not None
+
+
 def check_if_installed(package: str) -> bool:
     """Check if a package is already installed."""
     # Map package name to import name
@@ -65,17 +71,27 @@ def check_if_installed(package: str) -> bool:
         return False
 
 
-def install_package(package: str, verbose: bool = False) -> Tuple[bool, str]:
+def install_package(package: str, verbose: bool = False, use_uv: bool = False) -> Tuple[bool, str]:
     """
-    Install a package using pip.
+    Install a package using uv or pip.
+
+    Args:
+        package: Package name to install
+        verbose: Show verbose output
+        use_uv: Use uv instead of pip if available
 
     Returns:
         (success, error_message)
     """
     try:
-        cmd = [sys.executable, "-m", "pip", "install", package, "--quiet"]
-        if not verbose:
-            cmd.append("--no-warn-script-location")
+        if use_uv:
+            cmd = ["uv", "pip", "install", package]
+            if not verbose:
+                cmd.append("--quiet")
+        else:
+            cmd = [sys.executable, "-m", "pip", "install", package]
+            if not verbose:
+                cmd.extend(["--quiet", "--no-warn-script-location"])
 
         result = subprocess.run(
             cmd,
@@ -104,6 +120,14 @@ def main():
     print("=" * 70)
     print()
 
+    # Detect uv availability
+    use_uv = has_uv()
+    if use_uv:
+        print("✨ Using uv for faster installation")
+    else:
+        print("📦 Using pip for installation")
+    print()
+
     # Parse requirements
     print("📦 Reading requirements...")
     packages = parse_requirements()
@@ -127,7 +151,7 @@ def main():
 
         # Install package
         print(f"{progress} ⏳ {package:30} ", end="", flush=True)
-        success, error = install_package(package, verbose)
+        success, error = install_package(package, verbose, use_uv)
 
         if success:
             print("✅ installed")
@@ -156,7 +180,10 @@ def main():
                 print(f"    └─ {error[:100]}")
         print()
         print("💡 Tip: Some packages may require system dependencies.")
-        print("   Try installing manually: pip install <package-name>")
+        if use_uv:
+            print("   Try installing manually: uv pip install <package-name>")
+        else:
+            print("   Try installing manually: pip install <package-name>")
         sys.exit(1)
 
     print("✨ All dependencies installed successfully!")
