@@ -1,6 +1,6 @@
 {
   "name": "claude-project-planner",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Comprehensive project planning and architecture research skills for Claude Code - generates software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps backed by real research.",
   "author": {
     "name": "Jesper Vang",

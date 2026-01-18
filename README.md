@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.4.2-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.4.3-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
