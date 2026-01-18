@@ -48,7 +48,7 @@ Browse **[Skills Reference](SKILLS.md)** to see all 19+ planning capabilities.
 **Complete Pipeline Flow:**
 
 <p align="center">
-  <img src="../assets/complete-architecture.png" alt="Claude Project Planner Complete Architecture" width="100%">
+  <img src="assets/complete-architecture.png" alt="Claude Project Planner Complete Architecture" width="100%">
 </p>
 
 ### System Overview

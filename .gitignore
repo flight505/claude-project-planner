@@ -77,3 +77,5 @@ figures/
 # NanoBanana diagram generation artifacts
 assets/*_v*.png
 assets/*_review_log.json
+docs/assets/*_v*.png
+docs/assets/*_review_log.json
