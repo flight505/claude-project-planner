@@ -242,5 +242,5 @@ After running `/full-plan`, you get:
 
 <p align="center">
   <strong>Ready to start planning?</strong><br>
-  <a href="../README.md#-quick-start">Get Started in 2 Minutes →</a>
+  <a href="#getting-started">Get Started in 2 Minutes →</a>
 </p>
