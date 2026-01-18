@@ -58,6 +58,218 @@ export OPENROUTER_API_KEY='your_key'  # Recommended for research
 
 ---
 
+## 🎯 How It Works
+
+### The Simple View (ELI5)
+
+Think of Claude Project Planner as a **smart assistant that turns your idea into a complete project blueprint**. Instead of manually researching competitors, designing architecture, estimating costs, and planning sprints—you describe what you want to build, answer a few questions, and let AI do the heavy lifting.
+
+<p align="center">
+  <img src="assets/workflow-diagram.png" alt="4-Step Workflow" width="100%">
+</p>
+
+**The 4-step process:**
+
+1. **📝 Fill Template** - Open a form and describe your project (like filling out a survey)
+2. **✓ Validate Setup** - System checks you have everything needed (takes 30 seconds)
+3. **⚙️ Configure Options** - Answer 8 simple questions about how you want the plan made
+4. **✨ Generate Plan** - AI creates your complete project plan (30 min - 2 hours depending on depth)
+
+**What you get:** A folder with 50+ documents including market research, architecture diagrams, cost breakdowns, sprint plans, and implementation roadmaps—everything you'd normally spend weeks creating manually.
+
+---
+
+### The 8 Questions (No Flags to Remember!)
+
+Instead of memorizing command-line flags, you answer **8 interactive question groups** that cover every feature:
+
+| Question Group | What It Controls | Options |
+|----------------|------------------|---------|
+| **1. AI Provider** | Which research engine to use | Gemini Deep Research (60 min, most thorough) · Perplexity Sonar (30 sec, fast) · Auto-detect |
+| **2. Research Depth** | How comprehensive the research should be | Balanced · Quick · Comprehensive · Auto |
+| **3. Parallelization** | Speed vs predictability | Parallel (14% faster, 60% faster in Phase 3) · Sequential (simpler) |
+| **4. Approval Gates** | Pause after each phase for review | Interactive approval · Continuous (run all phases) |
+| **5. Core Phases** | Which planning phases to include | Market Research · Architecture · Implementation |
+| **6. Optional Phases** | Additional analyses | Feasibility · Go-to-Market · Plan Review |
+| **7. Quality Checks** | Validation and diagrams | Multi-model validation · Diagram generation · Building blocks |
+| **8. Output Formats** | Final deliverables | PDF reports · PowerPoint slides · Markdown |
+
+**Example walkthrough:**
+```
+Question 1: Which AI provider should handle research?
+→ Auto-detect (use best available from API keys)
+
+Question 2: Research depth?
+→ Balanced (Deep Research for critical Phase 1, Perplexity for others)
+
+Question 3: Enable parallelization?
+→ Yes (save ~14% time)
+
+Question 4: Pause for approval after each phase?
+→ Yes (review before continuing)
+
+Question 5: Core phases to include?
+→ All (Market Research, Architecture, Implementation)
+
+Question 6: Optional phases?
+→ Feasibility Analysis, Go-to-Market Strategy
+
+Question 7: Quality checks?
+→ Multi-model validation, Generate diagrams
+
+Question 8: Output formats?
+→ PDF report, Markdown
+```
+
+**Result:** The planner knows exactly how to run—no need to remember `--gemini --balanced --parallel --interactive --phases all --validate --diagrams --pdf`.
+
+---
+
+### What Happens Under the Hood
+
+Behind the simple interface, there's a sophisticated **3-layer architecture** that orchestrates multiple AI providers, checkpoint systems, and data processors:
+
+<p align="center">
+  <img src="assets/architecture-diagram.png" alt="Technical Architecture" width="100%">
+</p>
+
+#### Layer 1: User Interface
+- **Interactive Questions** - AskUserQuestion presents 8 groups dynamically based on available API keys
+- **Template Editor** - Opens in `$EDITOR` (nano/vim/VSCode) with structured prompts
+- **Progress Monitoring** - Real-time updates via streaming callbacks and JSON files
+
+#### Layer 2: AI Research Engine
+
+**Two research providers with automatic fallback:**
+
+| Provider | Speed | Depth | When Used | Progress Tracking |
+|----------|-------|-------|-----------|-------------------|
+| **Gemini Deep Research** | ~60 min/query | Comprehensive multi-step reasoning, 1M context | Phase 1 (Market Research) in Balanced mode, all phases in Comprehensive mode | 3-tier: streaming + progress files + checkpoints |
+| **Perplexity Sonar** | ~30 sec/query | Fast web search with citations | Quick mode, non-critical phases | Streaming callbacks only |
+
+**Graceful degradation:** If Gemini API fails or key is missing, automatically falls back to Perplexity without failing the entire plan.
+
+**3-Tier Progress Tracking:**
+```
+Tier 1: Streaming Progress (Perplexity)
+├─ Real-time callbacks during API calls
+├─ Instant feedback: "searching...", "analyzing...", "synthesizing..."
+└─ Total duration: ~30 seconds
+
+Tier 2: Progress Files (Deep Research)
+├─ JSON files written to planning_outputs/progress/
+├─ External monitoring: python scripts/monitor-research-progress.py
+├─ Live updates: [████████░░] 45% | analyzing...
+└─ Total duration: ~60 minutes
+
+Tier 3: Phase Checkpoints
+├─ Research task statuses saved at phase boundaries
+├─ Resume from 15%, 30%, or 50% completion
+├─ Recovery: python scripts/resume-research.py
+└─ Saves up to 50 minutes on interruptions
+```
+
+#### Layer 3: Data Processing
+
+**After research completes, specialized processors generate deliverables:**
+
+| Component | Input | Output | Purpose |
+|-----------|-------|--------|---------|
+| **Building Blocks Generator** | Architecture research + tech stack | `building_blocks.yaml` | Component specs for Claude Code to build incrementally |
+| **Cost Analyzer** | Service requirements + usage patterns | `service_costs.md` | Cloud pricing breakdowns, ROI projections |
+| **Sprint Planner** | Building blocks + team velocity | `sprint_plan.md` | User stories with INVEST criteria, story points, capacity planning |
+| **Diagram Generator** | Architecture decisions + data flows | `diagrams/*.png` | C4 models, sequence diagrams, ERDs, deployment diagrams |
+| **Risk Assessor** | Project constraints + market research | `risk_register.md` | Risk categories, likelihood/impact, mitigation strategies |
+| **Report Compiler** | All outputs + IEEE citations | `final_report.pdf` | Professional PDF with TOC, citations, cover page |
+
+**Checkpoint System:**
+- **15% checkpoint**: Initial research queries complete, can resume if interrupted
+- **30% checkpoint**: Cross-referencing and analysis done
+- **50% checkpoint**: Synthesis started, can resume with half the time saved
+- **100% completion**: All research tasks finished, ready for processing
+
+**Parallelization Strategy:**
+When enabled, independent tasks run concurrently:
+- Phase 1: Market research + competitive analysis (parallel)
+- Phase 2: Architecture patterns + tech stack research (parallel)
+- Phase 3: Cost analysis + risk assessment + feasibility (parallel, 60% faster!)
+- Overall time savings: ~14%
+
+---
+
+### Example Output Structure
+
+After running `/full-plan my-saas`, you get:
+
+```
+planning_outputs/20260118_143052_my-saas/
+├── specifications/
+│   ├── project_specification.md      # Parsed from your template
+│   └── technical_requirements.md     # Extracted technical specs
+├── research/
+│   ├── market_research.md            # Industry trends, market size
+│   ├── competitive_analysis.md       # Competitor profiling with data
+│   └── technology_research.md        # Tech stack options with benchmarks
+├── analysis/
+│   ├── feasibility_analysis.md       # Technical + market viability
+│   ├── risk_assessment.md            # Risk register with mitigation
+│   └── service_costs.md              # Cloud pricing breakdown
+├── architecture/
+│   ├── architecture_decisions.md     # ADRs with research backing
+│   ├── system_design.md              # C4 models, patterns
+│   └── tech_stack.md                 # Justified technology choices
+├── components/
+│   └── building_blocks.yaml          # Incremental build specs
+├── planning/
+│   ├── sprint_plan.md                # User stories, story points
+│   └── implementation_roadmap.md     # Timeline, milestones
+├── diagrams/
+│   ├── c4_context.png                # System context diagram
+│   ├── c4_container.png              # Container diagram
+│   ├── sequence_auth.png             # Authentication flow
+│   └── deployment.png                # Infrastructure diagram
+├── marketing/
+│   ├── gtm_strategy.md               # Go-to-market plan
+│   ├── content_calendar.md           # Social media schedule
+│   └── influencer_outreach.md        # Partnership strategies
+├── final_report.pdf                  # Compiled professional PDF
+└── SUMMARY.md                        # Executive summary
+```
+
+**Total deliverables:** 50+ documents, 10+ diagrams, 1 comprehensive PDF—everything needed to pitch, build, and launch your project.
+
+---
+
+### When to Use Each Mode
+
+| Your Situation | Recommended Setup | Why |
+|----------------|-------------------|-----|
+| **Quick prototype validation** | Quick mode, Perplexity only, no approvals, core phases only | Get high-level plan in 15 minutes |
+| **Startup pitch deck** | Balanced mode, interactive approvals, include market + GTM, PDF output | Need thorough market research, want to review before finalizing |
+| **Enterprise project** | Comprehensive mode, Gemini for all, multi-model validation, all phases | Mission-critical, need highest quality and validation |
+| **Personal side project** | Quick mode, sequential (simpler), core phases, Markdown only | Don't need exhaustive research, keep it simple |
+| **Grant proposal** | Comprehensive mode, interactive approvals, feasibility + cost analysis, PDF | Need detailed justification and risk assessment |
+
+---
+
+### Why This Approach Works
+
+**1. No cognitive load** - Answer questions instead of reading documentation to find the right flags
+
+**2. Discovery-based** - See all features as you configure, not buried in docs
+
+**3. Context-aware** - Questions adapt based on your API keys (hide Gemini options if no key)
+
+**4. Recoverable** - Checkpoints every 15%/30%/50% mean interruptions don't waste time
+
+**5. Transparent** - Progress tracking shows exactly what's happening (no black box)
+
+**6. Fail-safe** - Automatic fallback from Gemini → Perplexity prevents failures
+
+**7. Incremental** - Building blocks let you start coding before the full plan is done
+
+---
+
 ## ✨ What's New in v1.4.0-alpha
 
 ### 📊 Complete Progress Tracking & Error Recovery System

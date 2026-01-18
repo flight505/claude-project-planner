@@ -73,3 +73,7 @@ Thumbs.db
 temp/
 tmp/
 figures/
+
+# NanoBanana diagram generation artifacts
+assets/*_v*.png
+assets/*_review_log.json
