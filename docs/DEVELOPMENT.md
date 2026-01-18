@@ -1,6 +1,6 @@
 # Development and Architecture
 
-This document is for contributors and maintainers. It summarizes the package architecture, design decisions, and development workflow for Claude Project Planner v2.7.0.
+This document is for contributors and maintainers. It summarizes the package architecture, design decisions, and development workflow for Claude Project Planner v1.4.4.
 
 ## Architecture Overview
 
@@ -150,7 +150,7 @@ For local plugin development and testing:
 
 ## Release Notes
 
-v2.7.0 highlights:
+v1.4.4 highlights:
 
 - **Claude Code Plugin Focus** - Optimized for IDE integration
 - Plugin installation with `/project-planner:init`
@@ -180,7 +180,7 @@ Example:
 from project_planner import generate_paper
 ```
 
-### CLI/API -> Plugin (v2.7.0)
+### CLI/API -> Plugin (v1.4.4)
 
 For best IDE experience:
 - Install as Claude Code plugin (recommended)

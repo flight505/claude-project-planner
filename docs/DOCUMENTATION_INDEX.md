@@ -106,10 +106,10 @@
 
 ## 🔗 External Resources
 
-- **GitHub Repository**: https://github.com/K-Dense-AI/claude-project-planner
+- **GitHub Repository**: https://github.com/flight505/claude-project-planner
 - **PyPI Package**: https://pypi.org/project/project-planner/
 - **Community Slack**: [Join K-Dense Community](https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g)
-- **Issue Tracker**: https://github.com/K-Dense-AI/claude-project-planner/issues
+- **Issue Tracker**: https://github.com/flight505/claude-project-planner/issues
 
 ---
 
@@ -128,7 +128,7 @@
 
 ### Accuracy
 
-- ✅ Version numbers updated (v2.7.0)
+- ✅ Version numbers updated (v1.4.4)
 - ✅ Links verified
 - ✅ Examples tested
 - ✅ Prerequisites current
@@ -199,7 +199,7 @@ claude-project-planner/
 
 ### Version References
 
-- Always specify version when referencing features (e.g., "v2.7.0")
+- Always specify version when referencing features (e.g., "v1.4.4")
 - Use "Latest" for current version, "Previous" for older versions
 - Update version numbers during releases
 
@@ -238,13 +238,13 @@ claude-project-planner/
 Found an issue with the documentation? Please:
 
 1. **Check**: [Troubleshooting Guide](TROUBLESHOOTING.md)
-2. **Search**: [GitHub Issues](https://github.com/K-Dense-AI/claude-project-planner/issues)
+2. **Search**: [GitHub Issues](https://github.com/flight505/claude-project-planner/issues)
 3. **Report**: Create a new issue with the "documentation" label
 4. **Discuss**: Join our [Slack Community](https://join.slack.com/t/k-densecommunity/shared_invite/zt-3iajtyls1-EwmkwIZk0g_o74311Tkf5g)
 
 ---
 
-**Last Updated**: January 22, 2025 (v2.7.0)
+**Last Updated**: January 18, 2026 (v1.4.4)
 
 **Documentation Status**: ✅ Complete and Current
 

@@ -771,14 +771,17 @@ asyncio.run(main())
 
 ## 📖 Documentation
 
-- **[Interactive Mode Guide](docs/INTERACTIVE_SETUP.md)** - Complete workflow for v1.3.1
-- **[Parallelization Guide](docs/PARALLELIZATION_GUIDE.md)** - Performance optimization
-- **[Refine Command](commands/refine-plan.md)** - Iterative refinement
+**[📚 Complete Documentation Site](https://flight505.github.io/claude-project-planner)** - Full searchable documentation with navigation
+
+**Quick Links:**
+- **[Parallelization Guide](docs/PARALLELIZATION_GUIDE.md)** - Performance optimization (14% faster)
+- **[Workflows](docs/WORKFLOWS.md)** - Progress tracking, resume, monitoring
 - **[User Flow Diagrams](docs/USER_FLOW.md)** - Visual workflow
 - **[Features Guide](docs/FEATURES.md)** - Comprehensive overview
 - **[API Reference](docs/API.md)** - Python API
-- **[Skills Overview](docs/SKILLS.md)** - All 18 skills
+- **[Skills Overview](docs/SKILLS.md)** - All 19+ skills
 - **[Development Guide](docs/DEVELOPMENT.md)** - Contributing
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues
 - **[Changelog](CHANGELOG.md)** - Version history
 
 ---
