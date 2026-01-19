@@ -1,27 +1,30 @@
 {
-  "SessionStart": [
-    {
-      "matcher": "*",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/check-deps.sh",
-          "timeout": 30
-        }
-      ]
-    }
-  ],
-  "PostToolUse": [
-    {
-      "matcher": "Write",
-      "hooks": [
-        {
-          "type": "command",
-          "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-output.sh \"$TOOL_INPUT_FILE_PATH\" \"$TOOL_INPUT_CONTENT\"",
-          "timeout": 10,
-          "onError": "ignore"
-        }
-      ]
-    }
-  ]
+  "description": "Hooks for dependency checking and output validation",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/check-deps.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-output.sh \"$TOOL_INPUT_FILE_PATH\" \"$TOOL_INPUT_CONTENT\"",
+            "timeout": 10,
+            "onError": "ignore"
+          }
+        ]
+      }
+    ]
+  }
 }
