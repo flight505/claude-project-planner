@@ -404,18 +404,22 @@ This skill features **intelligent model selection** based on query complexity:
 
 ### Model Types
 
-**1. Sonar Pro Search** (`perplexity/sonar-pro-search`)
+**1. Sonar Pro** (`perplexity/sonar-pro`)
 - **Use Case**: Straightforward information lookup
-- **Best For**: 
+- **Context**: 200K tokens
+- **Pricing**: $3/1M prompt + $15/1M completion + $5/1K searches
+- **Best For**:
   - Simple fact-finding queries
   - Recent publication searches
   - Basic protocol lookups
   - Statistical data retrieval
 - **Speed**: Fast responses
-- **Cost**: Lower cost per query
 
 **2. Sonar Reasoning Pro** (`perplexity/sonar-reasoning-pro`)
 - **Use Case**: Complex analytical queries requiring deep reasoning
+- **Model**: Powered by DeepSeek R1 with Chain of Thought
+- **Context**: 128K tokens
+- **Pricing**: $2/1M prompt + $8/1M completion + $5/1K searches
 - **Best For**:
   - Comparative analysis ("compare X vs Y")
   - Synthesis of multiple studies
@@ -423,7 +427,6 @@ This skill features **intelligent model selection** based on query complexity:
   - Explaining mechanisms or relationships
   - Critical analysis and interpretation
 - **Speed**: Slower but more thorough
-- **Cost**: Higher cost per query, but provides deeper insights
 
 ### Complexity Assessment
 
@@ -503,14 +506,15 @@ python research_lookup.py "your query" --json -o results.json
 This skill integrates with OpenRouter (openrouter.ai) to access Perplexity's Sonar models:
 
 **Model Specifications**:
-- **Models**: 
-  - `perplexity/sonar-pro-search` (fast lookup)
-  - `perplexity/sonar-reasoning-pro-online` (deep analysis)
+- **Models**:
+  - `perplexity/sonar-pro` (fast lookup, 200K context)
+  - `perplexity/sonar-reasoning-pro` (deep analysis with DeepSeek R1, 128K context)
 - **Search Mode**: Academic/scholarly mode (prioritizes peer-reviewed sources)
 - **Search Context**: Always uses `high` search context for deeper, more comprehensive research results
-- **Context Window**: 200K+ tokens for comprehensive research
+- **Context Window**: 128-200K tokens depending on model
 - **Capabilities**: Academic paper search, citation generation, scholarly analysis
 - **Output**: Rich responses with citations and source links from academic databases
+- **Pricing**: $2-3/1M input + $8-15/1M output + $5/1K searches
 
 **API Requirements**:
 - OpenRouter API key (set as `OPENROUTER_API_KEY` environment variable)
