@@ -13,6 +13,7 @@ dependencies = [
     "jinja2>=3.1.0",
     "openai>=1.0.0",           # OpenRouter API client for research
     "markitdown>=0.1.0",       # Document conversion
+    "anthropic>=0.76.0",
 ]
 
 # System Dependencies (must be installed separately):

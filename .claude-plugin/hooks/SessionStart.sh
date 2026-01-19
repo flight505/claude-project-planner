@@ -14,7 +14,16 @@ if [[ "$LAST_MESSAGE" == *"/full-plan"* ]] || [[ "$LAST_MESSAGE" == *"full-plan"
    [[ "$LAST_MESSAGE" == *"/tech-plan"* ]] || [[ "$LAST_MESSAGE" == *"tech-plan"* ]]; then
 
     # Check if google-genai is installed (indicator that setup was run)
-    if ! python3 -c "import google.genai" 2>/dev/null; then
+    # Use uv if available to check project environment
+    if command -v uv &> /dev/null && [ -f "${CLAUDE_PLUGIN_ROOT}/pyproject.toml" ]; then
+        cd "${CLAUDE_PLUGIN_ROOT}" && uv run python -c "import google.genai" 2>/dev/null
+        GENAI_CHECK=$?
+    else
+        python3 -c "import google.genai" 2>/dev/null
+        GENAI_CHECK=$?
+    fi
+
+    if [ $GENAI_CHECK -ne 0 ]; then
         echo ""
         echo "⚠️  Setup Required"
         echo ""

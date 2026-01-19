@@ -13,7 +13,7 @@ Help the user configure the Claude Project Planner plugin for optimal performanc
 First, validate that API keys not only exist, but actually work by making real API calls:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/test-providers.py"
+"${CLAUDE_PLUGIN_ROOT}/scripts/run-in-env.sh" "${CLAUDE_PLUGIN_ROOT}/scripts/test-providers.py"
 ```
 
 This will:
@@ -50,7 +50,7 @@ Research Modes:
 Install all dependencies from `requirements-full-plan.txt` regardless of which providers are configured. This ensures users can switch providers later without re-running setup:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/install-all-dependencies.py"
+"${CLAUDE_PLUGIN_ROOT}/scripts/run-in-env.sh" "${CLAUDE_PLUGIN_ROOT}/scripts/install-all-dependencies.py"
 ```
 
 **What gets installed:**

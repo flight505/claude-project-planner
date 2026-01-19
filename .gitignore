@@ -53,6 +53,13 @@ writing_outputs/
 planning_outputs/
 data/
 
+# Plugin testing artifacts
+.*-guide.md
+.*-plan-input.md
+.*-config.json
+test_prompt.txt
+DEEP_RESEARCH_BUDGET.json
+
 # LaTeX auxiliary files
 *.aux
 *.bbl

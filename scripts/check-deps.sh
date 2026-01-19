@@ -3,14 +3,24 @@
 # This script runs on SessionStart to verify dependencies are available
 
 # Check if requests module is available (required for research-lookup)
-python3 -c "import requests" 2>/dev/null
-if [ $? -ne 0 ]; then
+# Use uv if available (checks project virtual environment), otherwise fall back to python3
+if command -v uv &> /dev/null && [ -f "${CLAUDE_PLUGIN_ROOT}/pyproject.toml" ]; then
+    # Check in uv environment
+    cd "${CLAUDE_PLUGIN_ROOT}" && uv run python -c "import requests" 2>/dev/null
+    CHECK_RESULT=$?
+else
+    # Fall back to system python3
+    python3 -c "import requests" 2>/dev/null
+    CHECK_RESULT=$?
+fi
+
+if [ $CHECK_RESULT -ne 0 ]; then
     echo "⚠️  Python 'requests' module not installed."
     echo ""
     echo "   To install all plugin dependencies:"
     # Check if uv is available (preferred)
     if command -v uv &> /dev/null; then
-        echo "   uv pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
+        echo "   cd ${CLAUDE_PLUGIN_ROOT} && uv pip install -r requirements.txt"
     else
         echo "   pip install -r ${CLAUDE_PLUGIN_ROOT}/requirements.txt"
     fi

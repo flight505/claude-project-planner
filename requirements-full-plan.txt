@@ -13,6 +13,7 @@ jinja2>=3.1.0               # Template rendering
 # Research & AI Integration (Required for research-lookup, competitive-analysis)
 # ===============================================================================
 openai>=1.0.0               # OpenRouter API client (used as OpenAI-compatible)
+anthropic>=0.76.0           # Anthropic API client (for test-providers validation)
 
 # Document Processing (Required for markitdown, document-skills)
 # ================================================================

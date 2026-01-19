@@ -41,6 +41,57 @@ The skill automatically selects the best provider and model based on:
 - Uses Deep Research for: competitive analysis, market landscape, architecture decisions
 - Uses Perplexity for: quick facts, pricing, version numbers, simple comparisons
 
+## ⚠️ Deep Research Budget Constraints
+
+**CRITICAL: You have a strict budget of 2 Deep Research queries per `/full-plan` session.**
+
+### Budget Allocation Strategy
+
+**Deep Research is expensive (30-60 min per query, high API cost). Use it ONLY for:**
+
+1. **Phase 1: Competitive Landscape/Analysis** (Highest Priority)
+   - Comprehensive market analysis with multiple competitors
+   - Industry trends and adoption patterns
+   - Regulatory landscape with complex timelines
+
+2. **Phase 2: Novel Architecture Decisions** (Use Sparingly)
+   - ONLY if technology stack is highly uncertain or cutting-edge
+   - ONLY if multiple architectural approaches need deep comparison
+   - DEFAULT to Gemini Pro or Perplexity for standard tech stack research
+
+### DO NOT Use Deep Research For:
+
+❌ Version checks or feature comparisons (use Perplexity)
+❌ Pricing lookups or cost estimates (use Perplexity)
+❌ Quick technical documentation (use Perplexity)
+❌ Simple "what is X" queries (use Gemini Flash/Perplexity)
+❌ Phases 3-6 research (use Perplexity - better temporal accuracy)
+
+### Recommended Budget Allocation
+
+**Conservative (Recommended):**
+- 1 Deep Research: Phase 1 competitive landscape
+- 1 Deep Research: Phase 1 regulatory timeline OR Phase 2 architecture (if novel)
+- All others: Perplexity or Gemini Pro
+
+**Aggressive (High-Stakes Projects):**
+- 2 Deep Research: Phase 1 market analysis queries
+- All others: Perplexity or Gemini Pro
+
+### Budget Tracking
+
+The system automatically tracks your Deep Research usage:
+- `planning_outputs/<project>/DEEP_RESEARCH_BUDGET.json` contains the budget state
+- Progress warnings appear when approaching limit: `⚠️ 1/2 Deep Research queries used`
+- System falls back to Gemini Pro if budget exhausted
+
+**Before using Deep Research, ask yourself:**
+1. Is this query critical to project viability/direction?
+2. Does it require 30-60 min comprehensive multi-source analysis?
+3. Can Perplexity or Gemini Pro provide sufficient depth?
+
+**Remember: Perplexity has better temporal accuracy for 2026 data, so prefer it for time-sensitive queries even in Phase 1.**
+
 ## When to Use This Skill
 
 Use this skill when you need:

@@ -19,7 +19,14 @@
     "sprints",
     "cost-analysis"
   ],
-  "commands": "./commands",
+  "commands": [
+    "./commands/full-plan.md",
+    "./commands/generate-report.md",
+    "./commands/refine-plan.md",
+    "./commands/resume-plan.md",
+    "./commands/setup.md",
+    "./commands/tech-plan.md"
+  ],
   "agents": [
     "./agents/architecture-validator.md"
   ],
