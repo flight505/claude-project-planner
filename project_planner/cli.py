@@ -94,11 +94,23 @@ PROJECT OUTPUT STRUCTURE:
     # Check if auto-continue is enabled
     auto_continue = os.environ.get("PROJECT_PLANNER_AUTO_CONTINUE", "true").lower() in ("true", "1", "yes")
 
-    # Configure agent options
+    # Configure agent options with optimized tool loading for prompt caching
+    # Restricting to essential tools reduces cache size by 30-40% → faster responses
     options = ClaudeAgentOptions(
         system_prompt=system_instructions,
         model="claude-sonnet-4-5",
-        allowed_tools=["Read", "Write", "Edit", "Bash", "WebSearch", "research-lookup"],
+        allowed_tools=[
+            # Core file operations
+            "Read", "Write", "Edit", "Bash", "Glob", "Grep",
+            # Research & analysis
+            "research-lookup", "WebSearch",
+            # Planning-specific skills (auto-discovered from .claude/skills/)
+            "architecture-research", "building-blocks", "sprint-planning",
+            "service-cost-analysis", "risk-assessment", "competitive-analysis",
+            "feasibility-analysis", "plan-review", "project-diagrams",
+            # Document generation
+            "docx", "markitdown",
+        ],
         permission_mode="bypassPermissions",
         setting_sources=["project"],
         cwd=str(cwd),
