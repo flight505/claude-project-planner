@@ -16,7 +16,6 @@ from datetime import datetime, timedelta
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from streaming_research_wrapper import StreamingResearchWrapper, ProgressFormatter
 from research_progress_tracker import ResearchProgressTracker, ProgressMonitor
 from research_error_handling import (
     ResearchErrorHandler,
@@ -25,116 +24,6 @@ from research_error_handling import (
     CircuitBreakerState,
     ErrorRecoveryStrategy
 )
-
-
-# ============================================================================
-# Pattern 1: Streaming Research Wrapper Tests
-# ============================================================================
-
-class TestStreamingResearchWrapper:
-    """Tests for StreamingResearchWrapper class."""
-
-    @pytest.mark.asyncio
-    async def test_default_callback_invoked(self):
-        """Verify default callback is invoked for events."""
-        # Create wrapper with default callback
-        wrapper = StreamingResearchWrapper()
-
-        # Verify it has a callback
-        assert wrapper.progress_callback is not None
-
-        # Test calling the callback
-        await wrapper.progress_callback("start", {"query": "test query"})
-        await wrapper.progress_callback("thinking", {"text": "test text"})
-        await wrapper.progress_callback("result", {"data": {}})
-
-    @pytest.mark.asyncio
-    async def test_custom_callback_invoked(self):
-        """Verify custom progress callback is called with correct events."""
-        events_received = []
-
-        async def custom_callback(event_type, data):
-            events_received.append((event_type, data))
-
-        wrapper = StreamingResearchWrapper(progress_callback=custom_callback)
-
-        # Trigger various events
-        await wrapper.progress_callback("start", {"query": "test"})
-        await wrapper.progress_callback("thinking", {"text": "reasoning"})
-        await wrapper.progress_callback("tool_start", {"tool_name": "WebSearch"})
-        await wrapper.progress_callback("result", {"data": {}})
-
-        # Verify all events received
-        assert len(events_received) == 4
-        assert events_received[0][0] == "start"
-        assert events_received[1][0] == "thinking"
-        assert events_received[2][0] == "tool_start"
-        assert events_received[3][0] == "result"
-
-    def test_get_summary(self):
-        """Verify get_summary returns correct information."""
-        wrapper = StreamingResearchWrapper()
-
-        # Simulate some activity
-        wrapper.tools_used = ["WebSearch", "Read", "WebSearch"]
-        wrapper.findings = ["finding 1", "finding 2"]
-        wrapper.start_time = datetime.now() - timedelta(seconds=30)
-
-        summary = wrapper.get_summary()
-
-        # Verify summary content
-        assert "tools_used" in summary
-        assert "WebSearch" in summary["tools_used"]
-        assert "Read" in summary["tools_used"]
-        assert summary["tool_count"] == 3
-        assert summary["findings_count"] == 2
-        assert summary["duration_sec"] >= 30
-
-
-class TestProgressFormatter:
-    """Tests for ProgressFormatter class."""
-
-    def test_format_start_event(self):
-        """Verify start event formatting."""
-        formatted = ProgressFormatter.format_event("start", {"query": "test query"})
-        assert "🚀" in formatted
-        assert "Starting research" in formatted
-
-    def test_format_thinking_event(self):
-        """Verify thinking event formatting."""
-        formatted = ProgressFormatter.format_event("thinking", {"text": "reasoning here"})
-        assert "💭" in formatted
-        assert "reasoning" in formatted
-
-    def test_format_tool_start_event(self):
-        """Verify tool start event formatting."""
-        formatted = ProgressFormatter.format_event("tool_start", {"tool_name": "WebSearch"})
-        assert "🛠️" in formatted
-        assert "WebSearch" in formatted
-
-    def test_format_tool_result_success(self):
-        """Verify successful tool result formatting."""
-        formatted = ProgressFormatter.format_event("tool_result", {
-            "tool_name": "WebSearch",
-            "success": True
-        })
-        assert "✅" in formatted
-        assert "completed" in formatted
-
-    def test_format_tool_result_failure(self):
-        """Verify failed tool result formatting."""
-        formatted = ProgressFormatter.format_event("tool_result", {
-            "tool_name": "WebSearch",
-            "success": False
-        })
-        assert "❌" in formatted
-        assert "failed" in formatted
-
-    def test_format_error_event(self):
-        """Verify error event formatting."""
-        formatted = ProgressFormatter.format_event("error", {"error": "Test error"})
-        assert "❌" in formatted
-        assert "Test error" in formatted
 
 
 # ============================================================================

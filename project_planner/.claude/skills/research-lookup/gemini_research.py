@@ -8,9 +8,7 @@ Requires GEMINI_API_KEY and Google AI Pro subscription ($19.99/month).
 
 import os
 import sys
-import json
 import time
-import subprocess
 from typing import Dict, List, Optional, Any, Callable
 from datetime import datetime
 from pathlib import Path
@@ -61,86 +59,6 @@ def get_gemini_client():
             os.environ["GOOGLE_API_KEY"] = old_google_key
         if old_cloud_key:
             os.environ["GOOGLE_CLOUD_API_KEY"] = old_cloud_key
-
-
-def check_deep_research_budget(project_folder: Optional[Path] = None) -> bool:
-    """Check if Deep Research budget is available.
-
-    Returns:
-        True if budget available or no project folder specified, False if exhausted
-    """
-    if not project_folder or not project_folder.exists():
-        # No budget tracking for standalone usage
-        return True
-
-    try:
-        # Get path to budget-tracker.py
-        script_dir = Path(__file__).parent.parent.parent.parent / "scripts"
-        budget_script = script_dir / "budget-tracker.py"
-
-        if not budget_script.exists():
-            print(f"⚠️  Budget tracker not found: {budget_script}", file=sys.stderr)
-            return True
-
-        # Check budget
-        result = subprocess.run(
-            [sys.executable, str(budget_script), "check", str(project_folder)],
-            capture_output=True,
-            text=True
-        )
-
-        # Print budget status (from stderr)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr, end='')
-
-        return result.returncode == 0
-
-    except Exception as e:
-        print(f"⚠️  Budget check failed: {e}", file=sys.stderr)
-        return True  # Don't block on error
-
-
-def record_deep_research_usage(
-    project_folder: Optional[Path],
-    query: str,
-    duration_seconds: float,
-    model_name: str,
-    phase: Optional[int] = None,
-    task_type: Optional[str] = None
-):
-    """Record Deep Research query usage in budget tracker."""
-    if not project_folder or not project_folder.exists():
-        return
-
-    try:
-        script_dir = Path(__file__).parent.parent.parent.parent / "scripts"
-        budget_script = script_dir / "budget-tracker.py"
-
-        if not budget_script.exists():
-            return
-
-        # Record usage
-        cmd = [
-            sys.executable, str(budget_script), "record",
-            str(project_folder),
-            query[:100],  # Summary
-            "--duration", str(duration_seconds),
-            "--model", model_name
-        ]
-
-        if phase is not None:
-            cmd.extend(["--phase", str(phase)])
-        if task_type is not None:
-            cmd.extend(["--task-type", task_type])
-
-        result = subprocess.run(cmd, capture_output=True, text=True)
-
-        # Print status update (from stderr)
-        if result.stderr:
-            print(result.stderr, file=sys.stderr, end='')
-
-    except Exception as e:
-        print(f"⚠️  Failed to record usage: {e}", file=sys.stderr)
 
 
 def get_available_models(client) -> Dict[str, str]:
@@ -312,15 +230,6 @@ def execute_deep_research(
         # Select optimal model based on query and context
         model, model_type = select_optimal_model(client, query, research_mode, context)
 
-        # Check budget if using Deep Research
-        if model_type == "deep_research":
-            if not check_deep_research_budget(project_folder):
-                # Budget exhausted - fallback to Gemini Pro
-                print(f"⚠️  Falling back to Gemini Pro due to budget constraints", file=sys.stderr)
-                model_type = "pro"
-                available = get_available_models(client)
-                model = available.get("pro", available.get("flash"))
-
         if progress_callback:
             if model_type == "deep_research":
                 progress_callback(f"⚠️  Using Deep Research Agent (expensive, 30-60 min)")
@@ -333,21 +242,6 @@ def execute_deep_research(
         result = _execute_comprehensive_research(
             client, types, query, model, model_type, output_file, progress_callback
         )
-
-        # Record usage if Deep Research was actually used
-        if result["success"] and model_type == "deep_research":
-            duration = result["metadata"].get("duration_seconds", 0)
-            phase = context.get("phase")
-            task_type = context.get("task_type")
-
-            record_deep_research_usage(
-                project_folder,
-                query,
-                duration,
-                model,
-                phase,
-                task_type
-            )
 
         return result
 

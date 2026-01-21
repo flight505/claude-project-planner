@@ -18,7 +18,8 @@ from unittest.mock import patch, AsyncMock, MagicMock
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-from streaming_research_wrapper import StreamingResearchWrapper, ProgressFormatter
+# NOTE: StreamingResearchWrapper has been removed - tests need rewriting to use SDK streaming directly
+# from streaming_research_wrapper import StreamingResearchWrapper, ProgressFormatter
 from research_progress_tracker import ResearchProgressTracker
 from research_error_handling import ResearchErrorHandler, ErrorRecoveryStrategy
 
