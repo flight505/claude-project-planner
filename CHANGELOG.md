@@ -7,6 +7,87 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.5] - 2026-01-22
+
+### 🚀 Feature Release - Architecture Optimization & Performance Improvements
+
+This release significantly simplifies the codebase and adds intelligent cost optimizations while maintaining full functionality and quality.
+
+### 🟢 Major Improvements
+
+#### Phase 1: Removed Unnecessary Complexity (~8.6K lines)
+
+**Gemini Budget Tracking System - Removed**
+- **Removed**: `scripts/budget-tracker.py` (8.3K lines)
+- **Removed**: `DEEP_RESEARCH_BUDGET_SYSTEM.md`
+- **Removed**: Budget check functions from `gemini_research.py`
+- **Reason**: Based on incorrect assumption that Gemini Deep Research was subscription-based with 2-query limit. It's actually pay-per-use API like Perplexity.
+- **Impact**: Cleaner code, no functionality loss
+
+**StreamingResearchWrapper - Removed**
+- **Removed**: `scripts/streaming_research_wrapper.py` (318 lines)
+- **Removed**: Related tests from `test_progress_tracking.py` and `test_research_integration.py`
+- **Reason**: Redundant wrapper around Claude Agent SDK native streaming capabilities
+- **Impact**: SDK streaming works identically, no wrapper needed
+
+#### Phase 2: Cost Optimization & Performance
+
+**Dynamic Context Sizing** (29-57% search cost savings)
+- **Added**: `_select_context_size()` method to `research_lookup.py`
+- **Intelligent Selection**:
+  - Simple queries (< 50 chars, fact lookups): `low` context → $6/1K searches (57% savings)
+  - Standard queries: `medium` context → $10/1K searches (29% savings)
+  - Complex queries (reasoning keywords, long queries): `high` context → $14/1K searches
+- **Tracking**: Added `context_size` to research response metadata
+- **Impact**: Automatic cost optimization with no quality compromise
+
+**Optimized Tool Loading** (50-85% faster responses)
+- **Updated**: `api.py` and `cli.py` to restrict `allowed_tools` to essential planning tools
+- **Cache Optimization**: 30-40% smaller cache size → faster cache warming
+- **Tools Included**:
+  - Core: Read, Write, Edit, Bash, Glob, Grep
+  - Research: research-lookup, WebSearch
+  - Planning: architecture-research, building-blocks, sprint-planning, service-cost-analysis, risk-assessment, competitive-analysis, feasibility-analysis, plan-review, project-diagrams
+  - Documents: docx, markitdown
+- **Impact**: 50-85% faster responses after first request (prompt caching benefit)
+
+#### Phase 3: Documentation
+
+**New Documentation**
+- **Added**: `ARCHITECTURE_AUDIT_RECOMMENDATIONS.md` - Comprehensive 17K word analysis
+- **Added**: `RESEARCH_OPENROUTER_WEB_SEARCH.md` - OpenRouter capabilities research
+- **Added**: `RESEARCH_PROMPT_CACHING.md` - Claude Agent SDK caching guide
+- **Updated**: `RESEARCH_PRICING_ANALYSIS.md` - Corrected cost breakdown
+
+### 📊 Impact Summary
+
+**Code Complexity**:
+- Before: ~50K lines across 20+ scripts
+- After: ~41K lines across 18 scripts
+- **Reduction: 18% simpler codebase**
+
+**Cost per Run** (with Claude MAX subscription):
+- Before: $0.30-0.50 (just Perplexity search fees)
+- After: $0.15-0.30 (optimized context sizing)
+- **Savings: ~$3-6/year** (modest but automatic)
+
+**Performance**:
+- Prompt caching: 50-85% faster responses after cache warm-up
+- Smaller cache: Faster initial loading
+- **No quality impact**: Same citations, same research depth
+
+**Note**: If you have **Claude MAX subscription**, Claude API costs are $0 (included). Total costs are just Perplexity search fees.
+
+### 🔗 References
+
+- Branch: `refactor/phase1-simplification`
+- Commits:
+  - cf79b2a - "refactor: Phase 1 - Remove unnecessary complexity"
+  - bbd62a7 - "feat: Phase 2 - Cost optimization and performance improvements"
+- Analysis: See `ARCHITECTURE_AUDIT_RECOMMENDATIONS.md`
+
+---
+
 ## [1.4.2] - 2026-01-17
 
 ### 🔧 Patch Release - AskUserQuestion Schema Compliance

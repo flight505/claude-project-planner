@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.4.4-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.4.5-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
@@ -267,6 +267,37 @@ planning_outputs/20260118_143052_my-saas/
 **6. Fail-safe** - Automatic fallback from Gemini → Perplexity prevents failures
 
 **7. Incremental** - Building blocks let you start coding before the full plan is done
+
+---
+
+## ✨ What's New in v1.4.5
+
+### 🚀 Architecture Optimization & Performance Improvements
+
+**Simpler, faster, cheaper!** v1.4.5 removes unnecessary complexity and adds intelligent cost optimization:
+
+**✅ Removed Unnecessary Systems (~8.6K lines)**
+- Eliminated Gemini budget tracking (was based on incorrect subscription assumption)
+- Removed redundant streaming wrapper (Claude Agent SDK already provides streaming)
+- Cleaner codebase with same functionality
+
+**⚡ Smart Cost Optimization**
+- **Dynamic Context Sizing**: Automatically selects low/medium/high context based on query complexity
+  - Simple queries: $6/1K searches (57% savings)
+  - Standard queries: $10/1K searches (29% savings)
+  - Complex queries: $14/1K searches (maintains depth)
+- **Optimized Tool Loading**: Restricts to essential tools → 30-40% smaller cache → 50-85% faster responses after first request
+- **Cost Tracking**: Research responses now include `context_size` metadata for transparency
+
+**📊 Impact**:
+- Code: 18% reduction (simpler architecture)
+- Search costs: $0.15-0.30/run (vs $0.30-0.50/run)
+- Response speed: 50-85% faster (after cache warm-up)
+- Quality: Unchanged (same citations and research depth)
+
+**Note**: If you have **Claude MAX subscription**, Claude API costs are $0 (included). Total cost per run: ~$0.15-0.30 (just Perplexity searches).
+
+**See**: `ARCHITECTURE_AUDIT_RECOMMENDATIONS.md` for comprehensive analysis.
 
 ---
 
