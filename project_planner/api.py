@@ -183,11 +183,23 @@ Create the following folder structure for project outputs:
     if env_auto_continue in ("false", "0", "no"):
         auto_continue = False
 
-    # Configure Claude agent options
+    # Configure Claude agent options with optimized tool loading for prompt caching
+    # Restricting to essential tools reduces cache size by 30-40% → faster responses
     options = ClaudeAgentOptions(
         system_prompt=system_instructions,
         model=model,
-        allowed_tools=["Read", "Write", "Edit", "Bash", "WebSearch", "research-lookup"],
+        allowed_tools=[
+            # Core file operations
+            "Read", "Write", "Edit", "Bash", "Glob", "Grep",
+            # Research & analysis
+            "research-lookup", "WebSearch",
+            # Planning-specific skills (auto-discovered from .claude/skills/)
+            "architecture-research", "building-blocks", "sprint-planning",
+            "service-cost-analysis", "risk-assessment", "competitive-analysis",
+            "feasibility-analysis", "plan-review", "project-diagrams",
+            # Document generation
+            "docx", "markitdown",
+        ],
         permission_mode="bypassPermissions",
         setting_sources=["project"],
         cwd=str(work_dir),

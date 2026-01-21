@@ -56,36 +56,81 @@ class ResearchLookup:
     def _select_model(self, query: str) -> str:
         """
         Select the appropriate model based on query complexity.
-        
+
         Args:
             query: The research query
-            
+
         Returns:
             Model identifier string
         """
         if self.force_model:
             return self.MODELS.get(self.force_model, self.MODELS["reasoning"])
-        
+
         # Check for reasoning keywords (case-insensitive)
         query_lower = query.lower()
         for keyword in self.REASONING_KEYWORDS:
             if keyword in query_lower:
                 return self.MODELS["reasoning"]
-        
+
         # Check for multiple questions or complex structure
         question_count = query.count("?")
         if question_count >= 2:
             return self.MODELS["reasoning"]
-        
+
         # Check for very long queries (likely complex)
         if len(query) > 200:
             return self.MODELS["reasoning"]
-        
+
         # Default to pro for simple lookups
         return self.MODELS["pro"]
 
-    def _make_request(self, messages: List[Dict[str, str]], model: str, **kwargs) -> Dict[str, Any]:
+    def _select_context_size(self, query: str) -> str:
+        """
+        Select appropriate search context size based on query complexity.
+
+        Context sizes and costs (per 1,000 searches):
+        - low: $6/1K (57% cheaper than high)
+        - medium: $10/1K (29% cheaper than high)
+        - high: $14/1K (most comprehensive)
+
+        Args:
+            query: The research query
+
+        Returns:
+            Context size: "low", "medium", or "high"
+        """
+        query_lower = query.lower()
+
+        # Simple fact lookups: low context
+        # Short queries with simple structure
+        if len(query) < 50 and query.count("?") <= 1:
+            # Check if it's a simple fact query
+            simple_patterns = ["what is", "who is", "when", "where", "define", "definition of"]
+            if any(pattern in query_lower for pattern in simple_patterns):
+                return "low"
+
+        # Complex analysis: high context
+        # Uses reasoning keywords or very long/detailed queries
+        for keyword in self.REASONING_KEYWORDS:
+            if keyword in query_lower:
+                return "high"
+
+        # Very long queries need comprehensive context
+        if len(query) > 200:
+            return "high"
+
+        # Multiple questions need more context
+        if query.count("?") >= 2:
+            return "high"
+
+        # Default: medium context (good balance)
+        return "medium"
+
+    def _make_request(self, messages: List[Dict[str, str]], model: str, query: str = "", **kwargs) -> Dict[str, Any]:
         """Make a request to the OpenRouter API with academic search mode."""
+        # Select context size based on query complexity (dynamic cost optimization)
+        context_size = self._select_context_size(query) if query else "medium"
+
         data = {
             "model": model,
             "messages": messages,
@@ -93,7 +138,7 @@ class ResearchLookup:
             "temperature": 0.1,  # Low temperature for factual research
             # Perplexity-specific parameters for academic search
             "search_mode": "academic",  # Prioritize scholarly sources (peer-reviewed papers, journals)
-            "search_context_size": "high",  # Always use high context for deeper research
+            "search_context_size": context_size,  # Dynamic context sizing for cost optimization
             **kwargs
         }
 
@@ -186,8 +231,11 @@ Focus exclusively on scholarly sources: peer-reviewed journals, academic papers,
         ]
 
         try:
-            # Make the API request
-            response = self._make_request(messages, model)
+            # Make the API request with dynamic context sizing
+            response = self._make_request(messages, model, query=query)
+
+            # Get the context size that was used for cost tracking
+            context_size = self._select_context_size(query)
 
             # Extract the response content
             if "choices" in response and len(response["choices"]) > 0:
@@ -197,10 +245,10 @@ Focus exclusively on scholarly sources: peer-reviewed journals, academic papers,
 
                     # Extract citations from API response (Perplexity provides these)
                     api_citations = self._extract_api_citations(response, choice)
-                    
+
                     # Also extract citations from text as fallback
                     text_citations = self._extract_citations_from_text(content)
-                    
+
                     # Combine: prioritize API citations, add text citations if no duplicates
                     citations = api_citations + text_citations
 
@@ -212,7 +260,8 @@ Focus exclusively on scholarly sources: peer-reviewed journals, academic papers,
                         "sources": api_citations,  # Separate field for API-provided sources
                         "timestamp": timestamp,
                         "model": model,
-                        "usage": response.get("usage", {})
+                        "usage": response.get("usage", {}),
+                        "context_size": context_size,  # Track which context size was used (cost optimization)
                     }
                 else:
                     raise Exception("Invalid response format from API")
