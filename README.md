@@ -9,7 +9,7 @@
 
 **AI-powered project planning toolkit** that transforms ideas into comprehensive, buildable specifications. Generate complete project plans including architecture documents, sprint plans, cost analyses, and implementation roadmaps—all backed by real-time research.
 
-**✨ New in v1.4.0:** Production-ready progress tracking & error recovery system! Monitor long-running Deep Research operations in real-time, resume interrupted research from checkpoints, and track progress with granular activity-based updates. Includes structured error handling with recovery suggestions, automatic cleanup, state machine validation, and comprehensive CLI tools.
+**✨ New in v1.4.5:** Simpler, faster, cheaper! Architecture optimization removes 8.6K lines of unnecessary code, adds intelligent cost optimization (29-57% search cost savings), and achieves 50-85% faster responses through optimized caching. With Claude MAX subscription, total cost per run is just $0.15-0.30 (Perplexity searches only).
 
 ---
 
@@ -55,6 +55,37 @@ export OPENROUTER_API_KEY='your_key'  # Recommended for research
 ```
 
 **That's it!** No flags to remember—discover all features through the interactive UI.
+
+---
+
+## ✨ What's New in v1.4.5
+
+### 🚀 Architecture Optimization & Performance Improvements
+
+**Simpler, faster, cheaper!** v1.4.5 removes unnecessary complexity and adds intelligent cost optimization:
+
+**✅ Removed Unnecessary Systems (~8.6K lines)**
+- Eliminated Gemini budget tracking (was based on incorrect subscription assumption)
+- Removed redundant streaming wrapper (Claude Agent SDK already provides streaming)
+- Cleaner codebase with same functionality
+
+**⚡ Smart Cost Optimization**
+- **Dynamic Context Sizing**: Automatically selects low/medium/high context based on query complexity
+  - Simple queries: $6/1K searches (57% savings)
+  - Standard queries: $10/1K searches (29% savings)
+  - Complex queries: $14/1K searches (maintains depth)
+- **Optimized Tool Loading**: Restricts to essential tools → 30-40% smaller cache → 50-85% faster responses after first request
+- **Cost Tracking**: Research responses now include `context_size` metadata for transparency
+
+**📊 Impact**:
+- Code: 18% reduction (simpler architecture)
+- Search costs: $0.15-0.30/run (vs $0.30-0.50/run)
+- Response speed: 50-85% faster (after cache warm-up)
+- Quality: Unchanged (same citations and research depth)
+
+**💰 Cost with Claude MAX**: If you have **Claude MAX subscription** ($60/month), Claude API costs are $0 (included). Total cost per run: ~$0.15-0.30 (just Perplexity searches).
+
+**See**: `REFACTOR_SUMMARY.md` and `ARCHITECTURE_AUDIT_RECOMMENDATIONS.md` for comprehensive analysis.
 
 ---
 
@@ -270,42 +301,9 @@ planning_outputs/20260118_143052_my-saas/
 
 ---
 
-## ✨ What's New in v1.4.5
+## 📊 Progress Tracking & Error Recovery (v1.4.0)
 
-### 🚀 Architecture Optimization & Performance Improvements
-
-**Simpler, faster, cheaper!** v1.4.5 removes unnecessary complexity and adds intelligent cost optimization:
-
-**✅ Removed Unnecessary Systems (~8.6K lines)**
-- Eliminated Gemini budget tracking (was based on incorrect subscription assumption)
-- Removed redundant streaming wrapper (Claude Agent SDK already provides streaming)
-- Cleaner codebase with same functionality
-
-**⚡ Smart Cost Optimization**
-- **Dynamic Context Sizing**: Automatically selects low/medium/high context based on query complexity
-  - Simple queries: $6/1K searches (57% savings)
-  - Standard queries: $10/1K searches (29% savings)
-  - Complex queries: $14/1K searches (maintains depth)
-- **Optimized Tool Loading**: Restricts to essential tools → 30-40% smaller cache → 50-85% faster responses after first request
-- **Cost Tracking**: Research responses now include `context_size` metadata for transparency
-
-**📊 Impact**:
-- Code: 18% reduction (simpler architecture)
-- Search costs: $0.15-0.30/run (vs $0.30-0.50/run)
-- Response speed: 50-85% faster (after cache warm-up)
-- Quality: Unchanged (same citations and research depth)
-
-**Note**: If you have **Claude MAX subscription**, Claude API costs are $0 (included). Total cost per run: ~$0.15-0.30 (just Perplexity searches).
-
-**See**: `ARCHITECTURE_AUDIT_RECOMMENDATIONS.md` for comprehensive analysis.
-
----
-
-## ✨ What's New in v1.4.0-alpha
-
-### 📊 Complete Progress Tracking & Error Recovery System
-
-**Never lose Deep Research progress again!** v1.4.0-alpha introduces a comprehensive 3-tier progress tracking and checkpoint system:
+**Never lose Deep Research progress again!** v1.4.0 introduced a comprehensive 3-tier progress tracking and checkpoint system:
 
 **3-Tier Architecture:**
 
@@ -853,6 +851,8 @@ planning_outputs/20260112_143022_b2b_inventory_saas/
 
 ## 🔄 Version History
 
+- **v1.4.5** (2026-01-22) - Architecture optimization: 18% code reduction, 29-57% cost savings, 50-85% faster responses
+- **v1.4.0** (2026-01-19) - Progress tracking & error recovery system with 3-tier checkpoints
 - **v1.3.1** (2026-01-12) - Interactive approval gates, `/refine-plan` command, comprehensive setup UI
 - **v1.3.0** (2026-01-12) - Post-plan parallelization analysis
 - **v1.2.0** (2026-01-11) - Interactive setup UI with file-based input
