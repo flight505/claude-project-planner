@@ -21,7 +21,7 @@ When the user invokes `/resume-plan`, resume an interrupted project planning ses
 ### If folder path provided:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" status "<folder>" --json
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" status "<folder>" --json
 ```
 
 ### If no folder provided:
@@ -29,7 +29,7 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" status "<folder>" -
 List all available checkpoints:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" list planning_outputs/ --json
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" list planning_outputs/ --json
 ```
 
 If multiple checkpoints found, present options to user:
@@ -54,7 +54,7 @@ If no checkpoints found:
 Once a checkpoint is identified, load the resume context:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" context "<folder>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" context "<folder>"
 ```
 
 This generates a context summary including:
@@ -114,7 +114,7 @@ options:
 ### If user chooses "Start over":
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" clear "<folder>"
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" clear "<folder>"
 ```
 
 Then inform user:
@@ -170,7 +170,7 @@ Continue from the next phase, following the same process as `/full-plan` or `/te
 After completing each remaining phase:
 
 ```bash
-python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" save \
   "<folder>" <phase_num> \
   --context "Summary of what was done in this phase" \
   --decisions "Decision 1;Decision 2;Decision 3"

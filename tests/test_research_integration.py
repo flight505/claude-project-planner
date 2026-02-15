@@ -12,127 +12,14 @@ import json
 import pytest
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 # Import modules to test
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
-# NOTE: StreamingResearchWrapper has been removed - tests need rewriting to use SDK streaming directly
-# from streaming_research_wrapper import StreamingResearchWrapper, ProgressFormatter
 from research_progress_tracker import ResearchProgressTracker
 from research_error_handling import ResearchErrorHandler, ErrorRecoveryStrategy
-
-
-class TestPerplexityStreamingIntegration:
-    """
-    Integration tests for Perplexity research with streaming progress.
-
-    These tests verify that streaming progress works end-to-end with
-    the Claude Agent SDK (or mocked equivalent).
-    """
-
-    @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires Claude Agent SDK - run manually")
-    async def test_perplexity_research_with_streaming_real(self):
-        """
-        Real integration test with Perplexity (requires API).
-
-        This test is skipped by default. To run manually:
-            pytest tests/test_research_integration.py::TestPerplexityStreamingIntegration::test_perplexity_research_with_streaming_real -v -s
-        """
-        # Track progress events
-        events = []
-
-        async def progress_callback(event_type, data):
-            events.append(event_type)
-            formatted = ProgressFormatter.format_event(event_type, data)
-            print(formatted)
-
-        # Create wrapper
-        wrapper = StreamingResearchWrapper(progress_callback=progress_callback)
-
-        # Execute research
-        query = "What are the latest AI agent frameworks as of 2025?"
-        results = await wrapper.research_with_progress(
-            query,
-            max_turns=50,
-            allowed_tools=["mcp__perplexity__*", "WebSearch"]
-        )
-
-        # Verify results
-        assert "query" in results
-        assert results["query"] == query
-        assert "tools_used" in results
-        assert "findings" in results
-        assert len(results["findings"]) > 0
-
-        # Verify progress events were triggered
-        assert "start" in events
-        assert "result" in events
-
-        # Verify summary
-        summary = wrapper.get_summary()
-        assert summary["tool_count"] > 0
-        assert summary["findings_count"] > 0
-
-    @pytest.mark.asyncio
-    async def test_perplexity_research_with_streaming_mocked(self):
-        """
-        Mocked integration test simulating streaming behavior.
-
-        Tests the wrapper logic without requiring actual API calls.
-        """
-        # Track progress events
-        events = []
-
-        async def progress_callback(event_type, data):
-            events.append((event_type, data))
-
-        # Create wrapper
-        wrapper = StreamingResearchWrapper(progress_callback=progress_callback)
-
-        # Mock the query function to simulate streaming
-        mock_text_block = MagicMock()
-        mock_text_block.text = "AI agent frameworks include LangChain, AutoGPT, and CrewAI."
-
-        mock_tool_block = MagicMock()
-        mock_tool_block.name = "mcp__perplexity__perplexity_research"
-        mock_tool_block.input = {"query": "AI agents"}
-
-        mock_assistant_message = MagicMock()
-        mock_assistant_message.content = [mock_text_block, mock_tool_block]
-
-        mock_result = MagicMock()
-        mock_result.result = True
-
-        # Create mock for Claude Agent SDK
-        async def mock_query_generator(prompt, options):
-            # Simulate streaming: first an assistant message, then result
-            yield mock_assistant_message
-            yield mock_result
-
-        # Patch the query function
-        with patch('streaming_research_wrapper.query', side_effect=mock_query_generator):
-            # Also need to patch the class imports
-            with patch('streaming_research_wrapper.AssistantMessage', return_value=mock_assistant_message):
-                # Execute research
-                query = "What are the latest AI agent frameworks?"
-
-                # Since we're mocking, we need to directly call the internal logic
-                # or create a simpler test method
-                # For now, just verify the callback mechanism
-                await wrapper.progress_callback("start", {"query": query})
-                await wrapper.progress_callback("thinking", {"text": mock_text_block.text})
-                await wrapper.progress_callback("tool_start", {"tool_name": mock_tool_block.name})
-                await wrapper.progress_callback("result", {"data": {}})
-
-        # Verify events
-        assert len(events) == 4
-        assert events[0][0] == "start"
-        assert events[1][0] == "thinking"
-        assert events[2][0] == "tool_start"
-        assert events[3][0] == "result"
 
 
 class TestDeepResearchProgressFileIntegration:
@@ -512,46 +399,5 @@ class TestExternalMonitoring:
                 await tracker.complete(results={"findings": "Complete"})
 
 
-# ============================================================================
-# Manual Testing Helpers
-# ============================================================================
-
-async def manual_test_perplexity_streaming():
-    """
-    Manual test for Perplexity streaming with real API.
-
-    Run with: python -m pytest tests/test_research_integration.py -k manual_test_perplexity_streaming -s
-    """
-    print("\n" + "="*70)
-    print("MANUAL TEST: Perplexity Research with Streaming Progress")
-    print("="*70)
-
-    async def progress_callback(event_type, data):
-        formatted = ProgressFormatter.format_event(event_type, data)
-        print(formatted)
-
-    wrapper = StreamingResearchWrapper(progress_callback=progress_callback)
-
-    query = "What are the top 3 AI agent frameworks in 2025?"
-    print(f"\nQuery: {query}\n")
-
-    try:
-        results = await wrapper.research_with_progress(query, max_turns=30)
-
-        print(f"\n{'='*70}")
-        print("RESULTS")
-        print("="*70)
-        print(f"Tools used: {', '.join(results['tools_used'])}")
-        print(f"Findings: {len(results['findings'])}")
-        print(f"Duration: {results['duration_sec']:.1f}s")
-
-    except Exception as e:
-        print(f"\n❌ Error: {e}")
-
-
 if __name__ == "__main__":
-    # Run all tests
     pytest.main([__file__, "-v"])
-
-    # Uncomment to run manual test:
-    # asyncio.run(manual_test_perplexity_streaming())

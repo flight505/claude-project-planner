@@ -24,6 +24,7 @@ from research_error_handling import (
     CircuitBreakerState,
     ErrorRecoveryStrategy
 )
+from research_errors import ResearchError
 
 
 # ============================================================================
@@ -141,26 +142,26 @@ class TestResearchProgressTracker:
             assert progress["error"] == "Test error"
             assert progress["error_type"] == "timeout"
 
-    def test_list_active_research(self):
+    @pytest.mark.asyncio
+    async def test_list_active_research(self):
         """Verify list_active_research finds running tasks."""
         with tempfile.TemporaryDirectory() as tmpdir:
             project_folder = Path(tmpdir)
 
             # Create multiple progress files
-            tasks = []
+            trackers = []
             for i in range(3):
                 task_id = f"task-{i}"
                 tracker = ResearchProgressTracker(project_folder, task_id)
-                asyncio.run(tracker.start(f"query {i}", "test_provider"))
-                tasks.append(task_id)
+                await tracker.start(f"query {i}", "test_provider")
+                trackers.append(tracker)
 
             # List active
             active = ResearchProgressTracker.list_active_research(project_folder)
             assert len(active) == 3
 
-            # Complete one task
-            tracker = ResearchProgressTracker(project_folder, tasks[0])
-            asyncio.run(tracker.complete())
+            # Complete one task using the original tracker instance
+            await trackers[0].complete()
 
             # List active again
             active = ResearchProgressTracker.list_active_research(project_folder)
@@ -349,7 +350,7 @@ class TestResearchErrorHandler:
         async def fatal_func():
             raise ValueError("Invalid request")
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ResearchError):
             await handler.retry_with_backoff(fatal_func)
 
         # Should fail immediately (1 attempt, no retries)

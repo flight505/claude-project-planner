@@ -29,7 +29,7 @@ class GeminiProvider(BaseAPIProvider):
     """Google Gemini API provider implementation."""
 
     # Default models
-    DEFAULT_TEXT_MODEL = "gemini-2.0-flash-thinking-exp-01-21"
+    DEFAULT_TEXT_MODEL = "gemini-2.0-flash"
     DEFAULT_VIDEO_MODEL = "veo-3.1-generate-preview"
     DEFAULT_IMAGE_MODEL = "imagen-3.0-generate-001"
     DEEP_RESEARCH_AGENT = "deep-research-pro-preview-12-2025"

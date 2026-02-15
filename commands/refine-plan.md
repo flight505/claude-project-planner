@@ -64,7 +64,7 @@ if [[ ! -d "$PLAN_DIR" ]]; then
 fi
 
 # Load checkpoint to get plan state
-CHECKPOINT=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" load "$PLAN_DIR")
+CHECKPOINT=$(python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" load "$PLAN_DIR")
 ```
 
 ### Step 2: Validate Phase Number
@@ -240,7 +240,7 @@ for dep_phase in "${DEPENDENT_PHASES[@]}"; do
   # (Same process as Step 6, but for dependent phase)
 
   # Update checkpoint
-  python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+  python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" save \
     "$PLAN_DIR" "$dep_phase" \
     --context "Re-executed after Phase $PHASE_NUM revision" \
     --revision "$((REVISION_NUM + 1))"
@@ -287,7 +287,7 @@ done
 
 ```bash
 # Update checkpoint with revision information
-python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint-manager.py" save \
+python "${CLAUDE_PLUGIN_ROOT}/scripts/checkpoint_manager.py" save \
   "$PLAN_DIR" "$PHASE_NUM" \
   --context "Phase $PHASE_NUM revised based on user feedback" \
   --revision "$((REVISION_NUM + 1))" \

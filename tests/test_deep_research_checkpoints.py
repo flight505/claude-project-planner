@@ -109,7 +109,7 @@ class TestDeepResearchCheckpointIntegration:
 
             # Pre-create a checkpoint as if research had progressed to 30%
             checkpoint_mgr = ResearchCheckpointManager(project_folder, phase_num)
-            checkpoint_mgr.save_research_checkpoint(
+            await checkpoint_mgr.save_research_checkpoint(
                 task_name="interrupted-research",
                 query="Original competitive analysis query",
                 partial_results={
@@ -335,7 +335,7 @@ class TestDeepResearchCheckpointIntegration:
             ]
 
             for task_name, progress, resumable in tasks:
-                checkpoint_mgr.save_research_checkpoint(
+                await checkpoint_mgr.save_research_checkpoint(
                     task_name=task_name,
                     query=f"Query for {task_name}",
                     partial_results={"progress": progress},

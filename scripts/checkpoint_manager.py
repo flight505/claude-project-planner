@@ -6,11 +6,11 @@ Manages checkpoints for resuming interrupted planning sessions.
 Saves state after each phase completion, enabling resume from last checkpoint.
 
 Usage:
-    python checkpoint-manager.py save <project_folder> <phase_num> [--context "context summary"]
-    python checkpoint-manager.py load <project_folder>
-    python checkpoint-manager.py list [search_path]
-    python checkpoint-manager.py status <project_folder>
-    python checkpoint-manager.py clear <project_folder>
+    python checkpoint_manager.py save <project_folder> <phase_num> [--context "context summary"]
+    python checkpoint_manager.py load <project_folder>
+    python checkpoint_manager.py list [search_path]
+    python checkpoint_manager.py status <project_folder>
+    python checkpoint_manager.py clear <project_folder>
 """
 
 import argparse

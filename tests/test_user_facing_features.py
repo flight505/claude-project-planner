@@ -28,7 +28,8 @@ from enhanced_research_integration import EnhancedResearchLookup, HAS_RESEARCH_L
 class TestResumeCommand:
     """Tests for resume-research.py CLI command."""
 
-    def test_resume_command_list(self):
+    @pytest.mark.asyncio
+    async def test_resume_command_list(self):
         """Test resume command --list option."""
         with tempfile.TemporaryDirectory() as tmpdir:
             project_folder = Path(tmpdir)
@@ -37,7 +38,7 @@ class TestResumeCommand:
             # Create some checkpoints
             manager = ResearchCheckpointManager(project_folder, phase_num)
             for i in range(3):
-                manager.save_research_checkpoint(
+                await manager.save_research_checkpoint(
                     task_name=f"task-{i}",
                     query=f"Query {i}",
                     partial_results={"findings": [f"finding {i}"]},
@@ -87,7 +88,8 @@ class TestResumeCommand:
             assert result.returncode == 0
             assert "NO RESUMABLE RESEARCH TASKS FOUND" in result.stdout
 
-    def test_resume_command_specific_task(self):
+    @pytest.mark.asyncio
+    async def test_resume_command_specific_task(self):
         """Test resuming a specific task."""
         with tempfile.TemporaryDirectory() as tmpdir:
             project_folder = Path(tmpdir)
@@ -95,7 +97,7 @@ class TestResumeCommand:
 
             # Create checkpoint
             manager = ResearchCheckpointManager(project_folder, phase_num)
-            manager.save_research_checkpoint(
+            await manager.save_research_checkpoint(
                 task_name="test-task",
                 query="Test query",
                 partial_results={"findings": ["partial finding"]},
@@ -348,7 +350,7 @@ class TestEndToEndWorkflow:
 
             # STEP 1: Create checkpoint (simulating interrupted research)
             manager = ResearchCheckpointManager(project_folder, phase_num)
-            manager.save_research_checkpoint(
+            await manager.save_research_checkpoint(
                 task_name=task_name,
                 query="Workflow test query",
                 partial_results={"findings": ["Partial finding"]},
