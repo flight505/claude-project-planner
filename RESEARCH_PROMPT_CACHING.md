@@ -259,7 +259,7 @@ async def cached_research_workflow():
 
 | Model | Minimum Cacheable Tokens |
 |-------|-------------------------|
-| Claude Opus 4.5 | 4,096 tokens |
+| Claude Opus 4.6 | 4,096 tokens |
 | Claude Sonnet 4.5 | 1,024 tokens |
 | Claude Sonnet 4 | 1,024 tokens |
 | Claude Haiku 4.5 | 1,024 tokens |
@@ -279,7 +279,7 @@ def check_cache_threshold(content: str, model: str = "claude-sonnet-4.5") -> boo
     token_count = len(enc.encode(content))
 
     thresholds = {
-        "claude-opus-4.5": 4096,
+        "claude-opus-4.6": 4096,
         "claude-sonnet-4.5": 1024,
         "claude-haiku-4.5": 1024
     }
@@ -1665,7 +1665,7 @@ async def parallel_analysis_with_shared_cache():
 ```python
 # Cost comparison for 100k token cached context, 10 queries
 
-# Claude Opus 4.5 (most capable, highest cost)
+# Claude Opus 4.6 (most capable, highest cost)
 opus_cost = {
     "cache_write": 100_000 / 1_000_000 * 6.25,  # $6.25/M
     "cache_reads": 100_000 / 1_000_000 * 0.50 * 9,  # $0.50/M × 9 reads
@@ -1690,14 +1690,14 @@ haiku_cost = {
 # Total: $0.22
 
 # Recommendations:
-# - Complex planning, architecture design → Opus 4.5
+# - Complex planning, architecture design → Opus 4.6
 # - General planning, research, analysis → Sonnet 4.5 (RECOMMENDED)
 # - Batch processing, simple queries → Haiku 4.5
 ```
 
 **For claude-project-planner:**
 - **Default model:** Sonnet 4.5 (best balance of capability and cost)
-- **High-stakes decisions:** Opus 4.5 (architecture ADRs, feasibility analysis)
+- **High-stakes decisions:** Opus 4.6 (architecture ADRs, feasibility analysis)
 - **Batch operations:** Haiku 4.5 (processing many proposals, simple evaluations)
 
 **Caching amplifies cost differences:**

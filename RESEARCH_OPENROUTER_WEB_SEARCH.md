@@ -222,14 +222,14 @@ OpenRouter offers BYOK mode:
 
 ### 5.3 Anthropic Native Search
 
-**Models:** Claude Opus 4.5, Claude Sonnet variants
+**Models:** Claude Opus 4.6, Claude Sonnet variants
 
 **Pricing:**
 - Context-size-based pricing (low/medium/high)
 - Specific per-query costs not publicly disclosed
 - Test billing required to understand exact costs
 
-**Example:** Claude Opus 4.5
+**Example:** Claude Opus 4.6
 - Token pricing: $5/M input, $25/M output
 - Web search: $10 per 1,000 calls
 - Native search via Anthropic infrastructure
@@ -429,7 +429,7 @@ response = client.chat.completions.create(
 ### 10.1 Supported Models
 
 Models with `reasoning` parameter support:
-- Claude Opus 4.5
+- Claude Opus 4.6
 - OpenAI reasoning models
 - Sonar Reasoning Pro
 - Sonar Pro Search
@@ -504,7 +504,7 @@ Features **available** through OpenRouter:
 | Provider | Models | Search Method | Key Difference |
 |----------|--------|---------------|----------------|
 | **OpenAI** | GPT-5, GPT-4o | Native web search | Free search tokens for non-reasoning |
-| **Anthropic** | Claude Opus 4.5 | Native web search | Context-size-based pricing |
+| **Anthropic** | Claude Opus 4.6 | Native web search | Context-size-based pricing |
 | **xAI** | Grok 4.1 Fast | Native + X search | Social media integration |
 | **Perplexity** | Sonar family | Purpose-built | Specialized for search synthesis |
 | **OpenRouter + Exa** | All 400+ models | Exa-powered | Universal search layer |

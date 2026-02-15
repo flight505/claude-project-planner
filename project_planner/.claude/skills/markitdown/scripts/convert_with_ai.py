@@ -168,7 +168,7 @@ Environment Variables:
 
 Popular Models (use with --model):
   anthropic/claude-sonnet-4.5 - Recommended for scientific vision
-  anthropic/claude-opus-4.5   - Advanced vision model
+  anthropic/claude-opus-4.6   - Advanced vision model
   openai/gpt-4o              - GPT-4 Omni (vision support)
   openai/gpt-4-vision        - GPT-4 Vision
   google/gemini-pro-vision   - Gemini Pro Vision
