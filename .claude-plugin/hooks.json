@@ -20,8 +20,7 @@
           {
             "type": "command",
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/validate-output.sh \"$TOOL_INPUT_FILE_PATH\" \"$TOOL_INPUT_CONTENT\"",
-            "timeout": 10,
-            "onError": "ignore"
+            "timeout": 10
           }
         ]
       }
