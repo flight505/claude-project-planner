@@ -4,6 +4,7 @@ description: Multi-model validation agent that reviews architecture decisions us
 model: sonnet
 tools: ["Read", "Write", "Bash", "WebFetch", "Grep", "Glob"]
 color: cyan
+permissionMode: default
 ---
 
 # Architecture Validator Agent
