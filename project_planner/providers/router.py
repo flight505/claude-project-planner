@@ -6,7 +6,8 @@ with automatic fallback chains when providers are unavailable or lack specific f
 """
 
 import os
-from typing import Any, Dict, Optional
+import sys
+from typing import Any, Dict, List, Optional
 
 from .base import (
     BaseAPIProvider,
@@ -205,6 +206,74 @@ class ProviderRouter:
             provider.supports_feature(feature)
             for provider in self.providers.values()
         )
+
+    def validate_models(self) -> List[Dict[str, str]]:
+        """
+        Validate that default models are reachable by sending minimal probe requests.
+
+        Returns a list of issues found. Empty list means all models are healthy.
+        Each issue is a dict with keys: provider, model, task, error.
+        """
+        issues: List[Dict[str, str]] = []
+
+        for name, provider in self.providers.items():
+            models_to_check: List[tuple] = []
+
+            if name == "gemini":
+                models_to_check = [
+                    ("text", provider.text_model),
+                    ("image", provider.image_model),
+                ]
+            elif name == "openrouter":
+                models_to_check = [
+                    ("text", provider.text_model),
+                    ("research", provider.research_model),
+                ]
+
+            for task, model_id in models_to_check:
+                try:
+                    if name == "gemini":
+                        # Minimal probe: list model info
+                        provider.client.models.get(model=model_id)
+                    elif name == "openrouter":
+                        # Minimal probe: 1-token completion
+                        provider.client.chat.completions.create(
+                            model=model_id,
+                            messages=[{"role": "user", "content": "ping"}],
+                            max_completion_tokens=1,
+                        )
+                except Exception as e:
+                    error_msg = str(e)
+                    # Truncate long error messages
+                    if len(error_msg) > 200:
+                        error_msg = error_msg[:200] + "..."
+                    issues.append({
+                        "provider": name,
+                        "model": model_id,
+                        "task": task,
+                        "error": error_msg,
+                    })
+
+        return issues
+
+    def print_model_status(self) -> None:
+        """Validate models and print status to stderr."""
+        issues = self.validate_models()
+        if issues:
+            print("⚠ Model validation warnings:", file=sys.stderr)
+            for issue in issues:
+                print(
+                    f"  {issue['provider']}/{issue['model']} ({issue['task']}): "
+                    f"{issue['error']}",
+                    file=sys.stderr,
+                )
+        else:
+            providers = list(self.providers.keys())
+            if providers:
+                print(
+                    f"✓ All models healthy ({', '.join(providers)})",
+                    file=sys.stderr,
+                )
 
     def __repr__(self) -> str:
         """String representation of router."""

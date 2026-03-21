@@ -555,8 +555,8 @@ Configuration Summary:
 
 **Features:**
 - ✅ **Deep Research**: 60-minute comprehensive research queries
-- ✅ **Veo 3.1**: 8-second videos with audio ($0.75/second)
-- ✅ **Imagen 3**: High-quality image generation
+- ✅ **Veo 3.1**: Video generation ($0.40/sec standard, $0.15/sec fast)
+- ✅ **Imagen 4**: High-quality image generation (Fast/Standard/Ultra tiers)
 - ✅ **1M Token Context**: Industry-leading context window
 
 ```bash
@@ -566,10 +566,52 @@ export GEMINI_API_KEY='your-key'
 **Auto-Detection:**
 
 Plugin automatically uses best provider for each task:
-- **Research**: Gemini Deep Research → Perplexity
-- **Text**: Gemini 2.0 Flash Thinking → Claude 3.5
-- **Images**: Flux (OpenRouter) → Imagen 3 (Gemini)
+- **Research**: Gemini Deep Research → Perplexity Sonar Pro
+- **Text**: Gemini 2.5 Flash → Claude Sonnet 4.5
+- **Images**: Gemini 2.5 Flash Image (OpenRouter) → Imagen 4 (Gemini)
 - **Videos**: Veo 3.1 (Gemini only)
+
+</details>
+
+<details>
+<summary><b>🔧 Models Used (v1.5.0)</b></summary>
+
+### Claude (Agent SDK)
+
+| Effort | Model ID | Use |
+|--------|----------|-----|
+| Low | `claude-haiku-4-5` | Fast, economical planning |
+| Medium | `claude-sonnet-4-6` | Balanced (default) |
+| High | `claude-opus-4-6` | Most capable |
+
+### Gemini (via `GEMINI_API_KEY`)
+
+| Model ID | Use |
+|----------|-----|
+| `gemini-2.5-flash` | Text generation |
+| `imagen-4.0-generate-001` | Image generation |
+| `veo-3.1-generate-preview` | Video generation |
+| `deep-research-pro-preview-12-2025` | Deep Research agent |
+
+### OpenRouter (via `OPENROUTER_API_KEY`)
+
+| Model ID | Use |
+|----------|-----|
+| `anthropic/claude-sonnet-4-5` | Text generation |
+| `perplexity/sonar-pro` | Web-grounded research |
+| `google/gemini-2.5-flash-image` | Image generation |
+
+### Multi-Model Validator
+
+| Model ID | Use |
+|----------|-----|
+| `google/gemini-2.5-flash` | Quick validation |
+| `openai/gpt-4o-mini` | Reasoning checks |
+| `anthropic/claude-haiku-4-5` | Technical accuracy |
+
+### Validation
+
+Run `python scripts/test-providers.py` to verify all configured providers and models are reachable. The `ProviderRouter.validate_models()` method can also be called programmatically to check model health at runtime.
 
 </details>
 
