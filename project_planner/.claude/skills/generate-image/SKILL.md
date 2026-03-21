@@ -1,6 +1,7 @@
 ---
 name: generate-image
 description: Generate or edit images using AI models (FLUX, Gemini). Use for general-purpose image generation including photos, illustrations, artwork, visual assets, concept art, and any image that isn't a technical diagram or schematic. For flowcharts, architecture diagrams, and technical diagrams, use the project-diagrams skill instead.
+allowed-tools: [Read, Write, Bash]
 ---
 
 # Generate Image

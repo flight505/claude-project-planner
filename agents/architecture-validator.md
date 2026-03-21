@@ -80,7 +80,7 @@ python "${CLAUDE_PLUGIN_ROOT}/scripts/multi-model-validator.py" \
   --architecture-file "<project_folder>/02_architecture/architecture_document.md" \
   --building-blocks "<project_folder>/02_architecture/building_blocks.md" \
   --output "<project_folder>/02_architecture/validation_report.md" \
-  --models "gemini-2.0-flash,gpt-4o-mini,claude-3-5-haiku"
+  --models "gemini-2.5-flash,gpt-4o-mini,claude-haiku-4-5"
 ```
 
 ### Step 4: Generate Consensus Report
@@ -92,7 +92,7 @@ Create a validation report with:
 
 **Project:** [Name]
 **Validated:** [Timestamp]
-**Models Used:** Gemini 2.0 Flash, GPT-4o-mini, Claude 3.5 Haiku
+**Models Used:** Gemini 2.5 Flash, GPT-4o-mini, Claude Haiku 4.5
 
 ## Summary
 
@@ -147,9 +147,9 @@ Models queried via OpenRouter (requires OPENROUTER_API_KEY):
 
 | Model | Strength | Use For |
 |-------|----------|---------|
-| `google/gemini-2.0-flash-001` | Fast, broad knowledge | Quick validation |
+| `google/gemini-2.5-flash` | Fast, broad knowledge | Quick validation |
 | `openai/gpt-4o-mini` | Strong reasoning | Complex tradeoffs |
-| `anthropic/claude-3-5-haiku` | Code understanding | Technical accuracy |
+| `anthropic/claude-haiku-4-5` | Code understanding | Technical accuracy |
 
 ## Confidence Scoring
 

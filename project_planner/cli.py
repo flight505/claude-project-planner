@@ -98,7 +98,7 @@ PROJECT OUTPUT STRUCTURE:
     # Restricting to essential tools reduces cache size by 30-40% → faster responses
     options = ClaudeAgentOptions(
         system_prompt=system_instructions,
-        model="claude-sonnet-4-5",
+        model="claude-sonnet-4-6",
         allowed_tools=[
             # Core file operations
             "Read", "Write", "Edit", "Bash", "Glob", "Grep",

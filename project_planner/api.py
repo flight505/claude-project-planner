@@ -28,7 +28,7 @@ from .utils import scan_project_directory
 # Model mapping for effort levels
 EFFORT_LEVEL_MODELS = {
     "low": "claude-haiku-4-5",
-    "medium": "claude-sonnet-4-5",
+    "medium": "claude-sonnet-4-6",
     "high": "claude-opus-4-6",
 }
 
@@ -74,8 +74,8 @@ async def generate_project(
         model: Optional explicit Claude model to use. If provided, overrides effort_level.
         effort_level: Effort level that determines the model to use (default: "medium"):
             - "low": Uses Claude Haiku 4.5 (fastest, most economical)
-            - "medium": Uses Claude Sonnet 4.5 (balanced) [default]
-            - "high": Uses Claude Opus 4.5 (most capable)
+            - "medium": Uses Claude Sonnet 4.6 (balanced) [default]
+            - "high": Uses Claude Opus 4.6 (most capable)
         project_type: Type of output to generate (default: "full"):
             - "full": Complete project plan with all components
             - "architecture": Focus on technical architecture only

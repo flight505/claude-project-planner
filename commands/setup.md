@@ -133,7 +133,7 @@ echo "   /project-planner:setup"
 echo ""
 echo "Cost Options:"
 echo "  • Free tier: 20 requests/day"
-echo "  • Google AI Pro: $19.99/month (unlimited Deep Research)"
+echo "  • Google Gemini API: Pay-as-you-go (~$2-5/task for Deep Research)"
 echo ""
 ```
 
@@ -189,7 +189,7 @@ The plugin checks for authentication in this order:
 **Critical:** Deep Research is ONLY available via direct `GEMINI_API_KEY`:
 - ❌ NOT available through OpenRouter
 - ✅ Requires Google AI Studio API key
-- ✅ Works with free tier (20 requests/day) or AI Pro subscription
+- ✅ Works with free tier or pay-as-you-go API
 
 ### Image Generation Defaults
 

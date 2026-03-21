@@ -1228,7 +1228,7 @@ asyncio.run(main())
 
 **Optional:**
 - `OPENROUTER_API_KEY` - Perplexity research, Flux image generation
-- `GEMINI_API_KEY` - Google Gemini Deep Research (requires AI Pro subscription)
+- `GEMINI_API_KEY` - Google Gemini Deep Research (pay-as-you-go API)
 
 **Auto-Detection:**
 - Plugin automatically uses best available provider for each task
@@ -1313,7 +1313,7 @@ asyncio.run(main())
 **1. Research Lookup Fails**
 - **Cause:** Missing `OPENROUTER_API_KEY` or `GEMINI_API_KEY`
 - **Solution:** Run `/project-planner:setup` to configure API keys
-- **Note (v1.3.2):** System automatically falls back to available provider. Deep Research requires `GEMINI_API_KEY` + Google AI Pro subscription ($19.99/mo)
+- **Note (v1.3.2):** System automatically falls back to available provider. Deep Research requires `GEMINI_API_KEY` (pay-as-you-go, ~$2-5/task)
 
 **2. Diagrams Not Generating**
 - **Cause:** mmdc (Mermaid CLI) not installed

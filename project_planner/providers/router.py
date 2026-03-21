@@ -161,7 +161,7 @@ class ProviderRouter:
 
         raise ProviderNotAvailableError(
             "Video generation requires Gemini with Veo 3.1. "
-            "Set GEMINI_API_KEY and ensure you have Google AI Pro subscription."
+            "Set GEMINI_API_KEY."
         )
 
     def _get_image_provider(self) -> BaseAPIProvider:

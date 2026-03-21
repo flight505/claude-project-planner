@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-03-21
+
+### Provider & Model Update — Broken Models Fixed, Dependencies Bumped, Skills 2.0
+
+### Breaking Changes
+
+- **Gemini**: Replaced shutdown `imagen-3.0-generate-001` with `imagen-4.0-generate-001`
+- **Gemini**: Updated deprecated `gemini-2.0-flash` to `gemini-2.5-flash`
+- **OpenRouter**: Replaced removed `perplexity/llama-3.1-sonar-large-128k-online` with `perplexity/sonar-pro`
+- **OpenRouter**: Replaced removed `black-forest-labs/flux-1.1-pro` with `google/gemini-2.5-flash-image`
+- **OpenRouter**: Replaced deprecated `anthropic/claude-3.5-sonnet` with `anthropic/claude-sonnet-4-5`
+- **OpenRouter**: `generate_image()` rewritten to use chat completions API with `modalities: ["image", "text"]` (old `/images/generations` endpoint removed by OpenRouter)
+
+### Updated
+
+- **claude-agent-sdk** bumped from 0.1.19 to 0.1.50
+- **anthropic** SDK bumped from 0.76.0 to 0.86.0
+- Default Claude model for medium effort: `claude-sonnet-4-5` → `claude-sonnet-4-6`
+- OpenRouter `max_tokens` migrated to `max_completion_tokens`
+- Multi-model validator models updated to current versions
+- Architecture validator agent updated with current model references
+- Deep Research no longer requires AI Pro subscription — now pay-as-you-go (~$2-5/task)
+- Video generation pricing updated: $0.40/sec standard, $0.15/sec fast
+
+### Skills 2.0 Compliance
+
+- Fixed `report-generation` name casing violation (was `Report Generation`)
+- Removed non-standard frontmatter fields (`license`, `source`, `version`)
+- Added `allowed-tools` to `generate-image`, `pdf`, `pptx`, `xlsx` skills
+- Added `effort: max` to `research-lookup` and `market-research-reports`
+- Split oversized SKILL.md files (5 files exceeded 500-line limit)
+
+### Fixed
+
+- `.env.example` now includes `GEMINI_API_KEY` documentation
+- All "AI Pro subscription" references replaced with "pay-as-you-go API"
+
+---
+
 ## [1.4.5] - 2026-01-22
 
 ### 🚀 Feature Release - Architecture Optimization & Performance Improvements

@@ -74,88 +74,12 @@ python .claude/skills/project-diagrams/scripts/generate_schematic.py "diagram de
 
 **Risk Score Calculation:**
 ```
-Risk Score = Likelihood × Impact
+Risk Score = Likelihood x Impact
 
 1-4:   Low risk (green)
 5-9:   Medium risk (yellow)
 10-15: High risk (orange)
 16-25: Critical risk (red)
-```
-
-### Risk Heat Map
-
-```
-           Impact
-           1    2    3    4    5
-        ┌────┬────┬────┬────┬────┐
-      5 │ 5  │ 10 │ 15 │ 20 │ 25 │
-L       ├────┼────┼────┼────┼────┤
-i     4 │ 4  │ 8  │ 12 │ 16 │ 20 │
-k       ├────┼────┼────┼────┼────┤
-e     3 │ 3  │ 6  │ 9  │ 12 │ 15 │
-l       ├────┼────┼────┼────┼────┤
-i     2 │ 2  │ 4  │ 6  │ 8  │ 10 │
-h       ├────┼────┼────┼────┼────┤
-o     1 │ 1  │ 2  │ 3  │ 4  │ 5  │
-o       └────┴────┴────┴────┴────┘
-d
-```
-
-## Risk Specification Schema
-
-```yaml
-risk:
-  # Identity
-  id: "RISK-NNN"
-  title: "Short descriptive title"
-
-  # Classification
-  category: "technical | security | resource | external | business | timeline | operational"
-
-  # Description
-  description: |
-    What is the risk? What could go wrong?
-
-  cause: |
-    What could cause this risk to materialize?
-
-  effect: |
-    What would be the impact if this risk materializes?
-
-  # Scoring
-  likelihood: 1-5
-  likelihood_rationale: "Why this likelihood score"
-
-  impact: 1-5
-  impact_rationale: "Why this impact score"
-
-  risk_score: N  # likelihood × impact
-  risk_level: "low | medium | high | critical"
-
-  # Response
-  response_strategy: "avoid | mitigate | transfer | accept"
-
-  mitigation:
-    actions:
-      - "Specific action to reduce likelihood or impact"
-    responsible: "Team or person"
-    deadline: "YYYY-MM-DD"
-    cost: "Estimated cost if applicable"
-
-  contingency:
-    trigger: "What indicates this risk has materialized"
-    actions:
-      - "Action to take if risk occurs"
-    responsible: "Team or person"
-
-  # Tracking
-  status: "identified | mitigating | monitoring | closed | materialized"
-  owner: "Person responsible for tracking"
-
-  # Metadata
-  identified_date: "YYYY-MM-DD"
-  last_reviewed: "YYYY-MM-DD"
-  related_risks: ["RISK-XXX"]
 ```
 
 ### Response Strategies
@@ -167,232 +91,42 @@ risk:
 | **Transfer** | Shift risk to third party | Insurance, outsourcing, SLAs |
 | **Accept** | Acknowledge and monitor | Low-impact risks, cost-effective |
 
-## Common Risks by Category
-
-### Technical Risks
+## Risk Specification Schema
 
 ```yaml
-risks:
-  - id: "RISK-T001"
-    title: "Integration Complexity"
-    category: "technical"
-    description: |
-      Third-party API integrations prove more complex than estimated,
-      requiring additional development time.
-    cause: |
-      - Poor API documentation
-      - Undocumented edge cases
-      - Version incompatibilities
-    effect: |
-      - Sprint delays
-      - Increased development cost
-      - Technical debt
-    likelihood: 3
-    impact: 3
-    risk_score: 9
-    risk_level: "medium"
-    response_strategy: "mitigate"
-    mitigation:
-      actions:
-        - "Prototype integrations in Sprint 1"
-        - "Create abstraction layer for external dependencies"
-        - "Document fallback approaches"
-      responsible: "Tech Lead"
-      deadline: "End of Sprint 1"
-    contingency:
-      trigger: "Integration spike takes >3 days"
-      actions:
-        - "Evaluate alternative providers"
-        - "Adjust timeline and communicate to stakeholders"
-    status: "identified"
-
-  - id: "RISK-T002"
-    title: "Scalability Issues"
-    category: "technical"
-    description: |
-      System architecture cannot handle projected user growth,
-      requiring significant rearchitecture.
-    cause: |
-      - Underestimated traffic growth
-      - Inefficient database queries
-      - Synchronous processing bottlenecks
-    effect: |
-      - Performance degradation
-      - User experience impact
-      - Costly emergency fixes
-    likelihood: 2
-    impact: 4
-    risk_score: 8
-    risk_level: "medium"
-    response_strategy: "mitigate"
-    mitigation:
-      actions:
-        - "Design for 10x expected load"
-        - "Implement caching layer from start"
-        - "Plan load testing in Sprint 3"
-    contingency:
-      trigger: "Response times exceed 2 seconds at 50% projected load"
-      actions:
-        - "Emergency scale-up infrastructure"
-        - "Activate CDN for static assets"
-        - "Implement request queuing"
-    status: "identified"
+risk:
+  id: "RISK-NNN"
+  title: "Short descriptive title"
+  category: "technical | security | resource | external | business | timeline | operational"
+  description: "What is the risk? What could go wrong?"
+  cause: "What could cause this risk to materialize?"
+  effect: "What would be the impact if this risk materializes?"
+  likelihood: 1-5
+  likelihood_rationale: "Why this likelihood score"
+  impact: 1-5
+  impact_rationale: "Why this impact score"
+  risk_score: N  # likelihood x impact
+  risk_level: "low | medium | high | critical"
+  response_strategy: "avoid | mitigate | transfer | accept"
+  mitigation:
+    actions:
+      - "Specific action to reduce likelihood or impact"
+    responsible: "Team or person"
+    deadline: "YYYY-MM-DD"
+    cost: "Estimated cost if applicable"
+  contingency:
+    trigger: "What indicates this risk has materialized"
+    actions:
+      - "Action to take if risk occurs"
+    responsible: "Team or person"
+  status: "identified | mitigating | monitoring | closed | materialized"
+  owner: "Person responsible for tracking"
+  identified_date: "YYYY-MM-DD"
+  last_reviewed: "YYYY-MM-DD"
+  related_risks: ["RISK-XXX"]
 ```
 
-### Security Risks
-
-```yaml
-risks:
-  - id: "RISK-S001"
-    title: "Data Breach"
-    category: "security"
-    description: |
-      Unauthorized access to user data due to security vulnerability.
-    cause: |
-      - Unpatched vulnerabilities
-      - Weak authentication
-      - SQL injection or XSS
-    effect: |
-      - Regulatory fines (GDPR)
-      - Reputation damage
-      - Legal liability
-    likelihood: 2
-    impact: 5
-    risk_score: 10
-    risk_level: "high"
-    response_strategy: "mitigate"
-    mitigation:
-      actions:
-        - "Security audit before launch"
-        - "Implement WAF and rate limiting"
-        - "Enable encryption at rest and in transit"
-        - "Conduct penetration testing"
-      responsible: "Security Team"
-      cost: "$5,000-10,000"
-    contingency:
-      trigger: "Detection of unauthorized access"
-      actions:
-        - "Activate incident response plan"
-        - "Isolate affected systems"
-        - "Notify affected users within 72 hours"
-        - "Engage forensic investigation"
-    status: "identified"
-```
-
-### Resource Risks
-
-```yaml
-risks:
-  - id: "RISK-R001"
-    title: "Key Person Dependency"
-    category: "resource"
-    description: |
-      Critical project knowledge concentrated in one team member,
-      creating single point of failure.
-    cause: |
-      - Complex domain expertise
-      - Specialized technical skills
-      - Insufficient documentation
-    effect: |
-      - Project delays if person unavailable
-      - Knowledge loss if person leaves
-      - Bottleneck in decision making
-    likelihood: 3
-    impact: 4
-    risk_score: 12
-    risk_level: "high"
-    response_strategy: "mitigate"
-    mitigation:
-      actions:
-        - "Document all architectural decisions (ADRs)"
-        - "Pair programming on critical components"
-        - "Cross-train at least 2 team members"
-      responsible: "Engineering Manager"
-    contingency:
-      trigger: "Key person unavailable > 1 week"
-      actions:
-        - "Activate backup assignee"
-        - "Prioritize documentation catch-up"
-        - "Consider contractor for specialized skills"
-    status: "identified"
-```
-
-### External Risks
-
-```yaml
-risks:
-  - id: "RISK-E001"
-    title: "Third-Party API Deprecation"
-    category: "external"
-    description: |
-      Critical third-party API announces deprecation or breaking changes
-      during project timeline.
-    cause: |
-      - Vendor business changes
-      - Technology evolution
-      - Acquisition or shutdown
-    effect: |
-      - Forced migration effort
-      - Timeline delays
-      - Potential feature loss
-    likelihood: 2
-    impact: 3
-    risk_score: 6
-    risk_level: "medium"
-    response_strategy: "mitigate"
-    mitigation:
-      actions:
-        - "Abstract all external dependencies"
-        - "Identify alternative providers"
-        - "Monitor vendor announcements"
-      responsible: "Tech Lead"
-    contingency:
-      trigger: "Deprecation announcement or breaking change"
-      actions:
-        - "Assess migration timeline"
-        - "Evaluate alternative providers"
-        - "Adjust project timeline if needed"
-    status: "identified"
-```
-
-### Timeline Risks
-
-```yaml
-risks:
-  - id: "RISK-TL001"
-    title: "Scope Creep"
-    category: "timeline"
-    description: |
-      Requirements expand beyond original scope, consuming budget
-      and extending timeline.
-    cause: |
-      - Unclear initial requirements
-      - Stakeholder additions
-      - "Just one more feature" syndrome
-    effect: |
-      - Budget overrun
-      - Timeline extension
-      - Team burnout
-    likelihood: 4
-    impact: 3
-    risk_score: 12
-    risk_level: "high"
-    response_strategy: "mitigate"
-    mitigation:
-      actions:
-        - "Document scope in detail before starting"
-        - "Implement change request process"
-        - "Regular scope reviews in sprint planning"
-        - "Prioritize MVP features ruthlessly"
-      responsible: "Product Owner"
-    contingency:
-      trigger: "Scope increases by >20% from baseline"
-      actions:
-        - "Formal change request required"
-        - "Adjust timeline or budget"
-        - "Deprioritize lower-value features"
-    status: "identified"
-```
+For detailed example risk entries across all categories (technical, security, resource, external, timeline), see `references/common_risks.md`.
 
 ## Risk Register Template
 
@@ -400,22 +134,17 @@ risks:
 risk_register:
   project: "[Project Name]"
   last_updated: "YYYY-MM-DD"
-
   summary:
     total_risks: N
     critical: N
     high: N
     medium: N
     low: N
-
   risks:
     - id: "RISK-001"
       title: "..."
       category: "..."
       # ... full specification
-
-    # ... more risks
-
   review_schedule:
     frequency: "Every sprint"
     next_review: "YYYY-MM-DD"
@@ -437,98 +166,41 @@ risk_register:
 [Visual representation of risks by likelihood/impact]
 
 ## Critical and High Risks
-
 ### RISK-001: [Title]
-**Score:** [N] (Critical/High)
-**Category:** [Category]
-
+**Score:** [N] (Critical/High) | **Category:** [Category]
 **Description:** [What could go wrong]
-
-**Mitigation:**
-- [Action 1]
-- [Action 2]
-
-**Contingency:** [If risk materializes]
-
+**Mitigation:** [Actions] | **Contingency:** [If risk materializes]
 **Owner:** [Person responsible]
 
----
-
-[Repeat for each critical/high risk]
-
 ## Medium and Low Risks
-
 | ID | Title | Category | Score | Status |
 |----|-------|----------|-------|--------|
-| RISK-X | Title | Category | N | Status |
 
 ## Risk Monitoring Plan
-
 | Risk ID | Metric to Monitor | Review Frequency | Trigger |
 |---------|-------------------|------------------|---------|
-| | | | |
 
 ## Recommendations
 1. [Key action to reduce overall risk]
-2. [Key action to reduce overall risk]
-3. [Key action to reduce overall risk]
-
-## Appendix: Full Risk Register
-[Complete risk specifications]
 ```
 
 ## Risk Assessment Process
 
 ### Phase 1: Risk Identification
+**Techniques:** Brainstorming, checklist review, assumption analysis, expert interviews, historical review.
 
-**Techniques:**
-1. **Brainstorming** - Team session to identify risks
-2. **Checklist Review** - Use category checklists
-3. **Assumption Analysis** - Challenge assumptions
-4. **Expert Interviews** - Consult domain experts
-5. **Historical Review** - Learn from past projects
-
-**Questions to Ask:**
-- What could go wrong?
-- What assumptions are we making?
-- What dependencies do we have?
-- What has failed in similar projects?
-- What keeps you up at night?
+**Questions to Ask:** What could go wrong? What assumptions are we making? What dependencies do we have? What has failed in similar projects?
 
 ### Phase 2: Risk Analysis
-
-**For each identified risk:**
-1. Describe the risk clearly
-2. Identify root causes
-3. Assess potential effects
-4. Score likelihood (1-5)
-5. Score impact (1-5)
-6. Calculate risk score
-7. Determine risk level
+For each identified risk: describe clearly, identify root causes, assess effects, score likelihood (1-5), score impact (1-5), calculate risk score, determine risk level.
 
 ### Phase 3: Risk Response Planning
-
-**For high and critical risks:**
-1. Choose response strategy
-2. Define specific mitigation actions
-3. Assign ownership
-4. Set deadlines
-5. Define contingency plans
-6. Identify trigger conditions
+For high and critical risks: choose response strategy, define mitigation actions, assign ownership, set deadlines, define contingency plans, identify triggers.
 
 ### Phase 4: Risk Monitoring
-
-**Ongoing activities:**
-- Review risk register each sprint
-- Update scores based on new information
-- Track mitigation action completion
-- Monitor trigger conditions
-- Add new risks as identified
-- Close risks that are no longer relevant
+Ongoing: review risk register each sprint, update scores, track mitigation completion, monitor triggers, add new risks, close resolved risks.
 
 ## Quality Checklist
-
-Before completing risk assessment:
 
 - [ ] All risk categories considered
 - [ ] Risks clearly described with cause and effect
@@ -542,18 +214,6 @@ Before completing risk assessment:
 
 ## Best Practices
 
-### Do's
-- Involve the whole team in risk identification
-- Be specific about causes and effects
-- Update risk register regularly
-- Track mitigation action completion
-- Learn from risks that materialize
-- Communicate risks transparently
+**Do's:** Involve the whole team, be specific about causes/effects, update regularly, track mitigation completion, learn from materialized risks, communicate transparently.
 
-### Don'ts
-- Don't ignore "unlikely" risks with high impact
-- Don't set and forget the risk register
-- Don't underestimate security risks
-- Don't assume risks are someone else's problem
-- Don't let risk assessment become checkbox exercise
-- Don't panic - plan and respond systematically
+**Don'ts:** Ignore "unlikely" high-impact risks, set and forget, underestimate security risks, assume risks are someone else's problem, let risk assessment become a checkbox exercise.

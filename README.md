@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.4.6-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
@@ -545,13 +545,12 @@ Configuration Summary:
 |----------|----------|--------------|----------|
 | **Anthropic** | Core planning, text generation | `ANTHROPIC_API_KEY` (required) | Everything |
 | **OpenRouter** | Research (Perplexity), Image Gen | `OPENROUTER_API_KEY` | Fast research |
-| **Google Gemini** | Deep Research, Veo 3.1 videos | `GEMINI_API_KEY` + AI Pro ($19.99/mo) | Comprehensive research |
+| **Google Gemini** | Deep Research, Veo 3.1 videos, Imagen 4 | `GEMINI_API_KEY` (pay-as-you-go) | Comprehensive research |
 
 ### Google Gemini Setup (Optional)
 
 **Requirements:**
-1. Google AI Pro subscription ($19.99/month)
-   - Visit: https://one.google.com/intl/en/about/google-ai-plans/
+1. Google Gemini API key (pay-as-you-go, ~$2-5/task for Deep Research)
 2. Get API key: https://ai.google.dev/
 
 **Features:**

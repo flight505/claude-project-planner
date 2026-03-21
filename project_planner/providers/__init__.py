@@ -2,8 +2,8 @@
 AI API provider abstraction layer for claude-project-planner.
 
 This package provides a unified interface for working with multiple AI providers:
-- Google Gemini (Deep Research, Veo 3.1, Imagen 3)
-- OpenRouter (Perplexity, various LLMs, image models)
+- Google Gemini (Deep Research, Veo 3.1, Imagen 4)
+- OpenRouter (Perplexity Sonar Pro, various LLMs, image models)
 
 Usage:
     from project_planner.providers import ProviderRouter

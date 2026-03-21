@@ -3,7 +3,7 @@
 Gemini Deep Research Integration
 
 Provides 60-minute comprehensive research using Google's Deep Research capability.
-Requires GEMINI_API_KEY and Google AI Pro subscription ($19.99/month).
+Requires GEMINI_API_KEY (pay-as-you-go API, ~$2-5/task).
 """
 
 import os
@@ -97,7 +97,7 @@ def get_available_models(client) -> Dict[str, str]:
         # Fast models
         flash_models = [
             "models/gemini-2.5-flash",
-            "models/gemini-2.0-flash-exp",
+            "models/gemini-2.5-flash",
         ]
         for model in flash_models:
             if model in model_names:

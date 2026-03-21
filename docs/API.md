@@ -503,7 +503,7 @@ export ANTHROPIC_API_KEY='your_key'  # Core planning and text generation
 
 ```bash
 export OPENROUTER_API_KEY='your_key'  # Perplexity research, image generation
-export GEMINI_API_KEY='your_key'      # Google Gemini Deep Research (requires AI Pro subscription)
+export GEMINI_API_KEY='your_key'      # Google Gemini Deep Research (pay-as-you-go API)
 ```
 
 ---

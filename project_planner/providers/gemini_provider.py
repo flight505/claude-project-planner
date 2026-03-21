@@ -2,15 +2,15 @@
 Google Gemini API provider implementation.
 
 This module provides integration with Google's Gemini API, including:
-- Deep Research (requires Google AI Pro subscription)
+- Deep Research (pay-as-you-go API)
 - Veo 3.1 video generation
-- Gemini 2.0 Flash Thinking for text generation
+- Gemini 2.5 Flash for text generation
+- Imagen 4 for image generation
 - 1M token context window
 
 Requires:
     - google-genai package
     - GEMINI_API_KEY environment variable
-    - Google AI Pro subscription for Deep Research
 """
 
 import asyncio
@@ -29,9 +29,9 @@ class GeminiProvider(BaseAPIProvider):
     """Google Gemini API provider implementation."""
 
     # Default models
-    DEFAULT_TEXT_MODEL = "gemini-2.0-flash"
+    DEFAULT_TEXT_MODEL = "gemini-2.5-flash"
     DEFAULT_VIDEO_MODEL = "veo-3.1-generate-preview"
-    DEFAULT_IMAGE_MODEL = "imagen-3.0-generate-001"
+    DEFAULT_IMAGE_MODEL = "imagen-4.0-generate-001"
     DEEP_RESEARCH_AGENT = "deep-research-pro-preview-12-2025"
 
     # Timeouts
@@ -85,7 +85,7 @@ class GeminiProvider(BaseAPIProvider):
 
         Args:
             prompt: Input prompt
-            model: Model override (defaults to gemini-2.0-flash-thinking)
+            model: Model override (defaults to gemini-2.5-flash)
             **kwargs: Additional generation parameters
 
         Returns:
@@ -122,9 +122,7 @@ class GeminiProvider(BaseAPIProvider):
         """
         Conduct deep research using Gemini Deep Research agent.
 
-        Requires Google AI Pro subscription ($19.99/month).
-        AI Pro: 5 reports/month
-        AI Ultra: 200 reports/day
+        Pay-as-you-go API (~$2-5/task based on Gemini 3.1 Pro token rates).
 
         Args:
             query: Research question or topic
@@ -209,7 +207,7 @@ class GeminiProvider(BaseAPIProvider):
         """
         Generate video using Veo 3.1.
 
-        Pricing: $0.75/second (e.g., 8 seconds = $6.00)
+        Pricing: $0.40/sec standard, $0.15/sec fast (720p/1080p)
 
         Args:
             prompt: Video description with cinematographic details
@@ -291,7 +289,7 @@ class GeminiProvider(BaseAPIProvider):
         **kwargs
     ) -> bytes:
         """
-        Generate image using Imagen 3.
+        Generate image using Imagen 4.
 
         Args:
             prompt: Image description

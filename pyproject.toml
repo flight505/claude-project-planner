@@ -1,19 +1,19 @@
 [project]
 name = "project-planner"
-version = "1.4.6"
+version = "1.5.0"
 description = "AI-powered project planning tool - generates comprehensive software architecture documents, sprint plans, building blocks, service cost analysis, and implementation roadmaps."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 dependencies = [
-    "claude-agent-sdk>=0.1.0",
+    "claude-agent-sdk>=0.1.50",
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
     "pyyaml>=6.0.0",
     "jinja2>=3.1.0",
     "openai>=1.0.0",           # OpenRouter API client for research
     "markitdown>=0.1.0",       # Document conversion
-    "anthropic>=0.76.0",
+    "anthropic>=0.86.0",
 ]
 
 # System Dependencies (must be installed separately):

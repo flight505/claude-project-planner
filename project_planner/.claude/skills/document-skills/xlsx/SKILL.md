@@ -1,7 +1,7 @@
 ---
 name: xlsx
 description: "Spreadsheet toolkit (.xlsx/.csv). Create/edit with formulas/formatting, analyze data, visualization, recalculate formulas, for spreadsheet processing and analysis."
-license: Proprietary. LICENSE.txt has complete terms
+allowed-tools: [Read, Write, Bash]
 ---
 
 # Requirements for Outputs

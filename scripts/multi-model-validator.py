@@ -10,7 +10,7 @@ Usage:
         --architecture-file <path> \
         --building-blocks <path> \
         --output <path> \
-        --models "gemini-2.0-flash,gpt-4o-mini,claude-3-5-haiku"
+        --models "gemini-2.5-flash,gpt-4o-mini,claude-haiku-4-5"
 """
 
 import argparse
@@ -30,9 +30,9 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # Model mappings for OpenRouter
 MODEL_CONFIGS = {
-    "gemini-2.0-flash": {
-        "id": "google/gemini-2.0-flash-001",
-        "name": "Gemini 2.0 Flash",
+    "gemini-2.5-flash": {
+        "id": "google/gemini-2.5-flash",
+        "name": "Gemini 2.5 Flash",
         "strength": "Fast, broad knowledge",
     },
     "gpt-4o-mini": {
@@ -40,14 +40,14 @@ MODEL_CONFIGS = {
         "name": "GPT-4o Mini",
         "strength": "Strong reasoning",
     },
-    "claude-3-5-haiku": {
-        "id": "anthropic/claude-3-5-haiku-20241022",
-        "name": "Claude 3.5 Haiku",
+    "claude-haiku-4-5": {
+        "id": "anthropic/claude-haiku-4-5",
+        "name": "Claude Haiku 4.5",
         "strength": "Code understanding",
     },
-    "claude-3-5-sonnet": {
-        "id": "anthropic/claude-3-5-sonnet-20241022",
-        "name": "Claude 3.5 Sonnet",
+    "claude-sonnet-4-5": {
+        "id": "anthropic/claude-sonnet-4-5",
+        "name": "Claude Sonnet 4.5",
         "strength": "Balanced analysis",
     },
     "deepseek-chat": {
@@ -504,7 +504,7 @@ def main():
     parser.add_argument(
         "--models",
         type=str,
-        default="gemini-2.0-flash,gpt-4o-mini,claude-3-5-haiku",
+        default="gemini-2.5-flash,gpt-4o-mini,claude-haiku-4-5",
         help="Comma-separated list of models to use",
     )
     parser.add_argument("--project-name", type=str, help="Project name for the report")

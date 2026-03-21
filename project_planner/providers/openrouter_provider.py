@@ -2,9 +2,9 @@
 OpenRouter API provider implementation.
 
 This module provides integration with OpenRouter, enabling access to:
-- Perplexity for research (via perplexity/llama-3.1-sonar-large-128k-online)
+- Perplexity Sonar Pro for research (via perplexity/sonar-pro)
 - Various LLMs for text generation
-- Image generation models (Flux, DALL-E, etc.)
+- Image generation models (via chat completions with modalities)
 
 OpenRouter acts as a unified API gateway to multiple AI providers.
 """
@@ -23,9 +23,9 @@ class OpenRouterProvider(BaseAPIProvider):
     """OpenRouter API provider implementation."""
 
     # Default models
-    DEFAULT_TEXT_MODEL = "anthropic/claude-3.5-sonnet"
-    DEFAULT_RESEARCH_MODEL = "perplexity/llama-3.1-sonar-large-128k-online"
-    DEFAULT_IMAGE_MODEL = "black-forest-labs/flux-1.1-pro"
+    DEFAULT_TEXT_MODEL = "anthropic/claude-sonnet-4-5"
+    DEFAULT_RESEARCH_MODEL = "perplexity/sonar-pro"
+    DEFAULT_IMAGE_MODEL = "google/gemini-2.5-flash-image"
 
     # OpenRouter API endpoint
     API_BASE = "https://openrouter.ai/api/v1"
@@ -74,10 +74,10 @@ class OpenRouterProvider(BaseAPIProvider):
 
         Args:
             prompt: Input prompt
-            model: Model override (defaults to claude-3.5-sonnet)
+            model: Model override (defaults to claude-sonnet-4-5)
             **kwargs: Additional generation parameters
                 - temperature: float (0.0-2.0)
-                - max_tokens: int
+                - max_completion_tokens: int
                 - system: str - System message
 
         Returns:
@@ -128,7 +128,7 @@ class OpenRouterProvider(BaseAPIProvider):
         Args:
             query: Research question
             **kwargs: Additional parameters
-                - max_tokens: int (default: 4000)
+                - max_completion_tokens: int (default: 4000)
 
         Returns:
             Dictionary containing:
@@ -140,7 +140,7 @@ class OpenRouterProvider(BaseAPIProvider):
             ProviderError: If research fails
         """
         try:
-            max_tokens = kwargs.get("max_tokens", 4000)
+            max_tokens = kwargs.get("max_completion_tokens", kwargs.get("max_tokens", 4000))
 
             messages = [
                 {
@@ -157,7 +157,7 @@ class OpenRouterProvider(BaseAPIProvider):
                 lambda: self.client.chat.completions.create(
                     model=self.research_model,
                     messages=messages,
-                    max_tokens=max_tokens,
+                    max_completion_tokens=max_tokens,
                     extra_headers={
                         "X-Title": self.app_name,
                     }
@@ -203,12 +203,14 @@ class OpenRouterProvider(BaseAPIProvider):
         """
         Generate image using models available on OpenRouter.
 
+        Uses the chat completions API with modalities parameter, as
+        OpenRouter no longer supports a separate /images/generations endpoint.
+
         Args:
             prompt: Image description
             **kwargs: Additional parameters
                 - model: Override image model
-                - size: Image size (e.g., "1024x1024")
-                - quality: "standard" or "hd"
+                - aspect_ratio: Aspect ratio (e.g., "16:9", "1:1")
 
         Returns:
             Image file as bytes
@@ -217,33 +219,43 @@ class OpenRouterProvider(BaseAPIProvider):
             ProviderError: If generation fails
         """
         try:
+            import base64
+
             model = kwargs.get("model", self.image_model)
-            size = kwargs.get("size", "1024x1024")
-            quality = kwargs.get("quality", "standard")
 
             loop = asyncio.get_event_loop()
             response = await loop.run_in_executor(
                 None,
-                lambda: self.client.images.generate(
+                lambda: self.client.chat.completions.create(
                     model=model,
-                    prompt=prompt,
-                    n=1,
-                    size=size,
-                    quality=quality,
-                    extra_headers={
-                        "X-Title": self.app_name,
-                    }
+                    messages=[{"role": "user", "content": prompt}],
+                    extra_headers={"X-Title": self.app_name},
+                    extra_body={"modalities": ["image", "text"]},
                 )
             )
 
-            # Download image from URL
-            import requests
-            image_url = response.data[0].url
-            image_response = requests.get(image_url, timeout=30)
-            image_response.raise_for_status()
+            # Extract image from response
+            message = response.choices[0].message
 
-            return image_response.content
+            # Handle images in content array
+            if hasattr(message, "content") and isinstance(message.content, list):
+                for part in message.content:
+                    if hasattr(part, "type") and part.type == "image_url":
+                        url = part.image_url.url
+                        if url.startswith("data:"):
+                            # Base64 data URL
+                            b64_data = url.split(",", 1)[1]
+                            return base64.b64decode(b64_data)
 
+            # Handle images field (some models)
+            if hasattr(message, "images") and message.images:
+                b64_data = message.images[0]
+                return base64.b64decode(b64_data)
+
+            raise ProviderError("No image found in response")
+
+        except ProviderError:
+            raise
         except Exception as e:
             raise ProviderError(f"Image generation failed: {e}") from e
 

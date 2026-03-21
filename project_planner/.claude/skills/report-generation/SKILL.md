@@ -1,7 +1,6 @@
 ---
-name: Report Generation
+name: report-generation
 description: This skill should be used when the user asks to "generate a report", "compile report", "create final report", "export to PDF", "make a PDF report", "combine all documents", "create deliverable", or wants to compile planning outputs into a professional document. Handles IEEE citations, table of contents, cover pages, and multi-format export (PDF/DOCX/Markdown).
-version: 1.0.0
 ---
 
 # Report Generation
