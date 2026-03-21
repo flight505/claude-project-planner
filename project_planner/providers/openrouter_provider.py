@@ -10,6 +10,7 @@ OpenRouter acts as a unified API gateway to multiple AI providers.
 """
 
 import asyncio
+import base64
 from typing import Any, Dict, Optional
 
 from .base import (
@@ -219,8 +220,6 @@ class OpenRouterProvider(BaseAPIProvider):
             ProviderError: If generation fails
         """
         try:
-            import base64
-
             model = kwargs.get("model", self.image_model)
 
             loop = asyncio.get_event_loop()
