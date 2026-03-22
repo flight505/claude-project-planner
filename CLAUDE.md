@@ -65,6 +65,7 @@ See `.claude/PLANNER.md` for comprehensive system instructions.
 | **Marketing Campaign** | `marketing-campaign` | Social media strategy, content calendars, influencer outreach |
 | **Market Research** | `market-research-reports` | Comprehensive market analysis |
 | **Report Generation** | `report-generation` | Compile outputs to PDF/DOCX with IEEE citations, TOC, cover page |
+| **AI Startup Advisor** | `ai-startup-advisor` | Defensibility scoring, foundation model squeeze analysis, moat evaluation |
 
 ## Output Structure
 

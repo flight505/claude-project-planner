@@ -49,6 +49,7 @@
     "./project_planner/.claude/skills/document-skills/pptx",
     "./project_planner/.claude/skills/document-skills/xlsx",
     "./project_planner/.claude/skills/marketing-campaign",
-    "./project_planner/.claude/skills/report-generation"
+    "./project_planner/.claude/skills/report-generation",
+    "./project_planner/.claude/skills/ai-startup-advisor"
   ]
 }

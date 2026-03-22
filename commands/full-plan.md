@@ -223,6 +223,10 @@ AskUserQuestion({
                 {
                     "label": "Building blocks for Claude Code",
                     "description": "Component specs in buildable YAML format"
+                },
+                {
+                    "label": "AI defensibility evaluation",
+                    "description": "Score idea against foundation model squeeze (moat, data flywheel, pricing)"
                 }
             ]
         },
@@ -323,9 +327,18 @@ Execute phases based on configuration:
 - If parallelization enabled: run research-lookup + competitive-analysis concurrently
 - Output: `01_market_research/`
 
+**Phase 1.5: AI Defensibility Evaluation** (If enabled in Quality config)
+- Skill: `ai-startup-advisor`
+- Run AFTER Phase 1 market research completes (needs competitive data)
+- Score idea against 7-dimension Defensibility Scorecard (max 21)
+- Flag red flags: wrapper patterns, single-model dependency, no data strategy
+- Output: `01_market_research/defensibility_evaluation.md`
+- If score < 8: warn user and ask whether to continue or pivot
+- Uses findings from competitive-analysis to inform scoring
+
 **Phase 2: Architecture** (Required)
 - Skills: `architecture-research`, `building-blocks`, `project-diagrams`
-- Uses findings from Phase 1
+- Uses findings from Phase 1 (and defensibility evaluation if enabled)
 - If validation enabled: invoke `architecture-validator` agent
 - Output: `02_architecture/`
 
