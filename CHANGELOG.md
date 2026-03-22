@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.1] - 2026-03-22
+
+### Added
+
+- **ai-startup-advisor** skill: 7-dimension Defensibility Scorecard (max 21) evaluating product ideas against the foundation model squeeze — data flywheels, workflow integration, regulatory barriers, domain expertise, counter-positioning, production complexity, vendor neutrality
+- Integrated into `/full-plan` as Phase 1.5 quality check (opt-in via configuration)
+- Includes `references/strategic-research.md` with case studies and academic frameworks
+
+---
+
 ## [1.5.0] - 2026-03-21
 
 ### Provider & Model Update — Broken Models Fixed, Dependencies Bumped, Skills 2.0

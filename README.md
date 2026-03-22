@@ -1,7 +1,7 @@
 # Claude Project Planner
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/flight505/claude-project-planner)
+[![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)](https://github.com/flight505/claude-project-planner)
 
 <p align="center">
   <img src="assets/hero.png" alt="Claude Project Planner - AI-powered project planning command center" width="100%">
@@ -790,6 +790,7 @@ sprints:
 **Quality & Review:**
 - `feasibility-analysis` - Technical/market feasibility
 - `plan-review` - Plan validation
+- `ai-startup-advisor` - Defensibility scoring against foundation model squeeze
 
 **Go-to-Market:**
 - `marketing-campaign` - Social media strategy, content calendars
